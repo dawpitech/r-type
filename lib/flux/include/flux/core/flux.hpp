@@ -62,6 +62,24 @@ namespace flux
             std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
 
         public:
+            // ReSharper disable CppClassCanBeFinal
+            class FluxException : std::runtime_error
+            {
+                public:
+                    explicit FluxException(const std::string& err) : std::runtime_error(err) {}
+            };
+            class InvalidComponentQuery : FluxException
+            {
+                public:
+                    explicit InvalidComponentQuery() : FluxException("Component not yet registered cannot be used as query") {}
+            };
+            class NoComponentFoundPanic : FluxException
+            {
+                public:
+                    explicit NoComponentFoundPanic() : FluxException("Component is not present is the given entity") {}
+            };
+            // ReSharper restore CppClassCanBeFinal
+
             Entity newEntity()
             {
                 const Entity id = nextEntityID++;
@@ -73,24 +91,21 @@ namespace flux
             {
                 auto& storePtr = this->componentsStore[typeid(Component)];
                 if (storePtr == nullptr)
-                {
                     storePtr = std::make_unique<ComponentVector<Component>>();
-                }
                 auto* store = static_cast<ComponentVector<Component>*>(storePtr.get());
                 store->Add(entity, Component{std::forward<Args>(args)...});
             }
 
-            template<typename Component>
+            template <typename Component>
             void Add(Entity entity) {
                 auto& storePtr = this->componentsStore[typeid(Component)];
-                if (!storePtr) {
+                if (!storePtr)
                     storePtr = std::make_unique<ComponentVector<Component>>();
-                }
                 auto* store = static_cast<ComponentVector<Component>*>(storePtr.get());
                 store->Add(entity);
             }
 
-            template<typename Component>
+            template <typename Component>
             bool HasComponent(Entity entity)
             {
                 const auto componentStore = this->componentsStore.find(typeid(Component));
@@ -100,10 +115,27 @@ namespace flux
                 return std::find(store->entityIDS.begin(), store->entityIDS.end(), entity) != store->entityIDS.end();
             }
 
-            template<typename... Components>
+            template <typename... Components>
             bool HasComponents(const Entity entity)
             {
                 return (this->HasComponent<Components>(entity) && ...);
+            }
+
+            template <typename Component>
+            Component& GetComponent(const Entity entity)
+            {
+                const auto componentStore = this->componentsStore.find(typeid(Component));
+                if (componentStore == this->componentsStore.end())
+                    throw InvalidComponentQuery();
+
+                auto* store = static_cast<ComponentVector<Component>*>(componentStore->second.get());
+                auto it = std::find(store->entityIDS.begin(), store->entityIDS.end(), entity);
+
+                if (it == store->entityIDS.end())
+                    throw NoComponentFoundPanic();
+
+                size_t idx = std::distance(store->entityIDS.begin(), it);
+                return store->data[idx];
             }
     };
 }

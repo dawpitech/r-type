@@ -25,8 +25,15 @@ int main() {
     flux::ECS ecs;
 
     const flux::Entity e1 = ecs.newEntity();
-    std::cout << e1 << std::endl;
+
     std::cout << ecs.HasComponent<Transform>(e1) << std::endl;
     ecs.Add<Transform>(e1, Transform{ 10, 10 });
     std::cout << ecs.HasComponent<Transform>(e1) << std::endl;
+
+    std::cout << ecs.GetComponent<Transform>(e1).x << "/" << ecs.GetComponent<Transform>(e1).y << std::endl;
+
+    auto& [x, y] = ecs.GetComponent<Transform>(e1);
+    x += 10;
+
+    std::cout << ecs.GetComponent<Transform>(e1).x << "/" << ecs.GetComponent<Transform>(e1).y << std::endl;
 }
