@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(r-type_SDL2 LANGUAGES CXX)
 
+find_package(PkgConfig)
+pkg_check_modules(SDL2 sdl2)
+pkg_check_modules(SDL2_IMAGE SDL2_image)
+pkg_check_modules(SDL2_TTF SDL2_ttf)
+
+if (NOT SDL2_FOUND OR NOT SDL2_IMAGE_FOUND OR NOT SDL2_TTF_FOUND)
 include(FetchContent)
 
 FetchContent_Declare(
@@ -9,6 +15,7 @@ FetchContent_Declare(
     GIT_TAG release-3.2.22
 )
 FetchContent_MakeAvailable(SDL2)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
