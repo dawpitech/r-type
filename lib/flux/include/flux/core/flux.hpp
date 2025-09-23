@@ -9,12 +9,10 @@
 
 #include <algorithm>
 #include <bitset>
-#include <cstdint>
 #include <memory>
-#include <stdexcept>
+#include <queue>
 #include <typeindex>
 #include <unordered_map>
-#include <vector>
 
 namespace flux
 {

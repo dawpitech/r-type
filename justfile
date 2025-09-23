@@ -1,9 +1,11 @@
 outdir := env("BUILD_OUT", "build")
 
-release: (_build "Release" "NONE")
+release: (_build "Release")
 
-_build type sanitizer:
-    cmake -S . -B {{ outdir }} -DCMAKE_BUILD_TYPE={{ type }} -DSANITIZER={{ sanitizer }}
+debug: (_build "Debug")
+
+_build type:
+    cmake -S . -B {{ outdir }} -DCMAKE_BUILD_TYPE={{ type }}
     cmake --build {{ outdir }}  -j {{ num_cpus() }}
 
 clean:
@@ -11,4 +13,3 @@ clean:
     rm -f r-type
 
 re: clean release
-

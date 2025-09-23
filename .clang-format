@@ -1,84 +1,55 @@
-# Google C/C++ Code Style settings
-# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
-# Author: Kehan Xue, kehan.xue (at) gmail.com
-
+---
 Language: Cpp
-AccessModifierOffset: -1
-AlignAfterOpenBracket: DontAlign
-AlignConsecutiveAssignments: None
-AlignOperands: Align
-AllowAllArgumentsOnNextLine: true
-AllowAllConstructorInitializersOnNextLine: true
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Empty
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Inline
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLambdasOnASingleLine: Inline
-AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterReturnType: None
+BasedOnStyle: LLVM
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: false
+AlignTrailingComments: false
 AlwaysBreakTemplateDeclarations: Yes
-BinPackArguments: true
-BreakBeforeBraces: Custom
-BraceWrapping:
-  AfterCaseLabel: false
-  AfterClass: false
-  AfterStruct: false
-  AfterControlStatement: Never
-  AfterEnum: false
+BraceWrapping: 
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
   AfterFunction: true
-  AfterNamespace: false
-  AfterUnion: false
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
   AfterExternBlock: false
-  BeforeCatch: false
-  BeforeElse: false
-  BeforeLambdaBody: false
-  IndentBraces: false
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: true
+  BeforeWhile: true
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
-BreakBeforeBinaryOperators: None
-BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeColon
-BreakInheritanceList: BeforeColon
-ColumnLimit: 79
-CompactNamespaces: false
-ContinuationIndentWidth: 4
-Cpp11BracedListStyle: true
-DerivePointerAlignment: false
-EmptyLineBeforeAccessModifier: LogicalBlock
-FixNamespaceComments: true
-IncludeBlocks: Preserve
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: AfterColon
+BreakConstructorInitializersBeforeComma: false
+ColumnLimit: 120
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+IncludeCategories: 
+  - Regex: '^<.*'
+    Priority: 1
+  - Regex: '^".*'
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+IncludeIsMainRegex: '([-_](test|unittest))?$'
+IndentAccessModifiers: True
+IndentCaseBlocks: true
 IndentCaseLabels: true
-IndentPPDirectives: AfterHash
-# IndentExternBlock: AfterExternBlock
-PPIndentWidth: 4
 IndentWidth: 4
-KeepEmptyLinesAtTheStartOfBlocks: true
+InsertNewlineAtEOF: true
+MacroBlockBegin: ''
+MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
-ObjCSpaceAfterProperty: false
-ObjCSpaceBeforeProtocolList: true
-PointerAlignment: Right
-ReflowComments: false
-SeparateDefinitionBlocks: Always
-SpaceAfterCStyleCast: false
-SpaceAfterLogicalNot: false
-SpaceAfterTemplateKeyword: true
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeCpp11BracedList: false
-SpaceBeforeCtorInitializerColon: true
-SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: ControlStatements
-SpaceBeforeRangeBasedForLoopColon: true
-SpaceBeforeSquareBrackets: false
+PointerAlignment: Left
 SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 2
 SpacesInAngles: false
+SpacesInConditionalStatement: false
 SpacesInCStyleCastParentheses: false
-SpacesInContainerLiterals: false
 SpacesInParentheses: false
-SpacesInSquareBrackets: false
-Standard: c++11
 TabWidth: 4
-UseTab: Never
+...

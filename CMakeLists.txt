@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.10)
 
+project(R-Type
+        VERSION 1.0.0
+        DESCRIPTION "Touhou but with aliens"
+        LANGUAGES CXX
+)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_GENERATOR
         "Unix Makefiles"
         CACHE STRING "generator"
 )
 
-project(R-Type
-        VERSION 1.0.0
-        DESCRIPTION "Touhou but with aliens"
-        LANGUAGES CXX
-)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g3 -O0")
@@ -19,11 +23,5 @@ endif()
 
 add_subdirectory(lib/flux)
 
-file(GLOB_RECURSE src "src/*.cpp")
-add_executable(r-type ${src})
-
-target_link_libraries(r-type PRIVATE flux)
-target_include_directories(r-type PRIVATE components)
-set_target_properties(flux
-        PROPERTIES PREFIX "${CMAKE_SOURCE_DIR}/"
-)
+add_subdirectory(client)
+add_subdirectory(server)
