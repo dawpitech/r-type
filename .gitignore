@@ -1,1 +1,17 @@
+*.o
+*.gcno
+*.gcda
+*.log
+*.json
+.cache
+*.out
+vgcore*
+*.json
+test
+*.so
+.vscode
+unit_tests
+.vscode
 build
+.build
+r-type*
