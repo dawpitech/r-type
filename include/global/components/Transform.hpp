@@ -10,14 +10,17 @@
 #include <cstdint>
 #include "vector2.hpp"
 
-struct Transform
+namespace component
 {
-        utils::Vector2<float> pos;
-        int8_t rotation;
-        utils::Vector2<float> scale;
+    struct Transform
+    {
+            utils::Vector2<float> pos;
+            int8_t rotation;
+            utils::Vector2<float> scale;
 
-        Transform(const float x, const float y, const char rotation,
-                  const float scaleX, const float scaleY) :
-            pos(x, y), rotation(rotation), scale(scaleX, scaleY)
-        {}
-};
+            Transform(const float x, const float y, const char rotation,
+                      const float scaleX, const float scaleY) :
+                pos(x, y), rotation(rotation), scale(scaleX, scaleY)
+            {}
+    };
+} // namespace component

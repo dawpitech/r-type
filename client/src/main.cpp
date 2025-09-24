@@ -6,22 +6,15 @@
 */
 
 #include <iostream>
-#include <ostream>
-#include "flux/core/flux.hpp"
-#include "global/components/Transform.hpp"
-#include "global/components/health.hpp"
-#include "global/systems/healthSystem.hpp"
+#include "client/game.hpp"
 
 int main()
 {
-    flux::ECS ecs;
-
-    const flux::Entity e1 = ecs.newEntity();
-    const flux::Entity e2 = ecs.newEntity();
-
-    ecs.Add<Health>(e1);
-    std::cout << static_cast<int>(ecs.GetComponent<Health>(e1).healthPoint) << std::endl;
-    HealthSystem(ecs, e1);
-    std::cout << static_cast<int>(ecs.GetComponent<Health>(e1).healthPoint) << std::endl;
-    return 0;
+    try {
+        rTypeClient::Game game;
+        game.launchGame();
+    }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+    }
 }
