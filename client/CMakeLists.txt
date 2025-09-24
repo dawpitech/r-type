@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 file(GLOB_RECURSE src "src/*.cpp")
-file(GLOB_RECURSE systems_src "../systems/global/*.cpp")
+file(GLOB_RECURSE systems_src "${CMAKE_SOURCE_DIR}/systems/global/*.cpp")
 add_executable(r-type ${src} ${systems_src})
 
 target_link_libraries(r-type PRIVATE flux)
