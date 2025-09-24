@@ -6,9 +6,9 @@
 //
 
 #include "flux/core/flux.hpp"
-#include "health.hpp"
+#include "global/components/health.hpp"
 
-void HealthSystem(flux::ECS ecs, flux::Entity e1)
+void HealthSystem(flux::ECS &ecs, flux::Entity e1)
 {
     if (!ecs.HasComponent<Health>(e1))
         return;
