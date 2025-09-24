@@ -33,7 +33,7 @@ namespace rTypeClient
     {
         public:
             Game();
-            ~Game() = default;
+            ~Game();
 
             void launchGame();
 

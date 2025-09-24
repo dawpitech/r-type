@@ -17,6 +17,14 @@
 
 rTypeClient::Game::Game() { this->_initSdl(); }
 
+rTypeClient::Game::~Game() {
+    if (this->_sdlRenderer != nullptr)
+        SDL_DestroyRenderer(this->_sdlRenderer);
+    if (this->_window != nullptr)
+        SDL_DestroyWindow(this->_window);
+    SDL_Quit();
+}
+
 void rTypeClient::Game::launchGame()
 {
     flux::ECS ecs;
