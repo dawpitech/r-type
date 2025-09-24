@@ -14,4 +14,6 @@ else
     cmake -B build
     cd build
     make
+    cd ..
+    mv build/compile_commands.json .
 fi
