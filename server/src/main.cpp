@@ -1,11 +1,8 @@
-/*
-** EPITECH PROJECT, 2025
-** r-type
-** File description:
-** main.cpp
-*/
+#include <cstdlib>
+#include "Rooms/RoomsPool.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-    return 0;
+    Room::RoomsPool roomsPool;
+    return EXIT_SUCCESS;
 }
