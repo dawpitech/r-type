@@ -14,5 +14,5 @@ struct Health
 {
     uint8_t healthPoint = 100;
 
-    Health() = default;
+    Health();
 };

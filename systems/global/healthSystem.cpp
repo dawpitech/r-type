@@ -8,11 +8,13 @@
 #include "flux/core/flux.hpp"
 #include "global/components/health.hpp"
 
-void HealthSystem(flux::ECS &ecs, flux::Entity e1)
+void HealthSystem(flux::ECS &ecs, flux::Entity entity)
 {
-    if (!ecs.HasComponent<Health>(e1))
+    if (!ecs.HasComponent<Health>(entity))
         return;
-    auto& [healthPoint] = ecs.GetComponent<Health>(e1);
+    auto& [healthPoint] = ecs.GetComponent<Health>(entity);
+    // This code is temporary and will be updated in the future.
+    // It serves as an example for adapting the code architecture.    
     if (healthPoint >= 10) {
         healthPoint -= 10;
     } else {

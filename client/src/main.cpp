@@ -17,7 +17,7 @@ int main()
 
     const flux::Entity e1 = ecs.newEntity();
 
-    ecs.Add<Health>(e1, Health());
+    ecs.Add<Health>(e1);
     std::cout << static_cast<int>(ecs.GetComponent<Health>(e1).healthPoint) << std::endl;
     HealthSystem(ecs, e1);
     std::cout << static_cast<int>(ecs.GetComponent<Health>(e1).healthPoint) << std::endl;
