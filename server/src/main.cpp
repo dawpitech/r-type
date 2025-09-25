@@ -9,7 +9,6 @@
 #include <boost/program_options/variables_map.hpp>
 #include <cstdint>
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 #include "Rooms/RoomsPool.hpp"
 #include "parseArgs.hpp"
@@ -43,7 +42,10 @@ int main(int argc, char** argv)
                       << std::endl;
         }
 
-        Room::RoomsPool roomsPool;
+        std::uint16_t port = variables["port"].as<uint16_t>();
+        std::uint16_t rooms = variables["rooms"].as<uint16_t>();
+        Room::RoomsPool roomsPool(port, rooms);
+        roomsPool.run();
     }
     catch (const utils::BaseError& e)
     {

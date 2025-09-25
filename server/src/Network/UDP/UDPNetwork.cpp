@@ -6,8 +6,9 @@
 //
 
 #include "UDPNetwork.hpp"
+#include <cstdint>
 
-network::UDPNetwork::UDPNetwork()
+network::UDPNetwork::UDPNetwork(std::uint16_t port): Network(port)
 {
 }
 
