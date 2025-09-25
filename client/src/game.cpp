@@ -5,11 +5,11 @@
 // game
 //
 
-#include "client/game.hpp"
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3/SDL_render.h>
 #include <iostream>
-#include "SDL3/SDL_render.h"
+#include "client/game.hpp"
 #include "flux/core/flux.hpp"
 #include "global/components/Transform.hpp"
 #include "global/components/health.hpp"
