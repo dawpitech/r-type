@@ -14,7 +14,5 @@ namespace component
             bool move_up = false;
             bool move_down = false;
             bool shoot = false;
-
-            float move_speed = 200.0f;
     };
 } // namespace component
