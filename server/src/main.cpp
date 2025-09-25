@@ -1,7 +1,15 @@
+//
+// EPITECH PROJECT, 2025
+// R-type
+// File description:
+// Entrypoint for r-type server
+//
+//
 #include <boost/program_options/errors.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <cstdint>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include "Rooms/RoomsPool.hpp"
 #include "parseArgs.hpp"
@@ -10,13 +18,11 @@ static void checkVariables(po::variables_map& variables)
 {
     if (variables.count("port") != 1)
     {
-        std::cerr << "No port defined" << std::endl;
-        exit(EXIT_FAILURE);
+        throw utils::ParsingError("Arg port undefined", "checkVariables");
     }
     if (variables.count("rooms") != 1)
     {
-        std::cerr << "No rooms defined" << std::endl;
-        exit(EXIT_FAILURE);
+        throw utils::ParsingError("Arg rooms undefined", "checkVariables");
     }
 }
 
@@ -38,6 +44,10 @@ int main(int argc, char** argv)
         }
 
         Room::RoomsPool roomsPool;
+    }
+    catch (const utils::BaseError& e)
+    {
+        std::cerr << "Error in " << e.where() << ": " << e.what() << std::endl;
     }
     catch (const po::error& e)
     {
