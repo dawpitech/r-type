@@ -15,6 +15,9 @@ int main()
         rTypeClient::Game game;
         game.launchGame();
     }
+    catch (const rTypeClient::GameError& e) {
+        std::cerr << e.what() << "in" << e.where() << std::endl;
+    }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }

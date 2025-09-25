@@ -51,15 +51,15 @@ void rTypeClient::Game::launchGame()
 void rTypeClient::Game::_initSdl()
 {
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        throw GameError("Failed to init sdl");
+        throw GameError("Failed to init sdl", "_initSdl");
     }
     this->_window = SDL_CreateWindow(
         this->_windowTitle.c_str(), this->_windowWidth, this->_windowHeight, 0);
     if (this->_window == nullptr) {
-        throw GameError("Failed to create window");
+        throw GameError("Failed to create window", "_initSdl");
     }
     this->_sdlRenderer = SDL_CreateRenderer(this->_window, nullptr);
     if (this->_sdlRenderer == nullptr) {
-        throw GameError("Failed to create Renderer");
+        throw GameError("Failed to create Renderer", "_initSdl");
     }
 }

@@ -11,6 +11,7 @@
 #include <SDL3/SDL_video.h>
 #include <exception>
 #include <string>
+#include <utility>
 #include "SDL3/SDL_render.h"
 
 namespace rTypeClient
@@ -18,15 +19,19 @@ namespace rTypeClient
     class GameError : public std::exception
     {
         public:
-            explicit GameError(const std::string& msg) : _msg(msg) {};
+            explicit GameError(std::string msg, std::string where) :
+                _msg(std::move(msg)), _where(std::move(where)) {};
 
-            const char* what() const noexcept override
+            [[nodiscard]] const char* what() const noexcept override
             {
                 return this->_msg.c_str();
             }
 
+            [[nodiscard]] const char* where() const { return this->_where.c_str(); }
+
         private:
             std::string _msg;
+            std::string _where;
     };
 
     class Game
