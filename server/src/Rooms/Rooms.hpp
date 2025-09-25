@@ -14,12 +14,14 @@ namespace Room {
 
     class Room {
        public:
-        explicit Room(std::uint8_t nbPlayers = BASEROOMPLAYER);
+        explicit Room(std::size_t roomNumber, std::uint8_t nbPlayers = BASEROOMPLAYER);
         ~Room() = default;
 
         void update( std::uint8_t nbFrames);
         void clear(std::uint8_t nbPlayers);
        private:
         std::uint8_t _nbPlayers;
+        std::size_t _roomNumber;
+        
     };
 }  // namespace Room

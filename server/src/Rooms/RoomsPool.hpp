@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <thread>
 #include <vector>
+#include "Network/TCP/TCPNetwork.hpp"
+#include "Network/UDP/UDPNetwork.hpp"
 
 namespace Room {
     constexpr uint8_t BASENBROOMS = 10;
@@ -23,6 +25,8 @@ namespace Room {
 
        private:
         std::uint8_t _nbRooms;
+        network::TCPNetwork connectionNetwork;
+        network::UDPNetwork gameUpdateNetwork;
         std::vector<std::thread> _threads;
     };
 }  // namespace Room
