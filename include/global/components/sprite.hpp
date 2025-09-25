@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
 
@@ -28,5 +29,7 @@ namespace component
 
             int layer = 0;
             bool visible = true;
+
+            explicit sprite(std::string spritePath): spritePath(std::move(spritePath)) {}
     };
 } // namespace component
