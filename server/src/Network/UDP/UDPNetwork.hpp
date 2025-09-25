@@ -14,7 +14,7 @@ namespace network
     class UDPNetwork : public Network
     {
         public:
-            UDPNetwork();
+            explicit UDPNetwork(uint16_t port);
             ~UDPNetwork();
 
         private:

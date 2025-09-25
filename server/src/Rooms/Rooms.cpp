@@ -4,7 +4,9 @@
 // File description:
 // Logic for each rooms
 //
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include "Rooms.hpp"
 #include "flux/core/flux.hpp"
@@ -18,6 +20,9 @@ Room::Room::Room(std::size_t roomNumber, const std::uint8_t nbPlayers) :
 void Room::Room::update(const std::uint8_t nbFrames)
 {
     std::cout << "Hello from room number: " << this->_roomNumber << std::endl;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)

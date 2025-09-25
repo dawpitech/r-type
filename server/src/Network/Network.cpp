@@ -6,6 +6,8 @@
 //
 #include "Network.hpp"
 
-network::Network::Network() {}
+network::Network::Network(const uint16_t port): _port(port)
+{
+}
 
 network::Network::~Network() {}
