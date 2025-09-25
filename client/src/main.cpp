@@ -5,6 +5,7 @@
 ** main.cpp
 */
 
+#include <cstdlib>
 #include <iostream>
 #include "client/game.hpp"
 
@@ -17,4 +18,5 @@ int main()
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }
+    return EXIT_SUCCESS;
 }

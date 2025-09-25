@@ -17,7 +17,8 @@
 
 rTypeClient::Game::Game() { this->_initSdl(); }
 
-rTypeClient::Game::~Game() {
+rTypeClient::Game::~Game()
+{
     if (this->_sdlRenderer != nullptr)
         SDL_DestroyRenderer(this->_sdlRenderer);
     if (this->_window != nullptr)
@@ -34,7 +35,7 @@ void rTypeClient::Game::launchGame()
     const flux::Entity e2 = ecs.newEntity();
 
     ecs.Add<component::Transform>(e2, component::Transform{1, 3, 0, 1.0, 1.0});
-    ecs.Add<component::Health>(e1, component::Health());
+    ecs.Add<component::Health>(e1);
     std::cout << static_cast<int>(
                      ecs.GetComponent<component::Health>(e1).healthPoint)
               << std::endl;
