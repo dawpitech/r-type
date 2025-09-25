@@ -13,7 +13,10 @@ Room::RoomsPool::RoomsPool(std::size_t nbRooms) : _nbRooms(nbRooms)
 {
     for (size_t i = 0; i < nbRooms; i += 1)
     {
-        this->_threads.emplace_back([this] { Room room; });
+        this->_threads.emplace_back([this, i] {
+            Room room(i); 
+            room.update(1);
+        });
     };
     for (auto& thread : this->_threads)
     {
