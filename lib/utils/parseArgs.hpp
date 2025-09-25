@@ -2,11 +2,19 @@
 
 #include <boost/program_options.hpp>
 #include <boost/program_options/variables_map.hpp>
+#include "error.hpp"
 
 namespace po = boost::program_options;
 
 namespace utils
 {
+    class ParsingError final : public BaseError
+    {
+        public:
+            ParsingError(const std::string& msg, const std::string& where) :
+                BaseError(msg, where) {};
+    };
+
     class Parser
     {
         public:

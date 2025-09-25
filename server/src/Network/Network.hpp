@@ -3,8 +3,8 @@
 namespace network {
     class Network {
        public:
-        Network();
-        ~Network();
+        Network() = default;
+        ~Network() = default;
        private:
     };
 }  // namespace network

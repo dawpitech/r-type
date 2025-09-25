@@ -1,3 +1,9 @@
+//
+// EPITECH PROJECT, 2025
+// R-type
+// File description:
+// Class to handle rooms threadpool
+//
 #pragma once
 
 #include <cstddef>
@@ -10,7 +16,7 @@ namespace Room {
 
     class RoomsPool {
        public:
-        RoomsPool(std::size_t nbRooms = BASENBROOMS);
+        explicit RoomsPool(std::size_t nbRooms = BASENBROOMS);
         ~RoomsPool();
 
         void run();

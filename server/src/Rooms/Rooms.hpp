@@ -1,3 +1,10 @@
+//
+// EPITECH PROJECT, 2025
+// R-Type
+// File description:
+// Class for rooms logic
+//
+
 #pragma once
 
 #include <cstdint>
@@ -7,7 +14,7 @@ namespace Room {
 
     class Room {
        public:
-        Room(std::uint8_t nbPlayers = BASEROOMPLAYER);
+        explicit Room(std::uint8_t nbPlayers = BASEROOMPLAYER);
         ~Room() = default;
 
         void update( std::uint8_t nbFrames);
