@@ -1,10 +1,23 @@
+//
+// EPITECH PROJECT, 2025
+// R-type
+// File description:
+// Class for network connection
+//
+
 #pragma once
 
-namespace network {
-    class Network {
-       public:
-        Network() = default;
-        ~Network() = default;
-       private:
+#include <boost/asio.hpp>
+
+namespace network
+{
+    class Network
+    {
+        public:
+            Network();
+            ~Network();
+
+        protected:
+            boost::asio::io_context io_context;
     };
-}  // namespace network
+} // namespace network
