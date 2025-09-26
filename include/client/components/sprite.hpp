@@ -11,6 +11,7 @@
 #include <utility>
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_surface.h"
 
 namespace component
 {
@@ -18,18 +19,23 @@ namespace component
     {
             std::string spritePath;
             SDL_Texture* texture = nullptr;
+            SDL_Surface* surface = nullptr;
 
-            SDL_Rect srcRect = {0, 0, 0, 0};
-            SDL_Rect destRect = {0, 0, 0, 0};
+            SDL_FRect srcRect = {0.0f, 0.0f, 0.0f, 0.0f};
+            SDL_FRect destRect = {0.0f, 0.0f, 0.0f, 0.0f};
 
             float angle = 0.0f;
             SDL_FPoint center = {0.5f, 0.5f};
 
             SDL_Color tint = {255, 255, 255, 255};
 
+            SDL_Renderer* sdlRenderer;
+
             int layer = 0;
             bool visible = true;
 
-            explicit sprite(std::string spritePath): spritePath(std::move(spritePath)) {}
+            explicit sprite(std::string spritePath, SDL_Renderer* sdlRenderer) :
+                spritePath(std::move(spritePath)), sdlRenderer(sdlRenderer)
+            {}
     };
 } // namespace component

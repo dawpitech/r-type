@@ -10,10 +10,13 @@
 #include <SDL3/SDL_render.h>
 #include <iostream>
 #include "client/game.hpp"
+#include "SDL3/SDL_events.h"
+#include "client/components/sprite.hpp"
 #include "flux/core/flux.hpp"
 #include "global/components/Transform.hpp"
 #include "global/components/health.hpp"
 #include "global/systems/healthSystem.hpp"
+#include "client/systems/renderSystem.hpp"
 
 rTypeClient::Game::Game() { this->_initSdl(); }
 
@@ -36,6 +39,7 @@ void rTypeClient::Game::launchGame()
 
     ecs.Add<component::Transform>(e2, component::Transform{1, 3, 0, 1.0, 1.0});
     ecs.Add<component::Health>(e1);
+    ecs.Add<component::sprite>(e1, component::sprite("../../assets/r-typesheet10.gif", this->_sdlRenderer));
     std::cout << static_cast<int>(
                      ecs.GetComponent<component::Health>(e1).healthPoint)
               << std::endl;
@@ -43,7 +47,18 @@ void rTypeClient::Game::launchGame()
     std::cout << static_cast<int>(
                      ecs.GetComponent<component::Health>(e1).healthPoint)
               << std::endl;
-    while (true) {
+    bool running = true;
+    SDL_Event test_event;
+    while (running) {
+        while (SDL_PollEvent(&test_event)) {
+            switch (test_event.type) {
+                case SDL_EVENT_KEY_DOWN:
+                    running = false;
+                    break;
+        }
+        }
+        SDL_RenderClear(this->_sdlRenderer);
+        RenderSystem(ecs, e1);
         SDL_RenderPresent(this->_sdlRenderer);
     }
 }
