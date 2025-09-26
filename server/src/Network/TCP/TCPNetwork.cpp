@@ -5,11 +5,12 @@
 // Function for the tcp connection
 //
 
-#include "TCPNetwork.hpp"
 #include <functional>
 #include <iostream>
+#include "TCPNetwork.hpp"
 #include "Network/Network.hpp"
 #include "libs/system/include/boost/system/detail/error_code.hpp"
+#include "logger.hpp"
 
 network::TCPNetwork::TCPNetwork(const uint16_t port) :
     Network(port), _acceptor(this->_io_context), _endpoint(tcp::v4(), port)
@@ -46,10 +47,12 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 {
     if (error)
     {
-        std::cerr << "Error: " << error.message() << std::endl;
+        utils::Logger::debug(std::format("Error: {}", error.message()));
         return;
     }
-    std::cout << "New connection accepted from ip: "
-              << this->_sockets.back()->remote_endpoint() << std::endl;
+    auto socketIp = this->_sockets.back()->remote_endpoint().address().to_string();
+    auto socketPort = this->_sockets.back()->remote_endpoint().port();
+    std::string msg = std::format("New connection accepted from: {}:{}", socketIp, socketPort);
+    utils::Logger::debug(msg);
     this->_acceptNewSocket();
 }

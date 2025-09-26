@@ -1,3 +1,9 @@
+//
+// EPITECH PROJECT, 2025
+// R-type
+// File description:
+// Parse args from command line
+//
 #pragma once
 
 #include <boost/program_options.hpp>
