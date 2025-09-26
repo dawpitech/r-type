@@ -10,7 +10,6 @@ namespace component
     struct player
     {
             int score = 0;
-            int nbLive = 3;
             int lvl = 0;
     };
 
