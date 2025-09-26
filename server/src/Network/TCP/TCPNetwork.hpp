@@ -21,11 +21,14 @@ namespace network
             explicit TCPNetwork(uint16_t port);
             ~TCPNetwork();
 
+            void connect();
+
         private:
             tcp::acceptor _acceptor;
             tcp::endpoint _endpoint;
-            std::unique_ptr<tcp::socket> _socket = nullptr;
+            std::vector<std::unique_ptr<tcp::socket>> _sockets;
 
-            static void _acceptHandler(const boost::system::error_code &error);
+            void _acceptHandler(const boost::system::error_code& error);
+            void _acceptNewSocket();
     };
 } // namespace network
