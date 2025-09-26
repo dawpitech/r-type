@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "Rooms/RoomsPool.hpp"
+#include "logger.hpp"
 #include "parseArgs.hpp"
 
 static void checkVariables(po::variables_map& variables)
@@ -23,6 +24,10 @@ static void checkVariables(po::variables_map& variables)
     {
         throw utils::ParsingError("Arg rooms undefined", "checkVariables");
     }
+    if (variables.find("debug") != variables.end())
+    {
+        utils::Logger::setDebug(true);
+    }
 }
 
 int main(int argc, char** argv)
@@ -34,13 +39,11 @@ int main(int argc, char** argv)
         po::variables_map variables = parser.getArgs();
 
         checkVariables(variables);
-        if (variables.find("debug") != variables.end())
-        {
-            std::cout << "Port: " << variables["port"].as<uint16_t>()
-                      << std::endl;
-            std::cout << "Rooms: " << variables["rooms"].as<uint16_t>()
-                      << std::endl;
-        }
+        std::string msg =
+            std::format("Port: {}", variables["port"].as<uint16_t>());
+        utils::Logger::debug(msg);
+        msg = std::format("Rooms: {}", variables["rooms"].as<uint16_t>());
+        utils::Logger::debug(msg);
 
         std::uint16_t port = variables["port"].as<uint16_t>();
         std::uint16_t rooms = variables["rooms"].as<uint16_t>();

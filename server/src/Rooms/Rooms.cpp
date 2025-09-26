@@ -19,7 +19,6 @@ Room::Room::Room(std::size_t roomNumber, const std::uint8_t nbPlayers) :
 
 void Room::Room::update(const std::uint8_t nbFrames)
 {
-    std::cout << "Hello from room number: " << this->_roomNumber << std::endl;
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
