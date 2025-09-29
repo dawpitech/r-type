@@ -135,6 +135,10 @@ namespace flux
                 this->entitiesComponentMask.resize(10 * PAGE_SIZE);
             }
 
+            /**
+             * Generate a new entity
+             * @return A new allocated entity
+             */
             Entity newEntity()
             {
                 const Entity id = nextEntityID++;
@@ -144,6 +148,11 @@ namespace flux
                 return id;
             }
 
+            /**
+             * Add a component to an entity while passing params to component constructor
+             * @tparam Component The component to add
+             * @param entity The entity to add to
+             */
             template <typename Component, typename... Args>
             void Add(Entity entity, Args&&... args)
             {
@@ -164,6 +173,11 @@ namespace flux
                 updateComponentMaskGroup(entity, oldMask, newMask);
             }
 
+            /**
+             * Add a component to an entity using its default constructor
+             * @tparam Component The component to add
+             * @param entity The entity to add to
+             */
             template <typename Component>
             void Add(Entity entity) {
                 auto& storePtr = this->componentsStore[typeid(Component)];
@@ -183,6 +197,11 @@ namespace flux
                 updateComponentMaskGroup(entity, oldMask, newMask);
             }
 
+            /**
+             * Remove a component from an entity
+             * @tparam Component The component type to remove
+             * @param entity The entity to remove from
+             */
             template <typename Component>
             void Remove(Entity entity)
             {
@@ -202,6 +221,12 @@ namespace flux
                 }
             }
 
+            /**
+             * Verify the presence or not of the given component in the entity
+             * @tparam Component Component to check for it's presence
+             * @param entity The entity to check against
+             * @return True if the component is present
+             */
             template <typename Component>
             bool HasComponent(const Entity& entity) const
             {
@@ -212,12 +237,25 @@ namespace flux
                 return this->entitiesComponentMask[entity].test(this->getComponentMaskOffset<Component>());
             }
 
+            /**
+             * Verify the presence or not of the components in the entity
+             * @tparam Components Components to check for their presence
+             * @param entity The entity to check against
+             * @return True if all components are present
+             */
             template <typename... Components>
             bool HasComponents(const Entity& entity) const
             {
                 return (this->HasComponent<Components>(entity) && ...);
             }
 
+            /**
+             * Return the selected component from the given entity
+             * @tparam Component Wanted component
+             * @param entity Entity to query
+             * @return The wanted component
+             * @throws NoComponentFoundPanic if the component is not present in that entity
+             */
             template <typename Component>
             Component& GetComponent(const Entity entity)
             {
@@ -235,14 +273,25 @@ namespace flux
                 return store->data[idx];
             }
 
+            /**
+             * Generate a filtering view from a list of components
+             * @tparam Components Component to filter from
+             * @return Created view matching the components
+             */
             template <typename... Components>
-            View GetComponentMaskFor() const
+            View GenerateViewFromComponents() const
             {
                 ComponentMask mask;
                 (mask.set(this->getComponentMaskOffset<Components>()), ...);
                 return mask;
             }
 
+            /**
+             * Query the ECS to retrieve the list of entities matching the view
+             * @note This variant is Exclusive, return entities are assured to have only the required components
+             * @param mask View to apply
+             * @return List of entities that match the view
+             */
             const std::vector<Entity>& QueryView(const View& mask) const
             {
                 static const std::vector<Entity> empty;
@@ -251,6 +300,12 @@ namespace flux
                 return it->second;
             }
 
+            /**
+             * Query the ECS to retrieve the list of entities matching the view
+             * @warning This variant is Not Exclusive, return entities are assured to have at least the required components but might have more
+             * @param mask View to apply
+             * @return List of entities that match the view
+             */
             std::vector<Entity> QueryViewNotExclusive(const View& mask) const
             {
                 std::vector<Entity> result;
