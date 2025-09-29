@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <bitset>
 #include <memory>
+#include <cstdint>
 #include <queue>
+#include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
 
