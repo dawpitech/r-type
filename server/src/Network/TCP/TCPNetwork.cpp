@@ -5,8 +5,9 @@
 // Function for the tcp connection
 //
 
-#include "TCPNetwork.hpp"
 #include <functional>
+
+#include "TCPNetwork.hpp"
 #include "Network/Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
 #include "libs/system/include/boost/system/detail/error_code.hpp"
