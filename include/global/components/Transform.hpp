@@ -8,7 +8,7 @@
 #pragma once
 
 #include <cstdint>
-#include "vector2.hpp"
+#include "global/vector2.hpp"
 
 namespace component
 {
