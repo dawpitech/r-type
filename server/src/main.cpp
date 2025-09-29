@@ -11,8 +11,8 @@
 #include <cstdlib>
 #include <iostream>
 #include "Rooms/RoomsPool.hpp"
-#include "logger.hpp"
-#include "parseArgs.hpp"
+#include "utils/logger.hpp"
+#include "utils/parseArgs.hpp"
 
 static void checkVariables(po::variables_map& variables)
 {

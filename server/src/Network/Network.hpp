@@ -8,7 +8,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include "error.hpp"
+#include "utils/error.hpp"
 
 namespace network
 {

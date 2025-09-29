@@ -40,7 +40,6 @@ target_link_libraries(r-type_server PRIVATE flux boost_program_options)
 
 target_include_directories(r-type_server PRIVATE
     ${CMAKE_SOURCE_DIR}/include/global
-    ${CMAKE_SOURCE_DIR}/lib/utils/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 )
 
