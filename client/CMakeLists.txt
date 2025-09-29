@@ -22,7 +22,6 @@ add_executable(r-type ${src} ${systems_src})
 
 target_link_libraries(r-type PRIVATE flux SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 target_include_directories(r-type PRIVATE ${CMAKE_SOURCE_DIR}/include/)
-target_include_directories(r-type PRIVATE ${CMAKE_SOURCE_DIR}/lib/utils/)
 
 set_target_properties(flux
         PROPERTIES PREFIX "${CMAKE_SOURCE_DIR}/"
