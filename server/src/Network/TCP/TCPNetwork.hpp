@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Network/Network.hpp"
+#include "Network/TCP/TCPInfo.hpp"
 #include "libs/asio/include/boost/asio/ip/tcp.hpp"
 #include "libs/system/include/boost/system/detail/error_code.hpp"
 
@@ -26,9 +27,12 @@ namespace network
         private:
             tcp::acceptor _acceptor;
             tcp::endpoint _endpoint;
-            std::vector<std::unique_ptr<tcp::socket>> _sockets;
+            ClientTCPReceivedInfo _receivedInfo;
+            std::vector<std::unique_ptr<ClientTCP>> _clients;
 
+            void _setupAcceptNewSocket();
             void _acceptHandler(const boost::system::error_code& error);
-            void _acceptNewSocket();
+
+            void _setupReadSocket(ClientTCP &client);
     };
 } // namespace network
