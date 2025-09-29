@@ -5,9 +5,10 @@
 // Function for the tcp connection
 //
 
-#include <functional>
 #include "TCPNetwork.hpp"
+#include <functional>
 #include "Network/Network.hpp"
+#include "Network/TCP/TCPInfo.hpp"
 #include "libs/system/include/boost/system/detail/error_code.hpp"
 #include "utils/logger.hpp"
 
@@ -19,26 +20,25 @@ network::TCPNetwork::TCPNetwork(const uint16_t port) :
     this->_acceptor.bind(this->_endpoint);
     this->_acceptor.listen();
 
-    this->_acceptNewSocket();
+    this->_setupAcceptNewSocket();
 }
 
 network::TCPNetwork::~TCPNetwork() {}
 
 void network::TCPNetwork::connect()
 {
-    int hasRun = this->_io_context.poll_one();
+    unsigned hasRun = this->_io_context.poll_one();
 }
 
-void network::TCPNetwork::_acceptNewSocket()
+void network::TCPNetwork::_setupAcceptNewSocket()
 {
-    this->_sockets.emplace_back(
-        std::make_unique<tcp::socket>(this->_io_context));
-    if (this->_sockets.back() == nullptr)
+    this->_clients.emplace_back(std::make_unique<ClientTCP>(this->_io_context));
+    if (this->_clients.back() == nullptr)
     {
-        throw NetworkError("Unable to create socket", "TCP accept");
+        throw NetworkError("Unable to create new client", "TCP accept");
     }
-    this->_acceptor.async_accept(
-        *this->_sockets.back(),
+    this->_clients.back()->acceptConnection(
+        this->_acceptor,
         std::bind(&TCPNetwork::_acceptHandler, this, std::placeholders::_1));
 }
 
@@ -46,12 +46,41 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 {
     if (error)
     {
-        utils::Logger::debug(std::format("Error: {}", error.message()));
+        utils::Logger::debug(
+            std::format("Error in TCP accept: {}", error.message()));
         return;
     }
-    auto socketIp = this->_sockets.back()->remote_endpoint().address().to_string();
-    auto socketPort = this->_sockets.back()->remote_endpoint().port();
-    std::string msg = std::format("New connection accepted from: {}:{}", socketIp, socketPort);
+    this->_setupReadSocket(*this->_clients.back());
+
+    auto& tcpSocket = this->_clients.back()->getSocket();
+    auto socketIp = tcpSocket.remote_endpoint().address().to_string();
+    auto socketPort = tcpSocket.remote_endpoint().port();
+    std::string msg = std::format("New connection accepted from: {}:{}",
+                                  socketIp, socketPort);
     utils::Logger::debug(msg);
-    this->_acceptNewSocket();
+    this->_setupAcceptNewSocket();
+}
+
+void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
+{
+    client.async_read(
+        [this, &client](const boost::system::error_code& error,
+                        size_t byteReads)
+        {
+            if (error)
+            {
+                utils::Logger::debug(
+                    std::format("Error in TCP read: {}", error.message()));
+                return;
+            }
+            if (byteReads != sizeof(ClientTCPReceivedInfo))
+            {
+                utils::Logger::debug(std::format(
+                    "Error in TCP read size\nexpected: {}\nbut got: {}",
+                    sizeof(ClientTCPReceivedInfo), byteReads));
+                return;
+            }
+            client.addData(this->_receivedInfo);
+            this->_setupReadSocket(client);
+        });
 }
