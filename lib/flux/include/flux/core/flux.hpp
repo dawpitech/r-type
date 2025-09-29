@@ -22,6 +22,7 @@ namespace flux
 {
     constexpr std::size_t MAX_COMPONENTS = 64;
     constexpr std::size_t PAGE_SIZE = 1000;
+    constexpr std::size_t DEFAULT_INIT_PAGE_MULTIPLIER = 10;
 
     typedef uint32_t Entity;
     typedef std::bitset<MAX_COMPONENTS> ComponentMask;
@@ -132,7 +133,7 @@ namespace flux
 
             explicit ECS()
             {
-                this->entitiesComponentMask.resize(10 * PAGE_SIZE);
+                this->entitiesComponentMask.resize(DEFAULT_INIT_PAGE_MULTIPLIER * PAGE_SIZE);
             }
 
             /**
