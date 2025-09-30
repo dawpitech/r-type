@@ -7,35 +7,30 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
-#include "SDL3/SDL_surface.h"
 
 namespace component
 {
     struct sprite
     {
-            std::string spritePath;
             SDL_Texture* texture = nullptr;
-            SDL_Surface* surface = nullptr;
 
-            SDL_FRect srcRect = {0.0f, 0.0f, 0.0f, 0.0f};
-            SDL_FRect destRect = {0.0f, 0.0f, 0.0f, 0.0f};
+            SDL_Rect srcRect{0, 0, 0, 0};
+            SDL_FRect destRect{55, 55, 55, 34};
 
             float angle = 0.0f;
             SDL_FPoint center = {0.5f, 0.5f};
 
             SDL_Color tint = {255, 255, 255, 255};
 
-            SDL_Renderer* sdlRenderer;
+            SDL_Renderer* sdlRenderer = nullptr;
 
             int layer = 0;
+            bool animation = false;
             bool visible = true;
 
-            explicit sprite(std::string spritePath, SDL_Renderer* sdlRenderer) :
-                spritePath(std::move(spritePath)), sdlRenderer(sdlRenderer)
-            {}
+            sprite(SDL_Texture* texture, bool animation, SDL_Renderer* renderer) :
+                texture(texture), animation(animation), sdlRenderer(renderer) {};
     };
 } // namespace component
