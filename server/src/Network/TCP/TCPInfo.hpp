@@ -16,9 +16,10 @@
 
 using boost::asio::ip::tcp;
 
+constexpr std::uint8_t BUFFERSIZE = 64;
+
 namespace network
 {
-    constexpr std::uint8_t BUFFERSIZE = 64;
 
     struct ClientTCPReceivedInfo
     {
@@ -32,6 +33,7 @@ namespace network
     {
             char userID[BUFFERSIZE];
             uint16_t portUDP;
+            uint16_t score;
     };
 
     class ClientTCP

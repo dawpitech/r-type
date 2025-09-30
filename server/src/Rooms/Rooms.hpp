@@ -8,6 +8,8 @@
 #pragma once
 
 #include <cstdint>
+#include "Network/TCP/TCPInfo.hpp"
+#include "Player/Player.hpp"
 
 namespace Room {
     constexpr uint8_t BASEROOMPLAYER = 3;
@@ -19,8 +21,13 @@ namespace Room {
 
         void update( std::uint8_t nbFrames);
         void clear(std::uint8_t nbPlayers);
+
+        bool addPlayer(network::ClientTCP &clientTCP, const std::string &id);
+        bool removePlayer();
+
        private:
-        std::uint8_t _nbPlayers;
+        std::vector<std::unique_ptr<game::Player>> _players;
+        std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
         
     };
