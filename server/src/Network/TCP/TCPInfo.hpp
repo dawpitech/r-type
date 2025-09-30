@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <cstdint>
 #include <utility>
 #include "Network/Network.hpp"
@@ -19,8 +22,21 @@ constexpr std::uint8_t BUFFERSIZE = 64;
 
 namespace network
 {
+    struct ConnectionInfo final
+    {
+            std::string ip;
+            uint16_t port;
+            std::string uuid;
 
-    struct ClientTCPReceivedInfo final : public ReceivedData
+            ConnectionInfo(std::string ip, uint16_t port) : ip(std::move(ip)), port(port)
+            {
+                static boost::uuids::random_generator gen;
+                auto boostUuid = gen();
+                this->uuid = boost::uuids::to_string(boostUuid);
+            };
+    };
+
+    struct ClientTCPReceivedInfo final
     {
             bool ready;
             uint16_t portUDP;
@@ -28,14 +44,14 @@ namespace network
             ClientTCPReceivedInfo() : ready(false), portUDP(0) {};
     };
 
-    struct ClientTCPSentInfo
+    struct ClientTCPSentInfo final
     {
             char userID[BUFFERSIZE];
             uint16_t portUDP;
             uint16_t score;
     };
 
-    class ClientTCP
+    class ClientTCP final
     {
         public:
             explicit ClientTCP(boost::asio::io_context& io_context) : _socket(io_context) {};
@@ -61,7 +77,7 @@ namespace network
 
                         if (bytesRead == sizeof(ClientTCPReceivedInfo))
                             this->addData(network, this->_data);
-                        
+
                         handler(error, bytesRead);
                         this->async_read(network, handler);
                     });
@@ -69,10 +85,7 @@ namespace network
 
             [[nodiscard]] tcp::socket& getSocket() { return this->_socket; };
 
-            void addData(Network& network, const ClientTCPReceivedInfo& data)
-            {
-                network.notify(data);
-            }
+            void addData(Network& network, const ClientTCPReceivedInfo& data) { network.notify(data); }
 
         private:
             tcp::socket _socket;

@@ -6,20 +6,45 @@
 //
 
 #include "Network.hpp"
-#include "utils/observer.hpp"
+#include <iostream>
+#include <type_traits>
+#include "Network/TCP/TCPInfo.hpp"
 
 network::Network::Network(const uint16_t port) : _port(port) {}
 
 network::Network::~Network() {}
 
-void network::Network::attach(utils::IObserver<network::ReceivedData>& observer)
+template <typename T>
+void network::Network::attach(std::function<void(const T&)> callback)
 {
-    this->_observers.push_back(observer);
-}
-
-void network::Network::notify(const ReceivedData& data)
-{
-    for (auto& observer : this->_observers) {
-        observer.get().update(data);
+    if constexpr(std::is_same_v<T, ClientTCPReceivedInfo>) {
+        this->_tcpReceivedCallback = callback;
+        return;
+    }
+    if constexpr(std::is_same_v<T, ConnectionInfo>) {
+        this->_connectionCallback = callback;
+        return;
     }
 }
+
+void network::Network::notify(const NetworkData& data)
+{
+    std::visit(
+        [this](auto&& arg)
+        {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, ClientTCPReceivedInfo>) {
+                // this->_tcpReceivedCallback(arg);
+                return;
+            }
+            if constexpr (std::is_same_v<T, ConnectionInfo>) {
+                this->_connectionCallback(arg);
+                return;
+            }
+        },
+        data);
+}
+
+template void network::Network::attach<network::ClientTCPReceivedInfo>(
+    std::function<void(const network::ClientTCPReceivedInfo&)>);
+template void network::Network::attach<network::ConnectionInfo>(std::function<void(const network::ConnectionInfo&)>);

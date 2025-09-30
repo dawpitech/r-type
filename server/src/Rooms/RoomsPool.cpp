@@ -6,7 +6,9 @@
 //
 
 #include "RoomsPool.hpp"
+#include <concepts>
 #include <iostream>
+#include <variant>
 #include "Network/Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
 #include "Network/TCP/TCPNetwork.hpp"
@@ -17,9 +19,9 @@
 Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port)
 {
-    this->_connectionNetwork.attach(*this);
-    for (uint16_t i = 0; i < nbRooms; i += 1)
-    {
+    this->_connectionNetwork.attach<network::ConnectionInfo>([this](const network::ConnectionInfo& info)
+                                                             { this->_playerManager.createNewPlayer(info); });
+    for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_threads.emplace_back(
             [this, i]
             {
@@ -27,12 +29,10 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
                 room.update(1);
             });
     };
-    while (true)
-    {
+    while (true) {
         this->_connectionNetwork.connect();
     }
-    for (auto& thread : this->_threads)
-    {
+    for (auto& thread : this->_threads) {
         thread.join();
     }
 }
@@ -41,22 +41,6 @@ Room::RoomsPool::~RoomsPool() {}
 
 void Room::RoomsPool::run()
 {
-    while (this->_isRunning)
-    {
+    while (this->_isRunning) {
     }
-}
-
-void Room::RoomsPool::update(const network::ReceivedData &data)
-{
-    const auto *TCPData = dynamic_cast<const network::ClientTCPReceivedInfo *>(&data);
-    if (TCPData != nullptr) {
-        //handle TCP DATA
-        return;
-    }
-
-    // const auto *UDPData = dynamic_cast<const network::ClientUDPReceivedInfo *>(&data);
-    // if (UDPData != nullptr) {
-    //     //handle UDP data
-    //     return;
-    // }
 }

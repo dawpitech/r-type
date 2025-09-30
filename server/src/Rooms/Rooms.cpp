@@ -34,14 +34,14 @@ void Room::Room::clear(const std::uint8_t nbPlayers)
     this->_nbPlayerMax = nbPlayers;
 }
 
-bool Room::Room::addPlayer(network::ClientTCP& clientTCP, const std::string& id)
+bool Room::Room::addPlayer(game::Player &player)
 {
     if (this->_players.size() == this->_nbPlayerMax) {
-        auto log = std::format("Too many player ! Can't add user {} in room {}", id, this->_roomNumber);
+        auto log = std::format("Too many player ! Can't add user in room {}", this->_roomNumber);
         utils::Logger::debug(log);
         return false;
     }
 
-    this->_players.emplace_back(std::make_unique<game::Player>(clientTCP, id));
+    this->_players.emplace_back(player);
     return true;
 }

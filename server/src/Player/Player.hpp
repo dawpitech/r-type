@@ -9,18 +9,21 @@
 
 #include <string>
 #include "Network/TCP/TCPInfo.hpp"
+#include "libs/uuid/include/boost/uuid/uuid.hpp"
 
 namespace game
 {
+
     class Player
     {
         public:
-            explicit Player(network::ClientTCP& client, std::string id) : _id(std::move(id)), _tcpClient(client) {};
+            explicit Player(const network::ConnectionInfo& info) : _id(info.uuid) {};
             ~Player() = default;
+
+            [[nodiscard]] const std::string& getId() { return this->_id; };
 
         private:
             std::string _id;
             uint16_t _score = 0;
-            network::ClientTCP& _tcpClient;
     };
 } // namespace game

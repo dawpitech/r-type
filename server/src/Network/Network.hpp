@@ -9,15 +9,19 @@
 
 #include <boost/asio.hpp>
 #include <functional>
+#include <utility>
+#include <variant>
 #include "utils/error.hpp"
-#include "utils/observer.hpp"
 
 namespace network
 {
-    struct ReceivedData
-    {
-            virtual ~ReceivedData() = default;
-    };
+    class ClientTCPReceivedInfo;
+    class ConnectionInfo;
+
+    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo>;
+
+    template <typename T>
+    concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
 
     class NetworkError final : public utils::BaseError
     {
@@ -25,18 +29,21 @@ namespace network
             NetworkError(const std::string& what, const std::string& where) : BaseError(what, where) {}
     };
 
-    class Network : public utils::ISubject<ReceivedData>
+    class Network
     {
         public:
             explicit Network(uint16_t port);
-            ~Network() override;
+            ~Network();
 
-            void attach(utils::IObserver<ReceivedData>& observer) override;
-            void notify(const ReceivedData& data) override;
+            template <typename T>
+            void attach(std::function<void(const T&)> callback);
+            void notify(const NetworkData& data);
 
         protected:
-            std::vector<std::reference_wrapper<utils::IObserver<ReceivedData>>> _observers;
             uint16_t _port;
             boost::asio::io_context _io_context;
+
+            std::function<void(const ClientTCPReceivedInfo&)> _tcpReceivedCallback;
+            std::function<void(const ConnectionInfo&)> _connectionCallback;
     };
 } // namespace network
