@@ -6,7 +6,6 @@
 //
 
 #include "Network.hpp"
-#include <iostream>
 #include <type_traits>
 #include "Network/TCP/TCPInfo.hpp"
 
@@ -14,7 +13,7 @@ network::Network::Network(const uint16_t port) : _port(port) {}
 
 network::Network::~Network() {}
 
-template <typename T>
+template <typename T> requires network::NetworkDataType<T>
 void network::Network::attach(std::function<void(const T&)> callback)
 {
     if constexpr(std::is_same_v<T, ClientTCPReceivedInfo>) {

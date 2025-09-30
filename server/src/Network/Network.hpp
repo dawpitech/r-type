@@ -15,10 +15,11 @@
 
 namespace network
 {
-    class ClientTCPReceivedInfo;
-    class ConnectionInfo;
+    struct ClientTCPReceivedInfo;
+    struct ConnectionInfo;
 
-    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo>;
+    using NetworkData =
+        std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo>;
 
     template <typename T>
     concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
@@ -36,6 +37,7 @@ namespace network
             ~Network();
 
             template <typename T>
+                requires NetworkDataType<T>
             void attach(std::function<void(const T&)> callback);
             void notify(const NetworkData& data);
 
