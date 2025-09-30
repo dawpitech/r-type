@@ -39,7 +39,7 @@ void rTypeClient::Game::launchGame()
 
     ecs.Add<component::Transform>(e2, component::Transform{1, 3, 0, 1.0, 1.0});
     ecs.Add<component::Health>(e1);
-    ecs.Add<component::sprite>(e1, component::sprite("../../assets/r-typesheet10.gif", this->_sdlRenderer));
+    ecs.Add<component::sprite>(e1, component::sprite("./assets/r-typesheet10.gi", this->_sdlRenderer));
     std::cout << static_cast<int>(
                      ecs.GetComponent<component::Health>(e1).healthPoint)
               << std::endl;
