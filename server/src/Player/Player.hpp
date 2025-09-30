@@ -16,11 +16,11 @@ namespace game
     {
         public:
             explicit Player(network::ClientTCP& client, std::string id) : _id(std::move(id)), _tcpClient(client) {};
-            ~Player() = delete;
+            ~Player() = default;
 
         private:
             std::string _id;
-            uint16_t score;
+            uint16_t _score = 0;
             network::ClientTCP& _tcpClient;
     };
 } // namespace game

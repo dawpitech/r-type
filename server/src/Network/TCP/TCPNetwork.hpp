@@ -16,7 +16,7 @@ using boost::asio::ip::tcp;
 
 namespace network
 {
-    class TCPNetwork : public Network
+    class TCPNetwork final: public Network
     {
         public:
             explicit TCPNetwork(uint16_t port);

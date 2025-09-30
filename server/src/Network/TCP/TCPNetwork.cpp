@@ -64,7 +64,7 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 
 void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
 {
-    client.async_read(
+    client.async_read(*this,
         [this, &client](const boost::system::error_code& error,
                         size_t byteReads)
         {
@@ -81,7 +81,5 @@ void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
                     sizeof(ClientTCPReceivedInfo), byteReads));
                 return;
             }
-            client.addData(this->_receivedInfo);
-            this->_setupReadSocket(client);
         });
 }
