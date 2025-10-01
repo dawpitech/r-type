@@ -15,6 +15,7 @@
 #include "Network/Network.hpp"
 #include "libs/asio/include/boost/asio/io_context.hpp"
 #include "libs/asio/include/boost/asio/ip/tcp.hpp"
+#include "utils/uuidGenerator.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -28,12 +29,8 @@ namespace network
             uint16_t port;
             std::string uuid;
 
-            ConnectionInfo(std::string ip, uint16_t port) : ip(std::move(ip)), port(port)
-            {
-                static boost::uuids::random_generator gen;
-                auto boostUuid = gen();
-                this->uuid = boost::uuids::to_string(boostUuid);
-            };
+            ConnectionInfo(std::string ip, uint16_t port) :
+                ip(std::move(ip)), port(port), uuid(utils::UuidGenerator::generateUuid()) {};
     };
 
     struct ClientTCPReceivedInfo final
