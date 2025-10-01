@@ -17,7 +17,7 @@ namespace component
     {
             std::vector<SDL_FRect> frames;
             int currentFrame = 0;
-            float frameTime = 0.1f;
+            const float frameTime = 0.1f;
             float elapsedTime = 0.0f;
 
             bool loop = true;
