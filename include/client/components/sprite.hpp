@@ -16,21 +16,19 @@ namespace component
     {
             SDL_Texture* texture = nullptr;
 
-            SDL_FRect srcRect{0, 0, 0, 0};
-            SDL_FRect destRect{0, 0, 0, 0};
+            SDL_FRect srcRect = {0, 0, 0, 0};
+            SDL_FRect destRect = {0, 0, 0, 0};
 
             float angle = 0.0f;
             SDL_FPoint center = {0.5f, 0.5f};
 
             SDL_Color tint = {255, 255, 255, 255};
 
-            SDL_Renderer* sdlRenderer = nullptr;
-
             int layer = 0;
             bool animation = false;
             bool visible = true;
 
-            sprite(SDL_Texture* texture, bool animation, SDL_Renderer* renderer) :
-                texture(texture), animation(animation), sdlRenderer(renderer) {};
+            sprite(SDL_Texture* texture, bool animation) :
+                texture(texture), animation(animation) {};
     };
 } // namespace component

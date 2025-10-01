@@ -29,7 +29,7 @@ void rTypeClient::Game::launchGame()
     const flux::Entity Entity = ecs.newEntity();
 
     ecs.Add<component::sprite>(
-        Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true, render::SDLManager::getRenderer()));
+        Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true));
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
 
     SDL_Event test_event;
