@@ -46,7 +46,7 @@ void rTypeClient::Game::launchGame()
 
     while (running) {
         Uint32 currentTime = SDL_GetTicks();
-        float deltaTime = (currentTime - lastTime) / 1000.0f;
+        float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
         lastTime = currentTime;
 
         while (SDL_PollEvent(&test_event)) {

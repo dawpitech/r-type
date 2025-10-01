@@ -5,12 +5,12 @@
 // animationSystem
 //
 
-
-#include "client/components/sprite.hpp"
 #include "client/components/animation.hpp"
+#include "client/components/sprite.hpp"
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime) {
+void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime)
+{
     if (!ecs.HasComponents<component::sprite, component::animation>(entity))
         return;
 
@@ -24,11 +24,11 @@ void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime) {
     if (anim.elapsedTime >= anim.frameTime) {
         anim.elapsedTime = 0.0f;
         anim.currentFrame++;
-
         if (anim.currentFrame >= static_cast<int>(anim.frames.size())) {
             anim.currentFrame = anim.loop ? 0 : static_cast<int>(anim.frames.size()) - 1;
         }
     }
-
+    sprite.destRect.w = anim.frames[anim.currentFrame].w;
+    sprite.destRect.h = anim.frames[anim.currentFrame].h;
     sprite.srcRect = anim.frames[anim.currentFrame];
 }
