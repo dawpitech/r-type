@@ -15,28 +15,20 @@
 #include "client/systems/animationSystem.hpp"
 #include "client/systems/renderSystem.hpp"
 #include "flux/core/flux.hpp"
+#include "client/sdlManager.hpp"
 
-rTypeClient::Game::Game() { this->_initSdl(); }
-
-rTypeClient::Game::~Game()
-{
-    if (this->_sdlRenderer != nullptr)
-        SDL_DestroyRenderer(this->_sdlRenderer);
-    if (this->_window != nullptr)
-        SDL_DestroyWindow(this->_window);
-    SDL_Quit();
-}
 
 void rTypeClient::Game::launchGame()
 {
     flux::ECS ecs;
+    render::SDLManager::init();
     utils::TextureManager TextureManager;
-    sprite::SpriteHandler spriteHandler(TextureManager, this->_sdlRenderer);
+    sprite::SpriteHandler spriteHandler(TextureManager, render::SDLManager::getRenderer());
 
     const flux::Entity Entity = ecs.newEntity();
 
     ecs.Add<component::sprite>(Entity,
-                               component::sprite(spriteHandler.getPlayerSprite().texture, true, this->_sdlRenderer));
+                               component::sprite(spriteHandler.getPlayerSprite().texture, true, render::SDLManager::getRenderer()));
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
 
     bool running = true;
@@ -56,24 +48,9 @@ void rTypeClient::Game::launchGame()
                     break;
             }
         }
-        SDL_RenderClear(this->_sdlRenderer);
+        render::SDLManager::clear();
         AnimationSystem(ecs, Entity, deltaTime);
         RenderSystem(ecs, Entity);
-        SDL_RenderPresent(this->_sdlRenderer);
-    }
-}
-
-void rTypeClient::Game::_initSdl()
-{
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        throw GameError("Failed to init sdl", "_initSdl");
-    }
-    this->_window = SDL_CreateWindow(this->_windowTitle.c_str(), this->_windowWidth, this->_windowHeight, 0);
-    if (this->_window == nullptr) {
-        throw GameError("Failed to create window", "_initSdl");
-    }
-    this->_sdlRenderer = SDL_CreateRenderer(this->_window, nullptr);
-    if (this->_sdlRenderer == nullptr) {
-        throw GameError("Failed to create Renderer", "_initSdl");
+        render::SDLManager::render();
     }
 }

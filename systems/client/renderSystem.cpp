@@ -11,6 +11,7 @@
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
 #include "flux/core/flux.hpp"
+#include "client/sdlManager.hpp"
 
 void RenderSystem(flux::ECS& ecs, flux::Entity entity)
 {
@@ -23,5 +24,5 @@ void RenderSystem(flux::ECS& ecs, flux::Entity entity)
     if (!sprite.visible)
         return;
 
-    SDL_RenderTexture(sprite.sdlRenderer, sprite.texture, &sprite.srcRect, &sprite.destRect);
+    render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
 }
