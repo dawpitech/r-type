@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Network/Network.hpp"
+#include "network/datatype.hpp"
 #include "Network/TCP/TCPInfo.hpp"
 #include "libs/asio/include/boost/asio/ip/tcp.hpp"
 #include "libs/system/include/boost/system/detail/error_code.hpp"

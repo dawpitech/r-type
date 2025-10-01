@@ -12,18 +12,10 @@
 #include <utility>
 #include <variant>
 #include "utils/error.hpp"
+#include "network/datatype.hpp"
 
 namespace network
 {
-    struct ClientTCPReceivedInfo;
-    struct ConnectionInfo;
-
-    using NetworkData =
-        std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo>;
-
-    template <typename T>
-    concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
-
     class NetworkError final : public utils::BaseError
     {
         public:
@@ -43,7 +35,7 @@ namespace network
 
         protected:
             uint16_t _port;
-            boost::asio::io_context _io_context;
+            boost::asio::io_context _ioContext;
 
             std::function<void(const ClientTCPReceivedInfo&)> _tcpReceivedCallback;
             std::function<void(const ConnectionInfo&)> _connectionCallback;

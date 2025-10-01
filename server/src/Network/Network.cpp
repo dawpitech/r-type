@@ -5,8 +5,9 @@
 // Base function for the network class
 //
 
-#include "Network.hpp"
 #include <type_traits>
+#include <iostream>
+#include "Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
 
 network::Network::Network(const uint16_t port) : _port(port) {}
@@ -17,11 +18,11 @@ template <typename T> requires network::NetworkDataType<T>
 void network::Network::attach(std::function<void(const T&)> callback)
 {
     if constexpr(std::is_same_v<T, ClientTCPReceivedInfo>) {
-        this->_tcpReceivedCallback = callback;
+        this->_tcpReceivedCallback = std::move(callback);
         return;
     }
     if constexpr(std::is_same_v<T, ConnectionInfo>) {
-        this->_connectionCallback = callback;
+        this->_connectionCallback = std::move(callback);
         return;
     }
 }
@@ -34,6 +35,7 @@ void network::Network::notify(const NetworkData& data)
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, ClientTCPReceivedInfo>) {
                 // this->_tcpReceivedCallback(arg);
+                std::cout << "Send message from client" << std::endl;
                 return;
             }
             if constexpr (std::is_same_v<T, ConnectionInfo>) {

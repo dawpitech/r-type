@@ -15,7 +15,7 @@
 #include "utils/logger.hpp"
 
 network::TCPNetwork::TCPNetwork(const uint16_t port) :
-    Network(port), _acceptor(this->_io_context), _endpoint(tcp::v4(), port)
+    Network(port), _acceptor(this->_ioContext), _endpoint(tcp::v4(), port)
 {
     this->_acceptor.open(this->_endpoint.protocol());
     this->_acceptor.set_option(tcp::acceptor::reuse_address(true));
@@ -27,11 +27,11 @@ network::TCPNetwork::TCPNetwork(const uint16_t port) :
 
 network::TCPNetwork::~TCPNetwork() {}
 
-void network::TCPNetwork::connect() { unsigned hasRun = this->_io_context.poll_one(); }
+void network::TCPNetwork::connect() { unsigned hasRun = this->_ioContext.poll_one(); }
 
 void network::TCPNetwork::_setupAcceptNewSocket()
 {
-    this->_clients.emplace_back(std::make_unique<ClientTCP>(this->_io_context));
+    this->_clients.emplace_back(std::make_unique<ClientTCP>(this->_ioContext));
     if (this->_clients.back() == nullptr) {
         throw NetworkError("Unable to create new client", "TCP accept");
     }

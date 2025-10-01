@@ -6,10 +6,8 @@
 //
 
 #include "RoomsPool.hpp"
-#include "Network/Network.hpp"
-#include "Network/TCP/TCPInfo.hpp"
-#include "Network/TCP/TCPNetwork.hpp"
 #include "Rooms.hpp"
+#include "network/datatype.hpp"
 
 // this function will be updated later,
 // but should remain the same for now in order to test the functionalities
