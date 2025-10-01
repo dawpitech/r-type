@@ -28,7 +28,7 @@ void sprite::SpriteHandler::_setPlayerSprite(SDL_Renderer* renderer)
     const float frameHeight = this->_playerSprite.size.y / NB_PLAYER_SPRITE_Y;
     for (int i = 0; i < NB_PLAYER_SPRITE_X; i++) {
         sprite::Rect rect{static_cast<float>(i) * frameWidth, 0, frameWidth, frameHeight};
-        this->_playerSprite.spriteMap.push_back(rect);
+        this->_playerSprite.spriteMap.emplace_back(rect);
     }
 }
 

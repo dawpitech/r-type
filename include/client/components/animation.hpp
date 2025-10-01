@@ -27,7 +27,7 @@ namespace component
             {
                 for (auto it : rect) {
                     SDL_FRect rect{it.srcX, it.srcY, it.destX, it.destY};
-                    frames.push_back(rect);
+                    frames.emplace_back(rect);
                 }
             }
     };
