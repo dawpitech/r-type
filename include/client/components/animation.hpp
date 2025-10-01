@@ -15,7 +15,7 @@ namespace component
 {
     struct animation
     {
-            std::vector<SDL_Rect> frames;
+            std::vector<SDL_FRect> frames;
             int currentFrame = 0;
             float frameTime = 0.1f;
             float elapsedTime = 0.0f;
@@ -26,7 +26,7 @@ namespace component
             explicit animation(const std::vector<::sprite::Rect>& rect)
             {
                 for (auto it : rect) {
-                    SDL_Rect rect{it.srcX, it.srcY, it.destX, it.destY};
+                    SDL_FRect rect{it.srcX, it.srcY, it.destX, it.destY};
                     frames.push_back(rect);
                 }
             }

@@ -16,8 +16,8 @@ namespace component
     {
             SDL_Texture* texture = nullptr;
 
-            SDL_Rect srcRect{0, 0, 0, 0};
-            SDL_FRect destRect{55, 55, 55, 34};
+            SDL_FRect srcRect{0, 0, 0, 0};
+            SDL_FRect destRect{100, 100, 66, 34};
 
             float angle = 0.0f;
             SDL_FPoint center = {0.5f, 0.5f};

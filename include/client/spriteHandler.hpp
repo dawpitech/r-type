@@ -14,16 +14,16 @@ namespace sprite
 {
     struct Rect
     {
-            int srcX;
-            int srcY;
-            int destX;
-            int destY;
+            float srcX;
+            float srcY;
+            float destX;
+            float destY;
     };
 
     struct SpriteData
     {
             SDL_Texture *texture;
-            utils::Vector2<int> size{0, 0};
+            utils::Vector2<float> size{0, 0};
             std::vector<sprite::Rect> spriteMap;
     };
 

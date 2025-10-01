@@ -12,9 +12,9 @@
 #include "SDL3/SDL_events.h"
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
+#include "client/systems/animationSystem.hpp"
 #include "client/systems/renderSystem.hpp"
 #include "flux/core/flux.hpp"
-#include "client/systems/animationSystem.hpp"
 
 rTypeClient::Game::Game() { this->_initSdl(); }
 
@@ -35,7 +35,8 @@ void rTypeClient::Game::launchGame()
 
     const flux::Entity Entity = ecs.newEntity();
 
-    ecs.Add<component::sprite>(Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true, this->_sdlRenderer));
+    ecs.Add<component::sprite>(Entity,
+                               component::sprite(spriteHandler.getPlayerSprite().texture, true, this->_sdlRenderer));
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
 
     bool running = true;
