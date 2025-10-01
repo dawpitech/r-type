@@ -25,5 +25,8 @@ namespace rTypeClient
             ~Game() = default;
 
             void launchGame();
+
+        private:
+            bool _running = true;
     };
 } // namespace rTypeClient

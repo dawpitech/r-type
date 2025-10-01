@@ -66,5 +66,3 @@ namespace render
             }
     };
 } // namespace render
-//
-//
