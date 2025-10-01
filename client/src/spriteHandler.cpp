@@ -9,8 +9,8 @@
 #include <cstdint>
 #include "SDL3/SDL_render.h"
 
-constexpr uint8_t nbPlayerSpriteX = 5;
-constexpr uint8_t nbPlayerSpriteY = 5;
+constexpr uint8_t NB_PLAYER_SPRITE_X = 5;
+constexpr uint8_t NB_PLAYER_SPRITE_Y = 5;
 
 sprite::SpriteHandler::SpriteHandler(utils::TextureManager& textureManager, SDL_Renderer* renderer) :
     _textureManager(textureManager)
@@ -24,9 +24,9 @@ void sprite::SpriteHandler::_setPlayerSprite(SDL_Renderer* renderer)
 
     this->_playerSprite.size.x = 332;
     this->_playerSprite.size.y = 172;
-    const float frameWidth = this->_playerSprite.size.x / nbPlayerSpriteX;
-    const float frameHeight = this->_playerSprite.size.y / nbPlayerSpriteY;
-    for (int i = 0; i < nbPlayerSpriteX; i++) {
+    const float frameWidth = this->_playerSprite.size.x / NB_PLAYER_SPRITE_X;
+    const float frameHeight = this->_playerSprite.size.y / NB_PLAYER_SPRITE_Y;
+    for (int i = 0; i < NB_PLAYER_SPRITE_X; i++) {
         sprite::Rect rect{static_cast<float>(i) * frameWidth, 0, frameWidth, frameHeight};
         this->_playerSprite.spriteMap.push_back(rect);
     }
