@@ -14,6 +14,8 @@ _build type:
 clean:
     rm -rf {{ OUTDIR }}
     rm -f r-type
+
+purge:
     rm -rf .cpm_cache
 
 re: clean release
