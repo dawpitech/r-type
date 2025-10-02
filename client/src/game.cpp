@@ -5,61 +5,52 @@
 // game
 //
 
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
-#include <SDL3/SDL_video.h>
 #include <SDL3/SDL_render.h>
-#include <iostream>
+#include <SDL3/SDL_video.h>
+#include <cstdint>
+
+#include "client/components/animation.hpp"
+#include "client/components/sprite.hpp"
 #include "client/game.hpp"
+#include "client/sdlManager.hpp"
+#include "client/systems/animationSystem.hpp"
+#include "client/systems/renderSystem.hpp"
 #include "flux/core/flux.hpp"
-#include "global/components/Transform.hpp"
-#include "global/components/health.hpp"
-#include "global/systems/healthSystem.hpp"
-
-rTypeClient::Game::Game() { this->_initSdl(); }
-
-rTypeClient::Game::~Game()
-{
-    if (this->_sdlRenderer != nullptr)
-        SDL_DestroyRenderer(this->_sdlRenderer);
-    if (this->_window != nullptr)
-        SDL_DestroyWindow(this->_window);
-    SDL_Quit();
-}
 
 void rTypeClient::Game::launchGame()
 {
     flux::ECS ecs;
+    render::SDLManager::init();
+    utils::TextureManager TextureManager;
+    sprite::SpriteHandler spriteHandler(TextureManager, render::SDLManager::getRenderer());
 
-    const flux::Entity windowEntity = ecs.newEntity();
-    const flux::Entity e1 = ecs.newEntity();
-    const flux::Entity e2 = ecs.newEntity();
+    const flux::Entity Entity = ecs.newEntity();
 
-    ecs.Add<component::Transform>(e2, component::Transform{1, 3, 0, 1.0, 1.0});
-    ecs.Add<component::Health>(e1);
-    std::cout << static_cast<int>(
-                     ecs.GetComponent<component::Health>(e1).healthPoint)
-              << std::endl;
-    HealthSystem(ecs, e1);
-    std::cout << static_cast<int>(
-                     ecs.GetComponent<component::Health>(e1).healthPoint)
-              << std::endl;
-    while (true) {
-        SDL_RenderPresent(this->_sdlRenderer);
-    }
-}
+    ecs.Add<component::sprite>(
+        Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true));
+    ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
 
-void rTypeClient::Game::_initSdl()
-{
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        throw GameError("Failed to init sdl", "_initSdl");
-    }
-    this->_window = SDL_CreateWindow(
-        this->_windowTitle.c_str(), this->_windowWidth, this->_windowHeight, 0);
-    if (this->_window == nullptr) {
-        throw GameError("Failed to create window", "_initSdl");
-    }
-    this->_sdlRenderer = SDL_CreateRenderer(this->_window, nullptr);
-    if (this->_sdlRenderer == nullptr) {
-        throw GameError("Failed to create Renderer", "_initSdl");
+    SDL_Event test_event;
+
+    uint32_t lastTime = SDL_GetTicks();
+
+    while (this->_running) {
+        uint32_t currentTime = SDL_GetTicks();
+        float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
+        lastTime = currentTime;
+
+        while (SDL_PollEvent(&test_event)) {
+            switch (test_event.type) {
+                case SDL_EVENT_QUIT:
+                    this->_running = false;
+                    break;
+            }
+        }
+        render::SDLManager::clear();
+        AnimationSystem(ecs, Entity, deltaTime);
+        RenderSystem(ecs, Entity);
+        render::SDLManager::render();
     }
 }

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "client/game.hpp"
+#include "global/utils/error.hpp"
 
 int main()
 {
@@ -16,6 +17,9 @@ int main()
         game.launchGame();
     }
     catch (const rTypeClient::GameError& e) {
+        std::cerr << e.what() << "in" << e.where() << std::endl;
+    }
+    catch (const utils::BaseError& e) {
         std::cerr << e.what() << "in" << e.where() << std::endl;
     }
     catch (const std::exception& e) {
