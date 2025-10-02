@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <utility>
+
 #include "Network/Network.hpp"
-#include "libs/asio/include/boost/asio/io_context.hpp"
-#include "libs/asio/include/boost/asio/ip/tcp.hpp"
 #include "network/datatype.hpp"
 
 using boost::asio::ip::tcp;
