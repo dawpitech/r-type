@@ -34,12 +34,13 @@ void network::Network::notify(const NetworkData& data)
         {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, ClientTCPReceivedInfo>) {
-                // this->_tcpReceivedCallback(arg);
-                std::cout << "Send message from client" << std::endl;
+                if (this->_tcpReceivedCallback)
+                    this->_tcpReceivedCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ConnectionInfo>) {
-                this->_connectionCallback(arg);
+                if (this->_connectionCallback)
+                    this->_connectionCallback(arg);
                 return;
             }
         },

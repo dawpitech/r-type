@@ -7,12 +7,11 @@
 
 #include <functional>
 
+#include <boost/system/error_code.hpp>
 #include <boost/uuid/uuid.hpp>
 #include "Network/Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
 #include "TCPNetwork.hpp"
-#include "libs/system/include/boost/system/detail/error_code.hpp"
-#include "utils/logger.hpp"
 
 network::TCPNetwork::TCPNetwork(const uint16_t port) :
     Network(port), _acceptor(this->_ioContext), _endpoint(tcp::v4(), port)
@@ -50,8 +49,7 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
     auto& tcpSocket = this->_clients.back()->getSocket();
     auto socketIp = tcpSocket.remote_endpoint().address().to_string();
     auto socketPort = tcpSocket.remote_endpoint().port();
-        std::string msg =
-        std::format("New connection accepted from: {}:{}", socketIp, socketPort);
+    std::string msg = std::format("New connection accepted from: {}:{}", socketIp, socketPort);
 
     ConnectionInfo info(socketIp, socketPort);
     this->notify(info);
@@ -61,17 +59,5 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 
 void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
 {
-    client.async_read(*this,
-                      [this, &client](const boost::system::error_code& error, size_t byteReads)
-                      {
-                          if (error) {
-                              utils::Logger::debug(std::format("Error in TCP read: {}", error.message()));
-                              return;
-                          }
-                          if (byteReads != sizeof(ClientTCPReceivedInfo)) {
-                              utils::Logger::debug(std::format("Error in TCP read size\nexpected: {}\nbut got: {}",
-                                                               sizeof(ClientTCPReceivedInfo), byteReads));
-                              return;
-                          }
-                      });
+    client.async_read(*this);
 }
