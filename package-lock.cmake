@@ -32,3 +32,10 @@ CPMDeclarePackage(sdl3_ttf
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
+# sdl3_image
+CPMDeclarePackage(sdl3_image
+        GIT_TAG release-3.2.4
+        GITHUB_REPOSITORY libsdl-org/SDL_image
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)

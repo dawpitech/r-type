@@ -19,6 +19,7 @@ CPMGetPackage(sol2)
 CPMGetPackage(boost)
 CPMGetPackage(sdl3)
 CPMGetPackage(sdl3_ttf)
+CPMGetPackage(sdl3_image)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

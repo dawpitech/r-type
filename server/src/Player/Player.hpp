@@ -8,8 +8,9 @@
 #pragma once
 
 #include <string>
+#include <boost/uuid/uuid.hpp>
+
 #include "Network/TCP/TCPInfo.hpp"
-#include "libs/uuid/include/boost/uuid/uuid.hpp"
 
 namespace game
 {

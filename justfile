@@ -1,7 +1,7 @@
 set export
 
 OUTDIR := env("BUILD_OUT", "build")
-CPM_SOURCE_CACHE := env("CPM_SOURCE_CACHE", "${PWD}/.cpm_cache")
+CPM_SOURCE_CACHE := env("CPM_SOURCE_CACHE", ".cpm_cache")
 
 release: (_build "Release")
 
