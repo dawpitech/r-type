@@ -20,22 +20,19 @@ CPMDeclarePackage(boost
 )
 # sdl3
 CPMDeclarePackage(sdl3
-        GIT_TAG release-3.2.22
-        GITHUB_REPOSITORY libsdl-org/SDL
+        URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.22/SDL3-3.2.22.tar.gz
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
 # sdl3_ttf
 CPMDeclarePackage(sdl3_ttf
-        GIT_TAG release-3.2.0
-        GITHUB_REPOSITORY libsdl-org/SDL_ttf
+        URL https://github.com/libsdl-org/SDL_ttf/releases/download/release-3.2.2/SDL3_ttf-3.2.2.tar.gz
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
 # sdl3_image
 CPMDeclarePackage(sdl3_image
-        GIT_TAG release-3.2.4
-        GITHUB_REPOSITORY libsdl-org/SDL_image
+        URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.2.4/SDL3_image-3.2.4.tar.gz
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
