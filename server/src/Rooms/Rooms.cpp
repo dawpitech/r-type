@@ -4,15 +4,19 @@
 // File description:
 // Logic for each rooms
 //
+
 #include <chrono>
-#include <iostream>
+#include <format>
 #include <thread>
 
+#include "Network/TCP/TCPInfo.hpp"
+#include "Player/Player.hpp"
 #include "Rooms.hpp"
 #include "flux/core/flux.hpp"
+#include "utils/logger.hpp"
 
 Room::Room::Room(std::size_t roomNumber, const std::uint8_t nbPlayers) :
-    _roomNumber(roomNumber), _nbPlayers(nbPlayers)
+    _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
 {
     flux::ECS ecs;
 }
@@ -26,5 +30,18 @@ void Room::Room::update(const std::uint8_t nbFrames)
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
 {
-    this->_nbPlayers = nbPlayers;
+    this->_players.erase(this->_players.begin(), this->_players.end());
+    this->_nbPlayerMax = nbPlayers;
+}
+
+bool Room::Room::addPlayer(game::Player &player)
+{
+    if (this->_players.size() == this->_nbPlayerMax) {
+        auto log = std::format("Too many player ! Can't add user in room {}", this->_roomNumber);
+        utils::Logger::debug(log);
+        return false;
+    }
+
+    this->_players.emplace_back(player);
+    return true;
 }

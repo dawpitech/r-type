@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include "Player/Player.hpp"
 
 namespace Room {
     constexpr uint8_t BASEROOMPLAYER = 3;
@@ -19,8 +20,13 @@ namespace Room {
 
         void update( std::uint8_t nbFrames);
         void clear(std::uint8_t nbPlayers);
+
+        bool addPlayer(game::Player &player);
+        bool removePlayer();
+
        private:
-        std::uint8_t _nbPlayers;
+        std::vector<std::reference_wrapper<game::Player>> _players;
+        std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
         
     };
