@@ -34,22 +34,12 @@ void rTypeClient::Game::launchGame()
 
     SDL_Event test_event;
 
-    uint32_t lastTime = SDL_GetTicks();
+    render::SDLManager::setLastTime();
 
     while (this->_running) {
-        uint32_t currentTime = SDL_GetTicks();
-        float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
-        lastTime = currentTime;
-
-        while (SDL_PollEvent(&test_event)) {
-            switch (test_event.type) {
-                case SDL_EVENT_QUIT:
-                    this->_running = false;
-                    break;
-            }
-        }
+        render::SDLManager::handleEvent(_running);
         render::SDLManager::clear();
-        AnimationSystem(ecs, Entity, deltaTime);
+        AnimationSystem(ecs, Entity);
         RenderSystem(ecs, Entity);
         render::SDLManager::render();
     }

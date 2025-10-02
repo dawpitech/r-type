@@ -6,9 +6,11 @@
 //
 
 #include <string>
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_video.h"
 #include "global/utils/error.hpp"
 
@@ -30,6 +32,27 @@ namespace render
 
             static void init() { SDLManager::instance(); }
 
+            static void setLastTime() { instance()._lastTime = SDL_GetTicks(); }
+
+            static float getDeltaTime() { return instance()._deltaTime; }
+
+            static void handleEvent(bool& running)
+            {
+                instance()._currentTime = SDL_GetTicks();
+                instance()._deltaTime = static_cast<float>(instance()._currentTime - instance()._lastTime) / 1000.0f;
+                instance()._lastTime = instance()._currentTime;
+
+                while (SDL_PollEvent(&instance()._event)) {
+                    switch (instance()._event.type) {
+                        case SDL_EVENT_QUIT:
+                            running = false;
+                            break;
+                        case SDL_EVENT_KEY_DOWN:
+                            running = false;
+                            break;
+                    }
+                }
+            }
             ~SDLManager()
             {
                 if (this->_renderer != nullptr)
@@ -43,6 +66,10 @@ namespace render
             SDL_Renderer* _renderer;
             SDL_Window* _window;
             std::string _windowTitle = "La windows";
+            SDL_Event _event;
+            uint32_t _lastTime = SDL_GetTicks();
+            uint32_t _currentTime = SDL_GetTicks();
+            float _deltaTime;
 
             explicit SDLManager()
             {

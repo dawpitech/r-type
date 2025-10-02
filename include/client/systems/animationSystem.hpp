@@ -9,4 +9,4 @@
 
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime);
+void AnimationSystem(flux::ECS& ecs, flux::Entity entity);
