@@ -1,0 +1,40 @@
+name: Workflow
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  SSH_PUB_KEY:
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzKKT5xCssZ38UI5VWaPOqW3ldVsg/0tDceTrCFnsd3 github.action@antoinebellanger.fr
+
+jobs:
+  compile:
+    if: github.repository_owner == 'dawpitech'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: 'true'
+
+      - uses: extractions/setup-just@v3
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Load build dependencies from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '.cpm_cache'
+          key: ${{ runner.os }}-cpm.cache
+
+      - name: Build project
+        run: just
+
+      - name: Save build dependencies in cache
+        uses: actions/cache/save@v4
+        with:
+          path: '.cpm_cache'
+          key: ${{ runner.os }}-cpm.cache
