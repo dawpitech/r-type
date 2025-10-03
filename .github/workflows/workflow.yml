@@ -3,8 +3,6 @@ name: Workflow
 
 on:
   push:
-  pull_request:
-  workflow_dispatch:
 
 env:
   SSH_PUB_KEY:
