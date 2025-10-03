@@ -2,6 +2,7 @@
 name: Workflow
 
 on:
+  push:
   pull_request:
   workflow_dispatch:
 
@@ -75,3 +76,21 @@ jobs:
         with:
           path: '.cpm_cache'
           key: ${{ runner.os }}-cpm.cache
+
+  mirror:
+    if: github.event_name != 'pull_request' && github.repository_owner == 'dawpitech' && github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: compile
+
+    steps:
+      - name: Checkout Main Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: 'true'
+
+      - name: Push to epitech
+        run: |
+          git remote add epitech "${{ secrets.MIRROR_REPO }}"
+          git push --force epitech +main
