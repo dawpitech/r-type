@@ -18,6 +18,7 @@
             just
             mold
             ninja
+            act
 
             alsa-lib
             hidapi
