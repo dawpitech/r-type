@@ -5,6 +5,8 @@
 // spriteHandler
 //
 
+#pragma once
+
 #include <vector>
 #include "SDL3/SDL_render.h"
 #include "global/vector2.hpp"

@@ -9,7 +9,6 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
-#include <cstdint>
 
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
@@ -18,6 +17,8 @@
 #include "client/systems/animationSystem.hpp"
 #include "client/systems/renderSystem.hpp"
 #include "flux/core/flux.hpp"
+#include "global/components/playerInput.hpp"
+#include "client/systems/inputSystem.hpp"
 
 void rTypeClient::Game::launchGame()
 {
@@ -31,13 +32,13 @@ void rTypeClient::Game::launchGame()
     ecs.Add<component::sprite>(
         Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true));
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
-
-    SDL_Event test_event;
+    ecs.Add<component::PlayerInput>(Entity);
 
     render::SDLManager::setLastTime();
 
     while (this->_running) {
         render::SDLManager::handleEvent(_running);
+        InputSystem(ecs, Entity);
         render::SDLManager::clear();
         AnimationSystem(ecs, Entity);
         RenderSystem(ecs, Entity);

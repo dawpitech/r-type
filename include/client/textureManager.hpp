@@ -5,6 +5,8 @@
 // textureManager
 //
 
+#pragma once
+
 #include <string>
 #include <unordered_map>
 #include <SDL3/SDL_render.h>
