@@ -6,12 +6,12 @@
 //
 
 #include <functional>
-
+#include <boost/system/detail/error_code.hpp>
 #include <boost/uuid/uuid.hpp>
+
+#include "TCPNetwork.hpp"
 #include "Network/Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
-#include "TCPNetwork.hpp"
-#include "libs/system/include/boost/system/detail/error_code.hpp"
 #include "utils/logger.hpp"
 
 network::TCPNetwork::TCPNetwork(const uint16_t port) :
