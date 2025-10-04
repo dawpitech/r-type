@@ -11,7 +11,6 @@ namespace component
 {
     struct Velocity
     {
-            float x = 0;
-            float y = 0;
+            float speed = 20;
     };
 } // namespace component
