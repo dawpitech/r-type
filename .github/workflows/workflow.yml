@@ -1,0 +1,94 @@
+#file: noinspection SpellCheckingInspection
+name: Workflow
+
+on:
+  push:
+
+env:
+  SSH_PUB_KEY:
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKzKKT5xCssZ38UI5VWaPOqW3ldVsg/0tDceTrCFnsd3 github.action@antoinebellanger.fr
+
+jobs:
+  compile:
+    if: github.repository_owner == 'dawpitech'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: 'true'
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: |
+            pkg-config
+            cmake
+            ninja-build
+            gnome-desktop-testing
+            libasound2-dev
+            libpulse-dev
+            libaudio-dev
+            libjack-dev
+            libsndio-dev
+            libx11-dev
+            libxext-dev
+            libxrandr-dev
+            libxcursor-dev
+            libxfixes-dev
+            libxi-dev
+            libxss-dev
+            libxtst-dev
+            libxkbcommon-dev
+            libdrm-dev
+            libgbm-dev
+            libgl1-mesa-dev
+            libgles2-mesa-dev
+            libegl1-mesa-dev
+            libdbus-1-dev
+            libibus-1.0-dev
+            libudev-dev
+            libpipewire-0.3-dev
+            libwayland-dev
+            libdecor-0-dev
+            liburing-dev
+            libfreetype6
+            libfreetype-dev
+
+      - uses: extractions/setup-just@v3
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Load build dependencies from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '.cpm_cache'
+          key: ${{ runner.os }}-cpm.cache
+
+      - name: Build project
+        run: just
+
+      - name: Save build dependencies in cache
+        uses: actions/cache/save@v4
+        with:
+          path: '.cpm_cache'
+          key: ${{ runner.os }}-cpm.cache
+
+  mirror:
+    if: github.event_name != 'pull_request' && github.repository_owner == 'dawpitech' && github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    needs: compile
+
+    steps:
+      - name: Checkout Main Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          persist-credentials: 'true'
+
+      - name: Push to epitech
+        run: |
+          git remote add epitech "${{ secrets.MIRROR_REPO }}"
+          git push --force epitech +main
