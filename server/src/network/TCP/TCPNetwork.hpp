@@ -10,15 +10,15 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/detail/error_code.hpp>
 
-#include "network/datatype.hpp"
 #include "network/Network.hpp"
+#include "network/datatype.hpp"
 #include "network/TCP/TCPInfo.hpp"
 
 using boost::asio::ip::tcp;
 
 namespace network
 {
-    class TCPNetwork final: public Network
+    class TCPNetwork final : public Network
     {
         public:
             explicit TCPNetwork(uint16_t port);
@@ -35,6 +35,6 @@ namespace network
             void _setupAcceptNewSocket();
             void _acceptHandler(const boost::system::error_code& error);
 
-            void _setupReadSocket(ClientTCP &client);
+            void _setupReadSocket(ClientTCP& client);
     };
 } // namespace network

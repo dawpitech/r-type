@@ -37,6 +37,7 @@ namespace network
             boost::asio::io_context _ioContext;
 
             std::function<void(const ClientTCPReceivedInfo&)> _tcpReceivedCallback;
+            std::function<void(const UDPReceivedInfo&)> _udpReceivedCallback;
             std::function<void(const ConnectionInfo&)> _connectionCallback;
     };
 } // namespace network

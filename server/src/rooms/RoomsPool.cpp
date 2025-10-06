@@ -5,9 +5,11 @@
 // Threadpool for the rooms
 //
 
-#include "rooms/RoomsPool.hpp"
+#include "RoomsPool.hpp"
+#include <thread>
+
+#include "Rooms.hpp"
 #include "network/datatype.hpp"
-#include "rooms/Rooms.hpp"
 
 // this function will be updated later,
 // but should remain the same for now in order to test the functionalities
@@ -16,6 +18,14 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
 {
     this->_connectionNetwork.attach<network::ConnectionInfo>([this](const network::ConnectionInfo& info)
                                                              { this->_playerManager.createNewPlayer(info); });
+    this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>(
+        [this](network::ClientTCPReceivedInfo info) {
+            this->_playerManager.storeInfo(info);
+        });
+    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info) {
+
+        return;
+    });
     for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_threads.emplace_back(
             [this, i]
@@ -37,5 +47,6 @@ Room::RoomsPool::~RoomsPool() {}
 void Room::RoomsPool::run()
 {
     while (this->_isRunning) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }

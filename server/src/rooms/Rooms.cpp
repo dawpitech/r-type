@@ -9,13 +9,13 @@
 #include <format>
 #include <thread>
 
+#include "rooms/Rooms.hpp"
 #include "flux/core/flux.hpp"
 #include "network/TCP/TCPInfo.hpp"
 #include "player/Player.hpp"
-#include "rooms/Rooms.hpp"
 #include "utils/logger.hpp"
 
-Room::Room::Room(std::size_t roomNumber, const std::uint8_t nbPlayers) :
+Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
     _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
 {
     flux::ECS ecs;

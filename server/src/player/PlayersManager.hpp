@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "network/TCP/TCPInfo.hpp"
 #include "Player.hpp"
+#include "network/datatype.hpp"
+#include "network/TCP/TCPInfo.hpp"
 
 namespace game
 {
@@ -19,6 +20,7 @@ namespace game
             ~PlayersManager() = default;
 
             void createNewPlayer(const network::ConnectionInfo& info);
+            void storeInfo(const network::ClientTCPReceivedInfo &info);
 
         private:
             std::vector<std::unique_ptr<Player>> _players;

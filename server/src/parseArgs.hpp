@@ -9,7 +9,7 @@
 
 #include <boost/program_options.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include "error.hpp"
+#include "../../common/include/utils/error.hpp"
 
 namespace po = boost::program_options;
 
