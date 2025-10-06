@@ -14,6 +14,6 @@ unit_tests
 .vscode
 build
 .build
+r-type
 r-type_server
-r-type_client
 .cpm_cache
