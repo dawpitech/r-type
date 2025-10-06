@@ -1,0 +1,79 @@
+//
+// EPITECH PROJECT, 2025
+// r-type
+// File description:
+// inputSystem
+//
+
+#include "components/Velocity.hpp"
+#include "flux/core/flux.hpp"
+#include "components/PlayerInput.hpp"
+#include "utils/eventManager.hpp"
+
+#if IS_CLIENT
+    #include "sdlManager.hpp"
+#endif
+
+
+constexpr auto MAX_VERTICAL_SPEED = 10;
+
+void InputSystem(flux::ECS& ecs)
+{
+    const auto& view = ecs.GenerateViewFromComponents<component::PlayerInput, component::Velocity>();
+    const auto& entities = ecs.QueryViewNotExclusive(view);
+
+    for (const flux::Entity entity : entities) {
+        auto& playerInput = ecs.GetComponent<component::PlayerInput>(entity);
+        auto& playerVelocity = ecs.GetComponent<component::Velocity>(entity);
+
+        #if IS_CLIENT
+            for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
+                if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
+                    switch (KeyboardEvent->key) {
+                        case utils::Keys::ARROW_DOWN:
+                            playerInput.move_down = true;
+                            break;
+                        case utils::Keys::ARROW_UP:
+                            playerInput.move_up = true;
+                            break;
+                        case utils::Keys::ARROW_LEFT:
+                            playerInput.move_left = true;
+                            break;
+                        case utils::Keys::ARROW_RIGHT:
+                            playerInput.move_right = true;
+                            break;
+                        default:
+                            break;
+                    }
+                if (KeyboardEvent->type == utils::KeyEvent::KEY_UP)
+                    switch (KeyboardEvent->key) {
+                        case utils::Keys::ARROW_DOWN:
+                            playerInput.move_down = false;
+                            break;
+                        case utils::Keys::ARROW_UP:
+                            playerInput.move_up = false;
+                            break;
+                        case utils::Keys::ARROW_LEFT:
+                            playerInput.move_left = false;
+                            break;
+                        case utils::Keys::ARROW_RIGHT:
+                            playerInput.move_right = false;
+                            break;
+                        default:
+                            break;
+                    }
+            }
+            render::SDLManager::getKeysEvent().clear();
+            SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+        #endif
+
+        if (playerInput.move_up)
+            playerVelocity.y -= 0.1;
+
+        if (playerInput.move_down)
+            playerVelocity.y += 0.1;
+
+        if (playerVelocity.y < -MAX_VERTICAL_SPEED) playerVelocity.y = -MAX_VERTICAL_SPEED;
+        if (playerVelocity.y > MAX_VERTICAL_SPEED) playerVelocity.y = MAX_VERTICAL_SPEED;
+    }
+}

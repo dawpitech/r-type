@@ -5,14 +5,13 @@
 // Entrypoint for r-type server
 //
 
-#include <boost/program_options/errors.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <boost/program_options/errors.hpp>
+#include <boost/program_options/variables_map.hpp>
 
-#include "Rooms/RoomsPool.hpp"
+#include "rooms/RoomsPool.hpp"
 #include "utils/logger.hpp"
 #include "utils/parseArgs.hpp"
 

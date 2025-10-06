@@ -5,19 +5,20 @@
 // TextureManager
 //
 
-#include <SDL3/SDL_render.h>
 #include <string>
-#include "SDL3_image/SDL_image.h"
-#include "global/utils/error.hpp"
+#include <SDL3/SDL_render.h>
+#include <SDL3_image/SDL_image.h>
 
-#include "client/textureManager.hpp"
+#include "utils/error.hpp"
+
+#include "textureManager.hpp"
 
 SDL_Texture* utils::TextureManager::load(SDL_Renderer* renderer, const std::string& path)
 {
-    if (this->_textures.count(path) == 0) {
+    if (!this->_textures.contains(path)) {
         SDL_Texture* texture = IMG_LoadTexture(renderer, path.c_str());
         if (!texture)
-            throw utils::BaseError("failed to load texture", "load");
+            throw BaseError("failed to load texture", "load");
         this->_textures[path] = texture;
     }
     return _textures[path];

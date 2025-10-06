@@ -7,8 +7,9 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "client/game.hpp"
-#include "global/utils/error.hpp"
+
+#include "game.hpp"
+#include "utils/error.hpp"
 
 int main()
 {

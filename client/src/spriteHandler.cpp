@@ -5,8 +5,7 @@
 // spriteHandler
 //
 
-#include "client/spriteHandler.hpp"
-#include <cstdint>
+#include "spriteHandler.hpp"
 #include "SDL3/SDL_render.h"
 
 constexpr uint8_t NB_PLAYER_SPRITE_X = 5;
@@ -27,7 +26,7 @@ void sprite::SpriteHandler::_setPlayerSprite(SDL_Renderer* renderer)
     const float frameWidth = this->_playerSprite.size.x / NB_PLAYER_SPRITE_X;
     const float frameHeight = this->_playerSprite.size.y / NB_PLAYER_SPRITE_Y;
     for (int i = 0; i < NB_PLAYER_SPRITE_X; i++) {
-        sprite::Rect rect{static_cast<float>(i) * frameWidth, 0, frameWidth, frameHeight};
+        Rect rect{static_cast<float>(i) * frameWidth, 0, frameWidth, frameHeight};
         this->_playerSprite.spriteMap.emplace_back(rect);
     }
 }

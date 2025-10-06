@@ -1,6 +1,7 @@
 set export
 
 OUTDIR := env("BUILD_OUT", "build")
+DEBUG_DIR := env("DEBUG_DIR", "cmake-build-cache")
 CPM_SOURCE_CACHE := env("CPM_SOURCE_CACHE", ".cpm_cache")
 
 release: (_build "Release")
@@ -15,6 +16,7 @@ _build type:
 
 clean:
     rm -rf {{ OUTDIR }}
+    rm -rf {{ DEBUG_DIR }}
     rm -f r-type
     rm -f r-type_server
 
