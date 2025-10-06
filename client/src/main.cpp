@@ -17,10 +17,10 @@ int main()
         game.launchGame();
     }
     catch (const rTypeClient::GameError& e) {
-        std::cerr << e.what() << "in" << e.where() << std::endl;
+        std::cerr << e.what() << " in " << e.where() << std::endl;
     }
     catch (const utils::BaseError& e) {
-        std::cerr << e.what() << "in" << e.where() << std::endl;
+        std::cerr << e.what() << " in " << e.where() << std::endl;
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
