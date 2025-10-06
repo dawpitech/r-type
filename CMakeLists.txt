@@ -7,10 +7,20 @@ project(R-Type
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_GENERATOR
-        "Unix Makefiles"
-        CACHE STRING "generator"
-)
+#set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#set(BOOST_INCLUDE_LIBRARIES program_options)
+
+include(cmake/CPM.cmake)
+CPMUsePackageLock(package-lock.cmake)
+CPMGetPackage(lua)
+CPMGetPackage(sol2)
+CPMGetPackage(boost)
+CPMGetPackage(sdl3)
+CPMGetPackage(sdl3_ttf)
+CPMGetPackage(sdl3_image)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

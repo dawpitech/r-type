@@ -5,6 +5,8 @@
 // player
 //
 
+#pragma once
+
 namespace component
 {
     struct player

@@ -9,7 +9,6 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
-#include <cstdint>
 
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
@@ -18,6 +17,11 @@
 #include "client/systems/animationSystem.hpp"
 #include "client/systems/renderSystem.hpp"
 #include "flux/core/flux.hpp"
+#include "global/components/Transform.hpp"
+#include "global/components/Velocity.hpp"
+#include "global/systems/movementSystem.hpp"
+#include "global/components/playerInput.hpp"
+#include "client/systems/inputSystem.hpp"
 
 void rTypeClient::Game::launchGame()
 {
@@ -31,25 +35,18 @@ void rTypeClient::Game::launchGame()
     ecs.Add<component::sprite>(
         Entity, component::sprite(spriteHandler.getPlayerSprite().texture, true));
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
+    ecs.Add<component::PlayerInput>(Entity);
+    ecs.Add<component::Transform>(Entity, component::Transform(0, 0, 0, 1, 1));
+    ecs.Add<component::Velocity>(Entity, component::Velocity(50.0, 10.0));
 
-    SDL_Event test_event;
-
-    uint32_t lastTime = SDL_GetTicks();
+    render::SDLManager::setLastTime();
 
     while (this->_running) {
-        uint32_t currentTime = SDL_GetTicks();
-        float deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
-        lastTime = currentTime;
-
-        while (SDL_PollEvent(&test_event)) {
-            switch (test_event.type) {
-                case SDL_EVENT_QUIT:
-                    this->_running = false;
-                    break;
-            }
-        }
+        render::SDLManager::handleEvent(_running);
+        InputSystem(ecs, Entity);
+        MovementSystem(ecs, Entity);
         render::SDLManager::clear();
-        AnimationSystem(ecs, Entity, deltaTime);
+        AnimationSystem(ecs, Entity);
         RenderSystem(ecs, Entity);
         render::SDLManager::render();
     }

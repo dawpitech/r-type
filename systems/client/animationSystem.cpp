@@ -7,9 +7,10 @@
 
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
+#include "client/sdlManager.hpp"
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime)
+void AnimationSystem(flux::ECS& ecs, flux::Entity entity)
 {
     if (!ecs.HasComponents<component::sprite, component::animation>(entity))
         return;
@@ -20,7 +21,7 @@ void AnimationSystem(flux::ECS& ecs, flux::Entity entity, float deltaTime)
     if (!anim.playing || anim.frames.empty())
         return;
 
-    anim.elapsedTime += deltaTime;
+    anim.elapsedTime += render::SDLManager::getDeltaTime();
     if (anim.elapsedTime >= anim.frameTime) {
         anim.elapsedTime = 0.0f;
         anim.currentFrame++;

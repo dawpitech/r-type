@@ -5,12 +5,21 @@
 // sdlManager
 //
 
+#pragma once
+
+#include <iostream>
+#include <map>
 #include <string>
+#include <vector>
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
+#include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_timer.h"
 #include "SDL3/SDL_video.h"
 #include "global/utils/error.hpp"
+#include "global/utils/eventManager.hpp"
 
 namespace render
 {
@@ -30,6 +39,95 @@ namespace render
 
             static void init() { SDLManager::instance(); }
 
+            static void setLastTime() { instance()._lastTime = SDL_GetTicks(); }
+
+            static float getDeltaTime() { return instance()._deltaTime; }
+
+            static std::vector<utils::EventManager>& getKeysEvent() { return instance()._keyEvent; }
+
+            static void handleEvent(bool& running)
+            {
+                SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+                const std::map<utils::Keys, SDL_Keycode> code{{utils::Keys::KEY_A, SDLK_A},
+                                                              {utils::Keys::KEY_B, SDLK_B},
+                                                              {utils::Keys::KEY_C, SDLK_C},
+                                                              {utils::Keys::KEY_D, SDLK_D},
+                                                              {utils::Keys::KEY_E, SDLK_E},
+                                                              {utils::Keys::KEY_F, SDLK_F},
+                                                              {utils::Keys::KEY_G, SDLK_G},
+                                                              {utils::Keys::KEY_H, SDLK_H},
+                                                              {utils::Keys::KEY_I, SDLK_I},
+                                                              {utils::Keys::KEY_J, SDLK_J},
+                                                              {utils::Keys::KEY_K, SDLK_K},
+                                                              {utils::Keys::KEY_L, SDLK_L},
+                                                              {utils::Keys::KEY_M, SDLK_M},
+                                                              {utils::Keys::KEY_N, SDLK_N},
+                                                              {utils::Keys::KEY_O, SDLK_O},
+                                                              {utils::Keys::KEY_P, SDLK_P},
+                                                              {utils::Keys::KEY_Q, SDLK_Q},
+                                                              {utils::Keys::KEY_R, SDLK_R},
+                                                              {utils::Keys::KEY_S, SDLK_S},
+                                                              {utils::Keys::KEY_T, SDLK_T},
+                                                              {utils::Keys::KEY_U, SDLK_U},
+                                                              {utils::Keys::KEY_V, SDLK_V},
+                                                              {utils::Keys::KEY_W, SDLK_W},
+                                                              {utils::Keys::KEY_X, SDLK_X},
+                                                              {utils::Keys::KEY_Y, SDLK_Y},
+                                                              {utils::Keys::KEY_Z, SDLK_Z},
+                                                              {utils::Keys::KEY_0, SDLK_0},
+                                                              {utils::Keys::KEY_1, SDLK_1},
+                                                              {utils::Keys::KEY_2, SDLK_2},
+                                                              {utils::Keys::KEY_3, SDLK_3},
+                                                              {utils::Keys::KEY_4, SDLK_4},
+                                                              {utils::Keys::KEY_5, SDLK_5},
+                                                              {utils::Keys::KEY_6, SDLK_6},
+                                                              {utils::Keys::KEY_7, SDLK_7},
+                                                              {utils::Keys::KEY_8, SDLK_8},
+                                                              {utils::Keys::KEY_9, SDLK_9},
+                                                              {utils::Keys::SPECIAL_KEY_SPACE, SDLK_SPACE},
+                                                              {utils::Keys::SPECIAL_KEY_BACKSPACE, SDLK_BACKSPACE},
+                                                              {utils::Keys::SPECIAL_KEY_ENTER, SDLK_RETURN},
+                                                              {utils::Keys::ARROW_DOWN, SDLK_DOWN},
+                                                              {utils::Keys::ARROW_UP, SDLK_UP},
+                                                              {utils::Keys::ARROW_LEFT, SDLK_LEFT},
+                                                              {utils::Keys::ARROW_RIGHT, SDLK_RIGHT}};
+                instance()._currentTime = SDL_GetTicks();
+                instance()._deltaTime = static_cast<float>(instance()._currentTime - instance()._lastTime) / 1000.0f;
+                instance()._lastTime = instance()._currentTime;
+
+                while (SDL_PollEvent(&instance()._event)) {
+                    switch (instance()._event.type) {
+                        case SDL_EVENT_QUIT:
+                            running = false;
+                            break;
+                        case SDL_EVENT_KEY_DOWN:
+                            for (auto it : code) {
+                                if (instance()._event.key.key == it.second) {
+                                    utils::EventManager event;
+                                    event.type = utils::EventType::KEYBOARD;
+                                    event.KeyboardEvent->type = utils::KeyEvent::KEY_DOWN;
+                                    event.KeyboardEvent->key = it.first;
+                                    instance()._keyEvent.push_back(event);
+                                    break;
+                                }
+                            }
+                            break;
+                        case SDL_EVENT_KEY_UP:
+                            for (auto it : code) {
+                                if (instance()._event.key.key == it.second) {
+                                    utils::EventManager event;
+                                    event.type = utils::EventType::KEYBOARD;
+                                    event.KeyboardEvent->type = utils::KeyEvent::KEY_UP;
+                                    event.KeyboardEvent->key = it.first;
+                                    instance()._keyEvent.push_back(event);
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+
             ~SDLManager()
             {
                 if (this->_renderer != nullptr)
@@ -43,6 +141,11 @@ namespace render
             SDL_Renderer* _renderer;
             SDL_Window* _window;
             std::string _windowTitle = "La windows";
+            SDL_Event _event;
+            uint32_t _lastTime = SDL_GetTicks();
+            uint32_t _currentTime = SDL_GetTicks();
+            std::vector<utils::EventManager> _keyEvent;
+            float _deltaTime;
 
             explicit SDLManager()
             {

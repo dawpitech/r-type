@@ -5,6 +5,8 @@
 // vector2
 //
 
+#pragma once
+
 namespace utils
 {
     template <typename T>
