@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include "Network/Network.hpp"
-#include "network/datatype.hpp"
-#include "Network/TCP/TCPInfo.hpp"
-#include <boost/system/detail/error_code.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/system/error_code.hpp>
+#include "Network/Network.hpp"
+#include "Network/TCP/TCPInfo.hpp"
+#include "network/datatype.hpp"
 
 using boost::asio::ip::tcp;
 
 namespace network
 {
-    class TCPNetwork final: public Network
+    class TCPNetwork final : public Network
     {
         public:
             explicit TCPNetwork(uint16_t port);
@@ -34,6 +34,6 @@ namespace network
             void _setupAcceptNewSocket();
             void _acceptHandler(const boost::system::error_code& error);
 
-            void _setupReadSocket(ClientTCP &client);
+            void _setupReadSocket(ClientTCP& client);
     };
 } // namespace network

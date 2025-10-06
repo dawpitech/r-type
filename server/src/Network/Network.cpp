@@ -9,6 +9,7 @@
 #include <iostream>
 #include "Network.hpp"
 #include "Network/TCP/TCPInfo.hpp"
+#include "network/datatype.hpp"
 
 network::Network::Network(const uint16_t port) : _port(port) {}
 
@@ -34,12 +35,18 @@ void network::Network::notify(const NetworkData& data)
         {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, ClientTCPReceivedInfo>) {
-                // this->_tcpReceivedCallback(arg);
-                std::cout << "Send message from client" << std::endl;
+                if (this->_tcpReceivedCallback)
+                    this->_tcpReceivedCallback(arg);
+                return;
+            }
+            if constexpr (std::is_same_v<T, UDPReceivedInfo>) {
+                if (this->_udpReceivedCallback)
+                    this->_udpReceivedCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ConnectionInfo>) {
-                this->_connectionCallback(arg);
+                if (this->_connectionCallback)
+                    this->_connectionCallback(arg);
                 return;
             }
         },
@@ -48,4 +55,6 @@ void network::Network::notify(const NetworkData& data)
 
 template void network::Network::attach<network::ClientTCPReceivedInfo>(
     std::function<void(const network::ClientTCPReceivedInfo&)>);
+template void network::Network::attach<network::UDPReceivedInfo>(
+    std::function<void(const network::UDPReceivedInfo&)>);
 template void network::Network::attach<network::ConnectionInfo>(std::function<void(const network::ConnectionInfo&)>);

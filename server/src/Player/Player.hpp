@@ -8,9 +8,8 @@
 #pragma once
 
 #include <string>
-#include <boost/uuid/uuid.hpp>
-
-#include "Network/TCP/TCPInfo.hpp"
+#include "network/datatype.hpp"
+#include "utils/logger.hpp"
 
 namespace game
 {
@@ -18,13 +17,19 @@ namespace game
     class Player
     {
         public:
-            explicit Player(const network::ConnectionInfo& info) : _id(info.uuid) {};
+            explicit Player(const network::ConnectionInfo& info) : _id(info.uuid) {}
             ~Player() = default;
 
-            [[nodiscard]] const std::string& getId() { return this->_id; };
+            [[nodiscard]] const std::string& getId() const { return this->_id; }
+            void storeInfo(const network::ClientTCPReceivedInfo& info)
+            {
+                utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));
+                this->_udpPort = info.portUDP;
+            }
 
         private:
             std::string _id;
             uint16_t _score = 0;
+            uint16_t _udpPort = 0;
     };
 } // namespace game

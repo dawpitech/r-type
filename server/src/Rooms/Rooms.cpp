@@ -13,7 +13,6 @@
 #include "Player/Player.hpp"
 #include "Rooms.hpp"
 #include "flux/core/flux.hpp"
-#include "utils/logger.hpp"
 
 Room::Room::Room(std::size_t roomNumber, const std::uint8_t nbPlayers) :
     _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)

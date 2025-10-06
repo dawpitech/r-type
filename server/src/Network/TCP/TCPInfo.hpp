@@ -12,10 +12,12 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <stdlib.h>
 #include <utility>
 
 #include "Network/Network.hpp"
 #include "network/datatype.hpp"
+#include "utils/logger.hpp"
 
 using boost::asio::ip::tcp;
 
@@ -33,23 +35,24 @@ namespace network
                 acceptor.async_accept(this->_socket, std::forward<Handler>(handler));
             };
 
-            template <typename Handler>
-            void async_read(Network& network, Handler&& handler)
+            void async_read(Network& network)
             {
-                this->_socket.async_receive(
-                    boost::asio::buffer(&this->_data, sizeof(ClientTCPReceivedInfo)),
-                    [this, &network, handler](const boost::system::error_code& error, size_t bytesRead)
+                boost::asio::async_read(
+                    this->_socket, boost::asio::buffer(&this->_data, sizeof(ClientTCPReceivedInfo)),
+                    [this, &network](const boost::system::error_code& error, size_t bytesRead)
                     {
                         if (error) {
-                            handler(error, bytesRead);
+                            utils::Logger::debug(std::format("Error in TCP read: {}", error.message()));
                             return;
                         }
 
-                        if (bytesRead == sizeof(ClientTCPReceivedInfo))
-                            this->addData(network, this->_data);
-
-                        handler(error, bytesRead);
-                        this->async_read(network, handler);
+                        if (bytesRead != sizeof(ClientTCPReceivedInfo)) {
+                            utils::Logger::debug(std::format("Error in TCP read size\nexpected: {}\nbut got: {}",
+                                                             sizeof(ClientTCPReceivedInfo), bytesRead));
+                            return;
+                        }
+                        network.notify(this->_data);
+                        this->async_read(network);
                     });
             }
 

@@ -13,7 +13,6 @@
 #include <iostream>
 
 #include "Rooms/RoomsPool.hpp"
-#include "utils/logger.hpp"
 #include "utils/parseArgs.hpp"
 
 static void checkVariables(po::variables_map& variables)
