@@ -16,7 +16,7 @@ void AnimationSystem(flux::ECS& ecs)
 
     auto entities = ecs.QueryViewNotExclusive(view);
 
-    for (flux::Entity entity : entities) {
+    for (const flux::Entity& entity : entities) {
         auto& anim = ecs.GetComponent<component::animation>(entity);
         auto& sprite = ecs.GetComponent<component::sprite>(entity);
 

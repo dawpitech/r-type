@@ -9,4 +9,4 @@
 
 #include "flux/core/flux.hpp"
 
-void InputSystem(flux::ECS& ecs, flux::Entity entity);
+void InputSystem(flux::ECS& ecs);

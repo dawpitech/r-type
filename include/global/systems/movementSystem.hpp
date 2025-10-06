@@ -9,4 +9,4 @@
 
 #include "flux/core/flux.hpp"
 
-void MovementSystem(flux::ECS &ecs, flux::Entity entity);
+void MovementSystem(flux::ECS &ecs);

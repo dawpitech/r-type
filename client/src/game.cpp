@@ -43,8 +43,8 @@ void rTypeClient::Game::launchGame()
 
     while (this->_running) {
         render::SDLManager::handleEvent(_running);
-        InputSystem(ecs, Entity);
-        MovementSystem(ecs, Entity);
+        InputSystem(ecs);
+        MovementSystem(ecs);
         render::SDLManager::clear();
         AnimationSystem(ecs);
         RenderSystem(ecs);

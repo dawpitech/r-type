@@ -21,7 +21,7 @@ void RenderSystem(flux::ECS& ecs)
 
     auto entities = ecs.QueryViewNotExclusive(view);
 
-    for (flux::Entity entity : entities) {
+    for (const flux::Entity& entity : entities) {
         auto& sprite = ecs.GetComponent<component::sprite>(entity);
         auto& animation = ecs.GetComponent<component::animation>(entity);
         auto& transform = ecs.GetComponent<component::Transform>(entity);
