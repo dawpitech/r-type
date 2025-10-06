@@ -11,24 +11,24 @@
 
 #include "client/components/animation.hpp"
 #include "client/components/sprite.hpp"
-#include "flux/core/flux.hpp"
 #include "client/sdlManager.hpp"
+#include "flux/core/flux.hpp"
 #include "global/components/Transform.hpp"
 
-void RenderSystem(flux::ECS& ecs, flux::Entity entity)
+void RenderSystem(flux::ECS& ecs)
 {
-    if (!ecs.HasComponents<component::sprite, component::animation, component::Transform>(entity))
-        return;
+    auto view = ecs.GenerateViewFromComponents<component::sprite, component::animation>();
 
-    auto& sprite = ecs.GetComponent<component::sprite>(entity);
-    auto& animation = ecs.GetComponent<component::animation>(entity);
-    auto& transform = ecs.GetComponent<component::Transform>(entity);
+    auto entities = ecs.QueryViewNotExclusive(view);
 
-    if (!sprite.visible)
-        return;
+    for (flux::Entity entity : entities) {
+        auto& sprite = ecs.GetComponent<component::sprite>(entity);
+        auto& animation = ecs.GetComponent<component::animation>(entity);
+        auto& transform = ecs.GetComponent<component::Transform>(entity);
 
-    sprite.destRect.x = transform.pos.x;
-    sprite.destRect.y = transform.pos.y;
+        sprite.destRect.x = transform.pos.x;
+        sprite.destRect.y = transform.pos.y;
 
-    render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
+        render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
+    }
 }

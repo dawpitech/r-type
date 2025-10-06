@@ -46,8 +46,8 @@ void rTypeClient::Game::launchGame()
         InputSystem(ecs, Entity);
         MovementSystem(ecs, Entity);
         render::SDLManager::clear();
-        AnimationSystem(ecs, Entity);
-        RenderSystem(ecs, Entity);
+        AnimationSystem(ecs);
+        RenderSystem(ecs);
         render::SDLManager::render();
     }
 }
