@@ -16,21 +16,20 @@
     #include "sdlManager.hpp"
     #include "components/Transform.hpp"
 
-    void RenderSystem(flux::ECS& ecs)
+    flux::View RenderSystemView(const flux::ECS& ecs)
     {
-        const auto view = ecs.GenerateViewFromComponents<component::sprite, component::Transform>();
+        return ecs.GenerateViewFromComponents<component::sprite, component::Transform>();
+    }
 
-        const auto& entities = ecs.QueryViewNotExclusive(view);
+    void RenderSystem(flux::ECS& ecs, flux::Entity entity)
+    {
+        auto& sprite = ecs.GetComponent<component::sprite>(entity);
+        const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
-        for (const flux::Entity& entity : entities) {
-            auto& sprite = ecs.GetComponent<component::sprite>(entity);
-            const auto& transform = ecs.GetComponent<component::Transform>(entity);
+        sprite.destRect.x = transform.pos.x;
+        sprite.destRect.y = transform.pos.y;
 
-            sprite.destRect.x = transform.pos.x;
-            sprite.destRect.y = transform.pos.y;
-
-            render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
-        }
+        render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
     }
 #else
     void RenderSystem(flux::ECS&) { return; }

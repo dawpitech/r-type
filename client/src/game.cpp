@@ -32,7 +32,6 @@ void rTypeClient::Game::launchGame()
 
     const flux::Entity playerEntity = ecs.newEntity();
 
-    // convert sprite::Rect(s) -> component::animation::Frame(s)
     {
         const auto& spriteMap = spriteHandler.getPlayerSprite().spriteMap;
         std::vector<component::animation::Frame> frames;
@@ -48,29 +47,17 @@ void rTypeClient::Game::launchGame()
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
 
+    ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
+    ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
+
+    flux::runtimeHooks hooks = {
+        .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
+        .hookBeforeRender = []{ render::SDLManager::clear(); },
+        .hookAfterRender = []{ render::SDLManager::render(); },
+    };
+
     render::SDLManager::setLastTime();
-
-    constexpr double LOGIC_STEP = 0.01;
-    double accumulator = 0.0;
-    auto prev = std::chrono::high_resolution_clock::now();
-
-    while (this->_running) {
-        auto now = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> frameTime = now - prev;
-        prev = now;
-        accumulator += frameTime.count();
-
-        while (accumulator > LOGIC_STEP) {
-            render::SDLManager::handleEvent(_running);
-            InputSystem(ecs);
-            MovementSystem(ecs);
-            accumulator -= LOGIC_STEP;
-        }
-        render::SDLManager::clear();
-        AnimationSystem(ecs);
-        RenderSystem(ecs);
-        render::SDLManager::render();
-
-        std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-    }
+    ecs.handExecution(hooks);
 }

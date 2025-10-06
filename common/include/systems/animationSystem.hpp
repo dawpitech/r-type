@@ -9,4 +9,5 @@
 
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs);
+void AnimationSystem(flux::ECS& ecs, flux::Entity entity);
+flux::View AnimationSystemView(const flux::ECS& ecs);

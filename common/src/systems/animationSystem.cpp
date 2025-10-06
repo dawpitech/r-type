@@ -12,40 +12,38 @@
 #if IS_CLIENT
     #include "sdlManager.hpp"
 
-    void AnimationSystem(flux::ECS& ecs)
+    flux::View AnimationSystemView(const flux::ECS& ecs)
     {
-        const auto view = ecs.GenerateViewFromComponents<component::sprite, component::animation>();
+        return ecs.GenerateViewFromComponents<component::sprite, component::animation>();
+    }
 
-        auto entities = ecs.QueryViewNotExclusive(view);
+    void AnimationSystem(flux::ECS& ecs, flux::Entity entity)
+    {
+        auto& anim = ecs.GetComponent<component::animation>(entity);
+        auto& sprite = ecs.GetComponent<component::sprite>(entity);
 
-        for (const flux::Entity& entity : entities) {
-            auto& anim = ecs.GetComponent<component::animation>(entity);
-            auto& sprite = ecs.GetComponent<component::sprite>(entity);
+        if (!anim.playing || anim.frames.empty())
+            return;
 
-            if (!anim.playing || anim.frames.empty())
-                continue;
-
-            anim.elapsedTime += render::SDLManager::getDeltaTime();
-            if (anim.elapsedTime >= anim.frameTime) {
-                anim.elapsedTime = 0.0f;
-                anim.currentFrame++;
-                if (anim.currentFrame >= static_cast<int>(anim.frames.size())) {
-                    anim.currentFrame = anim.loop ? 0 : static_cast<int>(anim.frames.size()) - 1;
-                }
-
-                const auto& f = anim.frames[anim.currentFrame];
-
-                // map plain Frame -> SDL rects
-                sprite.destRect.w = f.srcW;
-                sprite.destRect.h = f.srcH;
-
-                sprite.srcRect.x = f.srcX;
-                sprite.srcRect.y = f.srcY;
-                sprite.srcRect.w = f.srcW;
-                sprite.srcRect.h = f.srcH;
+        anim.elapsedTime += render::SDLManager::getDeltaTime();
+        if (anim.elapsedTime >= anim.frameTime) {
+            anim.elapsedTime = 0.0f;
+            anim.currentFrame++;
+            if (anim.currentFrame >= static_cast<int>(anim.frames.size())) {
+                anim.currentFrame = anim.loop ? 0 : static_cast<int>(anim.frames.size()) - 1;
             }
+
+            const auto& [srcX, srcY, srcW, srcH] = anim.frames[anim.currentFrame];
+
+            sprite.destRect.w = srcW;
+            sprite.destRect.h = srcH;
+
+            sprite.srcRect.x = srcX;
+            sprite.srcRect.y = srcY;
+            sprite.srcRect.w = srcW;
+            sprite.srcRect.h = srcH;
         }
     }
 #else
-    void AnimationSystem(flux::ECS& ecs) {/* server has no animation work to do */}
+    void AnimationSystem(flux::ECS& ecs) { return; }
 #endif

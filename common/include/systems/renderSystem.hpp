@@ -9,4 +9,5 @@
 
 #include "flux/core/flux.hpp"
 
-void RenderSystem(flux::ECS &ecs);
+void RenderSystem(flux::ECS &ecs, flux::Entity entity);
+flux::View RenderSystemView(const flux::ECS& ecs);

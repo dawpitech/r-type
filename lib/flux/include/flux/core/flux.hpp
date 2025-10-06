@@ -10,10 +10,14 @@
 #include <algorithm>
 #include <bitset>
 #include <cassert>
+#include <chrono>
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <stdexcept>
+#include <thread>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -27,6 +31,34 @@ namespace flux
     typedef uint32_t Entity;
     typedef std::bitset<MAX_COMPONENTS> ComponentMask;
     typedef ComponentMask View;
+
+    enum class systemType
+    {
+        LOGIC,
+        RENDER,
+    };
+
+    struct runtimeHooks
+    {
+        std::optional<std::function<void()>> asSoonAsPossible;
+        std::optional<std::function<void()>> hookBeforeLogic;
+        std::optional<std::function<void()>> hookAfterLogic;
+        std::optional<std::function<void()>> hookBeforeRender;
+        std::optional<std::function<void()>> hookAfterRender;
+    };
+
+    template<typename Fn, typename... Args>
+    std::function<void()> make_hook(Fn&& fn, Args&&... args)
+    {
+        using FnT = std::decay_t<Fn>;
+        auto callable = FnT(std::forward<Fn>(fn));
+        auto tup = std::make_tuple(std::forward<Args>(args)...);
+        return [callable = std::move(callable), tup = std::move(tup)]() mutable {
+            std::apply([&callable](auto&&... a){
+                std::invoke(callable, std::forward<decltype(a)>(a)...);
+            }, tup);
+        };
+    }
 
     class ECS
     {
@@ -43,6 +75,11 @@ namespace flux
         std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
 
         Entity nextEntityID = 0;
+
+        std::vector<std::tuple<std::function<void(ECS& ecs, Entity)>, View>> systemsLogicList;
+        std::vector<std::tuple<std::function<void(ECS& ecs, Entity)>, View>> systemsRenderList;
+
+        bool _running = true;
 
         template <typename T>
         struct ComponentVector final : IComponentVector
@@ -316,6 +353,54 @@ namespace flux
                     }
                 }
                 return result;
+            }
+
+            void registerSystem(std::function<void(ECS& ecs, Entity entity)> handler, const View& view, const systemType& type)
+            {
+                if (type == systemType::LOGIC)
+                    this->systemsLogicList.emplace_back(std::make_tuple(handler, view));
+                else
+                    this->systemsRenderList.emplace_back(std::make_tuple(handler, view));
+            }
+
+            void handExecution(const std::optional<runtimeHooks>& hooks = std::nullopt)
+            {
+                constexpr double LOGIC_STEP = 0.01;
+                double accumulator = 0.0;
+                auto prev = std::chrono::high_resolution_clock::now();
+
+                while (this->_running) {
+                    auto now = std::chrono::high_resolution_clock::now();
+                    std::chrono::duration<double> frameTime = now - prev;
+                    prev = now;
+                    accumulator += frameTime.count();
+
+                    while (accumulator > LOGIC_STEP) {
+                        if (hooks && hooks->hookBeforeLogic)
+                            hooks->hookBeforeLogic.value()();
+                        for (const auto& [handler, view] : this->systemsLogicList)
+                            for (const auto entity : this->QueryViewNotExclusive(view))
+                                handler(*this, entity);
+                        if (hooks && hooks->hookAfterLogic)
+                            hooks->hookAfterLogic.value()();
+                        accumulator -= LOGIC_STEP;
+                    }
+
+                    if (hooks && hooks->hookBeforeRender)
+                        hooks->hookBeforeRender.value()();
+                    for (const auto& [handler, view] : this->systemsRenderList)
+                        for (const auto entity : this->QueryViewNotExclusive(view))
+                            handler(*this, entity);
+                    if (hooks && hooks->hookAfterRender)
+                        hooks->hookAfterRender.value()();
+
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+                }
+            }
+
+            bool& getMasterRunState()
+            {
+                return this->_running;
             }
     };
 }
