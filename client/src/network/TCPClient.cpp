@@ -12,14 +12,14 @@ client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serv
 
 client::network::TCPClient::~TCPClient()
 {
-    if (_connected) {
+    if (this->_connected) {
         disconnect();
     }
 }
 
 void client::network::TCPClient::connect()
 {
-    if (_connected) {
+    if (this->_connected) {
         utils::Logger::debug("Client already connected");
         return;
     }
@@ -36,7 +36,7 @@ void client::network::TCPClient::connect()
 
 void client::network::TCPClient::disconnect()
 {
-    if (!_connected) {
+    if (!this->_connected) {
         return;
     }
 
@@ -49,7 +49,7 @@ void client::network::TCPClient::disconnect()
 
 void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo& data)
 {
-    if (!_connected) {
+    if (!this->_connected) {
         return;
     }
 
@@ -58,7 +58,7 @@ void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo
 
 bool client::network::TCPClient::isConnected() const
 {
-    return _connected;
+    return this->_connected;
 }
 
 void client::network::TCPClient::_connectHandler(const boost::system::error_code& error)
@@ -75,23 +75,26 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
 
 void client::network::TCPClient::_setupRead()
 {
+    auto data = std::make_unique<::network::ClientTCPSentInfo>();
     boost::asio::async_read(
         this->_socket, 
-        boost::asio::buffer(&this->_receivedData, sizeof(this->_receivedData)),
-        std::bind(&TCPClient::_readHandler, this, std::placeholders::_1, std::placeholders::_2));
+        boost::asio::buffer(data.get(), sizeof(::network::ClientTCPSentInfo)),
+        [this, data = std::move(data)](const boost::system::error_code& error, size_t bytesRead) mutable {
+            this->_readHandler(error, bytesRead, std::move(data));
+        });
 }
 
-void client::network::TCPClient::_readHandler(const boost::system::error_code& error, size_t bytesRead)
+void client::network::TCPClient::_readHandler(const boost::system::error_code& error, size_t bytesRead, std::unique_ptr<::network::ClientTCPSentInfo>&& data)
 {
     if (error) {
         this->_connected = false;
         return;
     }
 
-    if (bytesRead != sizeof(::network::ClientTCPReceivedInfo)) {
+    if (bytesRead != sizeof(::network::ClientTCPSentInfo)) {
         return;
     }
 
-    this->notify(this->_receivedData);
+    this->notify(*data);
     this->_setupRead();
 }

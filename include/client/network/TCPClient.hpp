@@ -25,10 +25,9 @@ namespace client::network
         private:
             tcp::socket _socket;
             bool _connected;
-            ::network::ClientTCPReceivedInfo _receivedData;
 
             void _connectHandler(const boost::system::error_code& error);
             void _setupRead();
-            void _readHandler(const boost::system::error_code& error, size_t bytesRead);
+            void _readHandler(const boost::system::error_code& error, size_t bytesRead, std::unique_ptr<::network::ClientTCPSentInfo>&& data);
     };
 } // namespace client::network

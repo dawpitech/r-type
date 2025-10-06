@@ -35,7 +35,7 @@ namespace client::network
             uint16_t _serverPort;
             boost::asio::io_context _ioContext;
 
-            std::function<void(const ::network::ClientTCPReceivedInfo&)> _tcpReceivedCallback;
+            std::function<void(const ::network::ClientTCPSentInfo&)> _tcpReceivedCallback;
             std::function<void(const ::network::UDPReceivedInfo&)> _udpReceivedCallback;
             std::function<void(const ::network::ConnectionInfo&)> _connectionCallback;
     };
