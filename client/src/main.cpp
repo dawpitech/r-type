@@ -7,18 +7,15 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <Simulation.hpp>
 
-#include "game.hpp"
 #include "utils/error.hpp"
 
 int main()
 {
     try {
-        rTypeClient::Game game;
-        game.launchGame();
-    }
-    catch (const rTypeClient::GameError& e) {
-        std::cerr << e.what() << " in " << e.where() << std::endl;
+        Simulation simulation;
+        simulation.runSimulation(true);
     }
     catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;

@@ -5,8 +5,9 @@
 // spriteHandler
 //
 
+#include <SDL3/SDL_render.h>
+
 #include "spriteHandler.hpp"
-#include "SDL3/SDL_render.h"
 
 constexpr uint8_t NB_PLAYER_SPRITE_X = 5;
 constexpr uint8_t NB_PLAYER_SPRITE_Y = 5;

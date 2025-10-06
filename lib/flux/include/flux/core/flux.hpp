@@ -40,7 +40,6 @@ namespace flux
 
     struct runtimeHooks
     {
-        std::optional<std::function<void()>> asSoonAsPossible;
         std::optional<std::function<void()>> hookBeforeLogic;
         std::optional<std::function<void()>> hookAfterLogic;
         std::optional<std::function<void()>> hookBeforeRender;

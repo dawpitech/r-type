@@ -11,7 +11,7 @@
 #include "utils/eventManager.hpp"
 
 #if IS_CLIENT
-    #include "sdlManager.hpp"
+    #include "../../include/sdlManager.hpp"
 #endif
 
 constexpr auto MAX_VERTICAL_SPEED = 10;

@@ -10,17 +10,24 @@
 #include <vector>
 #include <SDL3/SDL_render.h>
 
-#include "components/Animation.hpp"
 #include "textureManager.hpp"
 #include "vector2.hpp"
 
 namespace sprite
 {
+    struct Rect
+    {
+        float srcX;
+        float srcY;
+        float destX;
+        float destY;
+    };
+
     struct SpriteData
     {
-            SDL_Texture *texture;
-            utils::Vector2<float> size{0, 0};
-            std::vector<Rect> spriteMap;
+        SDL_Texture *texture;
+        utils::Vector2<float> size{0, 0};
+        std::vector<Rect> spriteMap;
     };
 
     class SpriteHandler

@@ -9,9 +9,8 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
-#include "utils/error.hpp"
-
 #include "textureManager.hpp"
+#include "utils/error.hpp"
 
 SDL_Texture* utils::TextureManager::load(SDL_Renderer* renderer, const std::string& path)
 {

@@ -7,38 +7,28 @@
 
 #pragma once
 
+#include <SDL3/SDL_rect.h>
+#include <spriteHandler.hpp>
 #include <vector>
-
-namespace sprite
-{
-    struct Rect {
-        float srcX = 0.f;
-        float srcY = 0.f;
-        float destX = 0.f; // width
-        float destY = 0.f; // height
-    };
-} // namespace sprite
 
 namespace component
 {
     struct animation
     {
-        struct Frame {
-            float srcX = 0.f;
-            float srcY = 0.f;
-            float srcW = 0.f;
-            float srcH = 0.f;
-        };
-
-        std::vector<Frame> frames;
+        std::vector<SDL_FRect> frames;
         int currentFrame = 0;
-        const float frameTime = 10.0f;
+        const float frameTime = 0.1f;
         float elapsedTime = 0.0f;
 
         bool loop = true;
         bool playing = true;
 
-        animation() = default;
-        explicit animation(const std::vector<Frame>& rects) : frames(rects) {}
+        explicit animation(const std::vector<sprite::Rect>& rect)
+        {
+            for (auto it : rect) {
+                SDL_FRect rect{it.srcX, it.srcY, it.destX, it.destY};
+                frames.emplace_back(rect);
+            }
+        }
     };
 } // namespace component
