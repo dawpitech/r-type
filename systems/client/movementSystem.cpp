@@ -22,11 +22,11 @@ void MovementSystem(flux::ECS& ecs, flux::Entity entity)
     auto& velocity = ecs.GetComponent<component::Velocity>(entity);
 
     if (input.move_up)
-        transform.pos.y -= (velocity.speed / SPEED_SCALE);
+        transform.pos.y -= (velocity.y / SPEED_SCALE);
     if (input.move_down)
-        transform.pos.y += (velocity.speed / SPEED_SCALE);
+        transform.pos.y += (velocity.y / SPEED_SCALE);
     if (input.move_right)
-        transform.pos.x += (velocity.speed / SPEED_SCALE);
+        transform.pos.x += (velocity.x / SPEED_SCALE);
     if (input.move_left)
-        transform.pos.x -= (velocity.speed / SPEED_SCALE);
+        transform.pos.x -= (velocity.x / SPEED_SCALE);
 }

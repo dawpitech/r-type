@@ -37,7 +37,7 @@ void rTypeClient::Game::launchGame()
     ecs.Add<component::animation>(Entity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
     ecs.Add<component::PlayerInput>(Entity);
     ecs.Add<component::Transform>(Entity, component::Transform(0, 0, 0, 1, 1));
-    ecs.Add<component::Velocity>(Entity);
+    ecs.Add<component::Velocity>(Entity, component::Velocity(50.0, 10.0));
 
     render::SDLManager::setLastTime();
 
