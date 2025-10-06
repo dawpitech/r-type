@@ -150,15 +150,16 @@ namespace render
             explicit SDLManager()
             {
                 if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-                    throw utils::BaseError("Failed to init sdl", "_initSdl");
+                    throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
                 this->_window = SDL_CreateWindow(this->_windowTitle.c_str(), 800, 600, 0);
                 if (this->_window == nullptr) {
-                    throw utils::BaseError("Failed to create window", "_initSdl");
+                    throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
                 this->_renderer = SDL_CreateRenderer(this->_window, nullptr);
                 if (this->_renderer == nullptr) {
-                    throw utils::BaseError("Failed to create Renderer", "_initSdl");
+                    std::cout << SDL_GetError() << std::endl;
+                    throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
             }
 
