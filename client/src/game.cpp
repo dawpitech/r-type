@@ -22,9 +22,14 @@
 #include "global/systems/movementSystem.hpp"
 #include "global/components/playerInput.hpp"
 #include "client/systems/inputSystem.hpp"
+#include "client/network/TCPClient.hpp"
+#include "global/network/datatype.hpp"
+#include "global/utils/logger.hpp"
 
-void rTypeClient::Game::launchGame()
+void rTypeClient::Game::launchGame(const std::string& serverIp, uint16_t serverPort)
 {
+    this->_setupNetwork(serverIp, serverPort);
+    
     flux::ECS ecs;
     render::SDLManager::init();
     utils::TextureManager TextureManager;
@@ -49,5 +54,22 @@ void rTypeClient::Game::launchGame()
         AnimationSystem(ecs, Entity);
         RenderSystem(ecs, Entity);
         render::SDLManager::render();
+        
+        if (this->_networkClient) {
+        }
+    }
+}
+
+void rTypeClient::Game::_setupNetwork(const std::string& serverIp, uint16_t serverPort)
+{
+    utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIp, serverPort));
+    this->_networkClient = std::make_unique<client::network::TCPClient>(serverIp, serverPort);
+    
+    try {
+        this->_networkClient->connect();
+        utils::Logger::debug("Network setup completed");
+    } catch (const client::network::NetworkError& e) {
+        utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
+        throw GameError("Failed to connect to server", "_setupNetwork");
     }
 }

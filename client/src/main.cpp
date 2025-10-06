@@ -50,13 +50,13 @@ int main(int argc, char **argv)
 
         std::string ip = variables["ip"].as<std::string>();
         std::uint16_t port = variables["port"].as<uint16_t>();
-        game.launchGame();
+        game.launchGame(ip, port);
     }
     catch (const rTypeClient::GameError& e) {
-        std::cerr << e.what() << "in" << e.where() << std::endl;
+        std::cerr << e.what() << " in " << e.where() << std::endl;
     }
     catch (const utils::BaseError& e) {
-        std::cerr << e.what() << "in" << e.where() << std::endl;
+        std::cerr << e.what() << " in " << e.where() << std::endl;
     }
     catch (const po::error& e)
     {

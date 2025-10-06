@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <variant>
 #include "components/playerInput.hpp"
 #include "utils/uuidGenerator.hpp"
@@ -18,9 +19,10 @@ namespace network
 
     struct ConnectionInfo;
     struct ClientTCPReceivedInfo;
+    struct ClientTCPSentInfo;
     struct UDPReceivedInfo;
 
-    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo, network::UDPReceivedInfo>;
+    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ClientTCPSentInfo, network::ConnectionInfo, network::UDPReceivedInfo>;
 
     template <typename T>
     concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
@@ -47,6 +49,10 @@ namespace network
             char userID[BUFFERSIZE];
             uint16_t portUDP;
             uint16_t score;
+
+            ClientTCPSentInfo() : portUDP(0), score(0) {
+                std::memset(this->userID, 0, BUFFERSIZE);
+            }
 
             explicit ClientTCPSentInfo(std::string id, uint16_t port, uint16_t score) : portUDP(port), score(score)
             {
