@@ -22,6 +22,10 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
         [this](network::ClientTCPReceivedInfo info) {
             this->_playerManager.storeInfo(info);
         });
+    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info) {
+
+        return;
+    });
     for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_threads.emplace_back(
             [this, i]

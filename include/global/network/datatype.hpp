@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <variant>
+#include "components/playerInput.hpp"
 #include "utils/uuidGenerator.hpp"
 
 namespace network
@@ -17,8 +18,9 @@ namespace network
 
     struct ConnectionInfo;
     struct ClientTCPReceivedInfo;
+    struct UDPReceivedInfo;
 
-    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo>;
+    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ConnectionInfo, network::UDPReceivedInfo>;
 
     template <typename T>
     concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
@@ -35,11 +37,9 @@ namespace network
 
     struct ClientTCPReceivedInfo final
     {
-            bool ready;
-            char uuid[BUFFERSIZE];
-            uint16_t portUDP;
-
-            ClientTCPReceivedInfo() : ready(false), portUDP(0), uuid{} {};
+            bool ready = false;
+            char uuid[BUFFERSIZE] = {};
+            uint16_t portUDP = 0;
     };
 
     struct ClientTCPSentInfo final
@@ -54,4 +54,9 @@ namespace network
             };
     };
 
+    struct UDPReceivedInfo final
+    {
+            char uuid[BUFFERSIZE] = "";
+            component::PlayerInput game;
+    };
 } // namespace network

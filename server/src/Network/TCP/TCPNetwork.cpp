@@ -57,7 +57,4 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
     this->_setupAcceptNewSocket();
 }
 
-void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
-{
-    client.async_read(*this);
-}
+void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client) { client.async_read(*this); }
