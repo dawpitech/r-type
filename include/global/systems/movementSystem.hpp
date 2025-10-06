@@ -2,11 +2,11 @@
 // EPITECH PROJECT, 2025
 // r-type
 // File description:
-// animation system
+// MovementSystem
 //
 
 #pragma once
 
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, flux::Entity entity);
+void MovementSystem(flux::ECS &ecs, flux::Entity entity);

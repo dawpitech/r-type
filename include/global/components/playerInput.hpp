@@ -5,6 +5,8 @@
 // movement
 //
 
+#pragma once
+
 namespace component
 {
     struct PlayerInput
