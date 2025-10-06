@@ -13,7 +13,7 @@ template <typename T> requires ::network::NetworkDataType<T>
 void client::network::Network::attach(std::function<void(const T&)> callback)
 {
     if constexpr(std::is_same_v<T, ::network::ClientTCPSentInfo>) {
-        this->_tcpReceivedCallback = std::move(callback);
+        this->_tcpSentCallback = std::move(callback);
         return;
     }
     if constexpr(std::is_same_v<T, ::network::ConnectionInfo>) {
@@ -33,8 +33,8 @@ void client::network::Network::notify(const ::network::NetworkData& data)
         {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, ::network::ClientTCPSentInfo>) {
-                if (this->_tcpReceivedCallback)
-                    this->_tcpReceivedCallback(arg);
+                if (this->_tcpSentCallback)
+                    this->_tcpSentCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ::network::UDPReceivedInfo>) {
