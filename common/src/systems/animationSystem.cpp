@@ -29,6 +29,8 @@ void AnimationSystem(flux::ECS& ecs, flux::Entity entity)
         if (anim.currentFrame >= static_cast<int>(anim.frames.size())) {
             anim.currentFrame = anim.loop ? 0 : static_cast<int>(anim.frames.size()) - 1;
         }
+        if (!anim.isAnimate)
+            anim.currentFrame = 0;
         sprite.destRect.w = anim.frames[anim.currentFrame].w;
         sprite.destRect.h = anim.frames[anim.currentFrame].h;
         sprite.srcRect = anim.frames[anim.currentFrame];

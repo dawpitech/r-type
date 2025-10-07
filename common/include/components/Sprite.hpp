@@ -25,10 +25,8 @@ namespace component
             SDL_Color tint = {255, 255, 255, 255};
 
             int layer = 0;
-            bool animation = false;
             bool visible = true;
 
-            sprite(SDL_Texture* texture, bool animation) :
-                texture(texture), animation(animation) {};
+            explicit sprite(SDL_Texture* texture) : texture(texture) {};
     };
 } // namespace component

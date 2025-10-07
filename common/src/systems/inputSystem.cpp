@@ -5,16 +5,17 @@
 // inputSystem
 //
 
+#include "components/PlayerInput.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
-#include "components/PlayerInput.hpp"
 #include "utils/eventManager.hpp"
 
 #if IS_CLIENT
-    #include "../../include/sdlManager.hpp"
+#include "../../include/sdlManager.hpp"
 #endif
 
 constexpr auto MAX_VERTICAL_SPEED = 10;
+constexpr auto MAX_HORIZONTAL_SPEED = 10;
 
 flux::View InputSystemView(const flux::ECS& ecs)
 {
@@ -26,46 +27,46 @@ void InputSystem(flux::ECS& ecs, flux::Entity entity)
     auto& playerInput = ecs.GetComponent<component::PlayerInput>(entity);
     auto& playerVelocity = ecs.GetComponent<component::Velocity>(entity);
 
-    #if IS_CLIENT
-        for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
-            if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
-                switch (KeyboardEvent->key) {
-                    case utils::Keys::ARROW_DOWN:
-                        playerInput.move_down = true;
-                        break;
-                    case utils::Keys::ARROW_UP:
-                        playerInput.move_up = true;
-                        break;
-                    case utils::Keys::ARROW_LEFT:
-                        playerInput.move_left = true;
-                        break;
-                    case utils::Keys::ARROW_RIGHT:
-                        playerInput.move_right = true;
-                        break;
-                    default:
-                        break;
-                }
-            if (KeyboardEvent->type == utils::KeyEvent::KEY_UP)
-                switch (KeyboardEvent->key) {
-                    case utils::Keys::ARROW_DOWN:
-                        playerInput.move_down = false;
-                        break;
-                    case utils::Keys::ARROW_UP:
-                        playerInput.move_up = false;
-                        break;
-                    case utils::Keys::ARROW_LEFT:
-                        playerInput.move_left = false;
-                        break;
-                    case utils::Keys::ARROW_RIGHT:
-                        playerInput.move_right = false;
-                        break;
-                    default:
-                        break;
-                }
-        }
-        render::SDLManager::getKeysEvent().clear();
-        SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
-    #endif
+#if IS_CLIENT
+    for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
+        if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
+            switch (KeyboardEvent->key) {
+                case utils::Keys::ARROW_DOWN:
+                    playerInput.move_down = true;
+                    break;
+                case utils::Keys::ARROW_UP:
+                    playerInput.move_up = true;
+                    break;
+                case utils::Keys::ARROW_LEFT:
+                    playerInput.move_left = true;
+                    break;
+                case utils::Keys::ARROW_RIGHT:
+                    playerInput.move_right = true;
+                    break;
+                default:
+                    break;
+            }
+        if (KeyboardEvent->type == utils::KeyEvent::KEY_UP)
+            switch (KeyboardEvent->key) {
+                case utils::Keys::ARROW_DOWN:
+                    playerInput.move_down = false;
+                    break;
+                case utils::Keys::ARROW_UP:
+                    playerInput.move_up = false;
+                    break;
+                case utils::Keys::ARROW_LEFT:
+                    playerInput.move_left = false;
+                    break;
+                case utils::Keys::ARROW_RIGHT:
+                    playerInput.move_right = false;
+                    break;
+                default:
+                    break;
+            }
+    }
+    render::SDLManager::getKeysEvent().clear();
+    SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+#endif
 
     if (playerInput.move_up)
         playerVelocity.y -= 0.1;
@@ -73,6 +74,19 @@ void InputSystem(flux::ECS& ecs, flux::Entity entity)
     if (playerInput.move_down)
         playerVelocity.y += 0.1;
 
-    if (playerVelocity.y < -MAX_VERTICAL_SPEED) playerVelocity.y = -MAX_VERTICAL_SPEED;
-    if (playerVelocity.y > MAX_VERTICAL_SPEED) playerVelocity.y = MAX_VERTICAL_SPEED;
+    if (playerVelocity.y < -MAX_VERTICAL_SPEED)
+        playerVelocity.y = -MAX_VERTICAL_SPEED;
+    if (playerVelocity.y > MAX_VERTICAL_SPEED)
+        playerVelocity.y = MAX_VERTICAL_SPEED;
+
+    if (playerInput.move_right)
+        playerVelocity.x += 0.1;
+
+    if (playerInput.move_left)
+        playerVelocity.x -= 0.1;
+
+    if (playerVelocity.x < -MAX_HORIZONTAL_SPEED)
+        playerVelocity.x = -MAX_HORIZONTAL_SPEED;
+    if (playerVelocity.x > MAX_HORIZONTAL_SPEED)
+        playerVelocity.x = MAX_HORIZONTAL_SPEED;
 }
