@@ -19,6 +19,7 @@
             mold
             ninja
             act
+            sdl3
 
             alsa-lib
             hidapi

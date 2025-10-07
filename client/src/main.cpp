@@ -5,29 +5,27 @@
 ** main.cpp
 */
 
-#include <boost/program_options/errors.hpp>
+#include <cstdlib>
+#include <format>
+#include <iostream>
 #include <boost/program_options/variables_map.hpp>
 
-#include <format>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include "client/game.hpp"
-#include "global/utils/error.hpp"
-#include "global/utils/logger.hpp"
-#include "client/parseArgs.hpp"
+#include "parseArgs.hpp"
+#include "Simulation.hpp"
+#include "utils/error.hpp"
+#include "utils/logger.hpp"
 
-static void checkVariables(po::variables_map& variables)
+static void checkVariables(const po::variables_map& variables)
 {
-    if (variables.count("ip") != 1)
+    if (!variables.contains("ip"))
     {
         throw utils::ParsingError("Arg ip undefined", "checkVariables");
     }
-    if (variables.count("port") != 1)
+    if (!variables.contains("port"))
     {
         throw utils::ParsingError("Arg port undefined", "checkVariables");
     }
-    if (variables.find("debug") != variables.end())
+    if (variables.contains("debug"))
     {
         utils::Logger::setDebug(true);
     }
@@ -36,7 +34,6 @@ static void checkVariables(po::variables_map& variables)
 int main(int argc, char **argv)
 {
     try {
-        rTypeClient::Game game;
         utils::Parser parser(argc, argv);
         parser.parseArgs();
         po::variables_map variables = parser.getArgs();
@@ -48,12 +45,11 @@ int main(int argc, char **argv)
         msg = std::format("Port: {}", variables["port"].as<uint16_t>());
         utils::Logger::debug(msg);
 
-        std::string ip = variables["ip"].as<std::string>();
+        auto ip = variables["ip"].as<std::string>();
         std::uint16_t port = variables["port"].as<uint16_t>();
-        game.launchGame(ip, port);
-    }
-    catch (const rTypeClient::GameError& e) {
-        std::cerr << e.what() << " in " << e.where() << std::endl;
+
+        Simulation simulation;
+        simulation.runSimulationWithNetwork(true, ip, port);
     }
     catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;

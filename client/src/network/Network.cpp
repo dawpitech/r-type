@@ -1,8 +1,14 @@
+/*
+** EPITECH PROJECT, 2025
+** r-type
+** File description:
+** Network.cpp
+*/
 
 #include <type_traits>
-#include <iostream>
-#include "client/network/Network.hpp"
-#include "global/network/datatype.hpp"
+
+#include "Network.hpp"
+#include "network/datatype.hpp"
 
 client::network::Network::Network(const std::string& serverIp, uint16_t serverPort) : 
     _serverIp(serverIp), _serverPort(serverPort) {}

@@ -5,27 +5,27 @@
 // Entrypoint for r-type server
 //
 
-#include <boost/program_options/errors.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <boost/program_options/errors.hpp>
+#include <boost/program_options/variables_map.hpp>
 
-#include "Rooms/RoomsPool.hpp"
-#include "utils/parseArgs.hpp"
+#include "parseArgs.hpp"
+#include "rooms/RoomsPool.hpp"
+#include "utils/logger.hpp"
 
-static void checkVariables(po::variables_map& variables)
+static void checkVariables(const po::variables_map& variables)
 {
-    if (variables.count("port") != 1)
+    if (!variables.contains("port"))
     {
         throw utils::ParsingError("Arg port undefined", "checkVariables");
     }
-    if (variables.count("rooms") != 1)
+    if (!variables.contains("rooms"))
     {
         throw utils::ParsingError("Arg rooms undefined", "checkVariables");
     }
-    if (variables.find("debug") != variables.end())
+    if (variables.contains("debug"))
     {
         utils::Logger::setDebug(true);
     }

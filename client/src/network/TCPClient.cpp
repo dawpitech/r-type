@@ -1,8 +1,15 @@
+/*
+** EPITECH PROJECT, 2025
+** r-type
+** File description:
+** TCPClient.cpp
+*/
 
 #include <functional>
 #include <boost/system/error_code.hpp>
-#include "client/network/TCPClient.hpp"
-#include "global/utils/logger.hpp"
+
+#include "network/TCPClient.hpp"
+#include "utils/logger.hpp"
 
 client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort) :
     Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false)
@@ -28,8 +35,7 @@ void client::network::TCPClient::connect()
     tcp::resolver resolver(this->_ioContext);
     auto endpoints = resolver.resolve(this->_serverIp, std::to_string(this->_serverPort));
     
-    boost::asio::async_connect(this->_socket, endpoints,
-        std::bind(&TCPClient::_connectHandler, this, std::placeholders::_1));
+    boost::asio::async_connect(this->_socket, endpoints, std::bind(&TCPClient::_connectHandler, this, std::placeholders::_1));
     
     this->_ioContext.poll_one();
 }
