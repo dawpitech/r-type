@@ -7,7 +7,8 @@
 
 #pragma once
 
+#include <vector>
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, flux::Entity entity);
+void AnimationSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities);
 flux::View AnimationSystemView(const flux::ECS& ecs);

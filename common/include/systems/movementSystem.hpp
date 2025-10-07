@@ -7,7 +7,8 @@
 
 #pragma once
 
+#include <vector>
 #include "flux/core/flux.hpp"
 
-void MovementSystem(flux::ECS &ecs, flux::Entity entity);
+void MovementSystem(flux::ECS &ecs, const std::vector<flux::Entity>& entities);
 flux::View MovementSystemView(const flux::ECS& ecs);
