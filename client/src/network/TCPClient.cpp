@@ -5,10 +5,12 @@
 ** TCPClient.cpp
 */
 
+#include <cstdint>
 #include <functional>
 #include <boost/system/error_code.hpp>
 
 #include "network/TCPClient.hpp"
+#include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
 client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort) :
@@ -67,6 +69,11 @@ bool client::network::TCPClient::isConnected() const
     return this->_connected;
 }
 
+uint16_t client::network::TCPClient::getPortUDP() const
+{
+    return this->_portUDP;
+}
+
 void client::network::TCPClient::_connectHandler(const boost::system::error_code& error)
 {
     if (error) {
@@ -77,12 +84,32 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
     this->_connected = true;
     utils::Logger::debug(std::format("Successfully connected to {}:{}", this->_serverIp, this->_serverPort));
     this->_setupRead();
-    if (this->_uuid == "") {
-        utils::Logger::debug(std::format("Error, client UUID was \"\""));
+
+    if (this->_uuid.empty()) {
+        utils::Logger::debug("Error, client UUID was empty");
         return;
     }
+
     utils::Logger::debug(std::format("Client UUID: {}", this->_uuid));
-    utils::Logger::debug(std::format("UDP port: {}", this->_portUDP));
+
+    this->_networkClientUDP = std::make_unique<client::network::UDPClient>(
+        this->_serverIp, this->_portUDP);
+
+    ::network::ClientTCPReceivedInfo info;
+    info.ready = true;
+    std::strncpy(info.uuid, this->_uuid.c_str(), sizeof(info.uuid) - 1);
+    info.uuid[sizeof(info.uuid) - 1] = '\0';
+    utils::Logger::debug(std::format("uuid {}", info.uuid));
+    info.portUDP = this->_networkClientUDP->getLocalPort();
+
+    try {
+        boost::asio::write(this->_socket, boost::asio::buffer(&info, sizeof(info)));
+        utils::Logger::debug(std::format("Sent ClientTCPReceivedInfo via TCP ({} bytes)", sizeof(info)));
+    } catch (const boost::system::system_error& e) {
+        utils::Logger::debug(std::format("Failed to send ClientTCPSReceivedInfo via TCP: {}", e.what()));
+    }
+
+    utils::Logger::debug(std::format("UDP client local port: {}", info.portUDP));
 }
 
 void client::network::TCPClient::_setupRead()
