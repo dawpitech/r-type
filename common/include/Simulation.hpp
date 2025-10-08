@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include "flux/core/flux.hpp"
+
 #ifdef IS_CLIENT
   #include "network/TCPClient.hpp"
 #endif
@@ -16,8 +18,8 @@
 class Simulation
 {
     public:
-        void runSimulation(bool hasGUI = false);
-        void runSimulationWithNetwork(bool hasGUI, const std::string& serverIP, uint16_t serverPort);
+        void runSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
+        void runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, bool hasGUI, const std::string& serverIP, uint16_t serverPort);
 
     private:
 #ifdef IS_CLIENT

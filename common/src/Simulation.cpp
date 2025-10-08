@@ -29,13 +29,13 @@
 #include "systems/movementSystem.hpp"
 #include "systems/renderSystem.hpp"
 
-void Simulation::runSimulationWithNetwork(const bool hasGUI, const std::string& serverIP, uint16_t serverPort)
+void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI, const std::string& serverIP, uint16_t serverPort)
 {
     this->_setupNetwork(serverIP, serverPort);
-    this->runSimulation(hasGUI);
+    this->runSimulation(hooks, hasGUI);
 }
 
-void Simulation::runSimulation(const bool hasGUI)
+void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bool hasGUI)
 {
     flux::ECS ecs;
     if (hasGUI)
@@ -77,17 +77,13 @@ void Simulation::runSimulation(const bool hasGUI)
 
     if (hasGUI) {
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
-        flux::runtimeHooks hooks = {
-            .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
-            .hookBeforeRender = [] { render::SDLManager::clear(); },
-            .hookAfterRender = [] { render::SDLManager::render(); },
-        };
-
         render::SDLManager::setLastTime();
+        if (hooks.has_value())
+            hooks->hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
         ecs.handExecution(hooks);
     }
     else
-        ecs.handExecution();
+        ecs.handExecution(hooks);
 }
 
 #ifdef IS_CLIENT
