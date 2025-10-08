@@ -6,10 +6,24 @@
 //
 
 #include <algorithm>
+#include <functional>
+#include <mutex>
 
 #include "player/PlayersManager.hpp"
 #include "network/datatype.hpp"
+#include "player/Player.hpp"
 #include "utils/logger.hpp"
+
+std::optional<std::reference_wrapper<game::Player>> game::PlayersManager::getPlayer(const std::string &id)
+{
+    std::lock_guard<std::mutex> lock(this->_lock);
+    for (auto &it: this->_players) {
+        if (id == it->getId()) {
+            return *it;
+        }
+    }
+    return std::nullopt;
+}
 
 void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info)
 {
