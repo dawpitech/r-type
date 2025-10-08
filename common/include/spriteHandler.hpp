@@ -10,7 +10,6 @@
 #include <vector>
 #include <SDL3/SDL_render.h>
 
-#include "textureManager.hpp"
 #include "vector2.hpp"
 
 namespace sprite
@@ -34,7 +33,7 @@ namespace sprite
     class SpriteHandler
     {
         public:
-            explicit SpriteHandler(utils::TextureManager &textureManager, SDL_Renderer *renderer);
+            SpriteHandler();
             ~SpriteHandler() = default;
 
             [[nodiscard]] SpriteData getPlayerSprite() const;
@@ -43,7 +42,6 @@ namespace sprite
         private:
             SpriteData _playerSprite;
             SpriteData _mobSprite;
-            utils::TextureManager& _textureManager;
 
             void _setPlayerSprite(SDL_Renderer *renderer);
             void _setMobSprite(SDL_Renderer *renderer);

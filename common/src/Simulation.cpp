@@ -5,8 +5,6 @@
 ** Simulation.cpp
 */
 
-#include "components/Collider.hpp"
-#include "components/Health.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
 #endif
@@ -17,11 +15,12 @@
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
+#include "components/Collider.hpp"
+#include "components/Health.hpp"
 #include "flux/core/flux.hpp"
 #include "sdlManager.hpp"
 #include "Simulation.hpp"
 #include "spriteHandler.hpp"
-#include "textureManager.hpp"
 #include "utils/logger.hpp"
 
 #include "systems/animationSystem.hpp"
@@ -43,8 +42,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     flux::ECS ecs;
     if (hasGUI)
         render::SDLManager::init();
-    utils::TextureManager TextureManager;
-    const sprite::SpriteHandler spriteHandler(TextureManager, render::SDLManager::getRenderer());
+    const sprite::SpriteHandler spriteHandler;
 
     const flux::Entity playerEntity = ecs.newEntity();
     const flux::Entity mobEntity = ecs.newEntity();

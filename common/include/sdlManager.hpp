@@ -7,10 +7,9 @@
 
 #pragma once
 
+#include <SDL3_image/SDL_image.h>
 #include <iostream>
 #include <map>
-#include <string>
-#include <vector>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
@@ -18,6 +17,9 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "utils/error.hpp"
 #include "utils/eventManager.hpp"
@@ -131,6 +133,17 @@ namespace render
                 }
             }
 
+            static SDL_Texture* load(const std::string& path)
+            {
+                if (!instance()._textures.contains(path)) {
+                    SDL_Texture* texture = IMG_LoadTexture(instance()._renderer, path.c_str());
+                    if (!texture)
+                        throw utils::BaseError("failed to load texture", "load");
+                    instance()._textures[path] = texture;
+                }
+                return instance()._textures[path];
+            }
+
             ~SDLManager()
             {
                 if (this->_renderer != nullptr)
@@ -148,6 +161,7 @@ namespace render
             uint32_t _lastTime = SDL_GetTicks();
             uint32_t _currentTime = SDL_GetTicks();
             std::vector<utils::EventManager> _keyEvent;
+            std::unordered_map<std::string, SDL_Texture*> _textures;
             float _deltaTime = 0;
 
             explicit SDLManager()
