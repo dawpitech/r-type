@@ -12,7 +12,7 @@
 #include "utils/logger.hpp"
 
 client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort) :
-    Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false)
+    Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false), _uuid("")
 {
     utils::Logger::debug(std::format("TCP Client created for {}:{}", serverIp, serverPort));
 }
@@ -77,30 +77,47 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
     this->_connected = true;
     utils::Logger::debug(std::format("Successfully connected to {}:{}", this->_serverIp, this->_serverPort));
     this->_setupRead();
+    if (this->_uuid == "") {
+        utils::Logger::debug(std::format("Error, client UUID was \"\""));
+        return;
+    }
+    utils::Logger::debug(std::format("Client UUID: {}", this->_uuid));
+    utils::Logger::debug(std::format("UDP port: {}", this->_portUDP));
 }
 
 void client::network::TCPClient::_setupRead()
 {
     auto data = std::make_unique<::network::ClientTCPSentInfo>();
-    boost::asio::async_read(
-        this->_socket, 
+
+    boost::system::error_code error;
+    std::size_t bytesRead = boost::asio::read(
+        this->_socket,
         boost::asio::buffer(data.get(), sizeof(::network::ClientTCPSentInfo)),
-        [this, data = std::move(data)](const boost::system::error_code& error, size_t bytesRead) mutable {
-            this->_readHandler(error, bytesRead, std::move(data));
-        });
+        error
+    );
+
+    this->_readHandler(error, bytesRead, std::move(data));
 }
 
-void client::network::TCPClient::_readHandler(const boost::system::error_code& error, size_t bytesRead, std::unique_ptr<::network::ClientTCPSentInfo>&& data)
+void client::network::TCPClient::_readHandler(
+    const boost::system::error_code& error,
+    std::size_t bytesRead,
+    std::unique_ptr<::network::ClientTCPSentInfo>&& data)
 {
     if (error) {
         this->_connected = false;
+        utils::Logger::debug(std::format("TCP read error: {}", error.message()));
         return;
     }
 
     if (bytesRead != sizeof(::network::ClientTCPSentInfo)) {
+        utils::Logger::debug(std::format("Incomplete TCP packet ({} bytes)", bytesRead));
         return;
     }
 
     this->notify(*data);
-    this->_setupRead();
+
+    this->_uuid    = data->userID;
+    this->_portUDP = data->portUDP;
+    this->_score   = data->score;
 }

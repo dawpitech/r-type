@@ -9,6 +9,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
+#include <memory>
 #include "Network.hpp"
 #include "network/datatype.hpp"
 
@@ -31,6 +32,9 @@ namespace client::network
         private:
             tcp::socket _socket;
             bool _connected;
+            std::string _uuid;
+            uint16_t _portUDP = 0;
+            uint16_t _score = 0;
 
             void _connectHandler(const boost::system::error_code& error);
             void _setupRead();
