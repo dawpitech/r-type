@@ -9,25 +9,59 @@
 #include <format>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 
-#include "rooms/Rooms.hpp"
-#include "Simulation.hpp"
+#include "components/Collider.hpp"
+#include "components/Health.hpp"
+#include "components/Mob.hpp"
+#include "components/Player.hpp"
+#include "components/Transform.hpp"
+#include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
+#include "flux/core/Serialization.hpp"
 #include "network/TCP/TCPInfo.hpp"
 #include "player/Player.hpp"
+#include "rooms/Rooms.hpp"
+#include "Simulation.hpp"
 #include "utils/logger.hpp"
 
 Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
     _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
+{}
+
+template <typename T>
+void getEntities(const flux::ECS& ecs,
+                             std::unordered_map<flux::Entity, std::vector<std::any>>& componentStore)
 {
+    auto view = ecs.GenerateViewFromComponents<component::Health>();
+    auto entities = ecs.QueryViewNotExclusive(view);
+
+    for (auto& it : entities)
+        componentStore[it];
 }
 
 void Room::Room::run()
 {
-    this->_simulation.runSimulation();
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     };
+
+    flux::runtimeHooks hooks;
+    hooks.hooksNetwork = [this](flux::ECS& ecs)
+    {
+        std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
+
+        getEntities<component::Health>(ecs, componentStore);
+        getEntities<component::mob>(ecs, componentStore);
+        getEntities<component::player>(ecs, componentStore);
+        getEntities<component::Transform>(ecs, componentStore);
+        getEntities<component::Velocity>(ecs, componentStore);
+    };
+
+    this->_simulation.runSimulation(hooks);
+    // while (true) {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    // };
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
@@ -53,5 +87,5 @@ bool Room::Room::addPlayer(game::Player& player)
 bool Room::Room::_isRoomFull()
 {
     std::lock_guard<std::mutex> lock(this->_roomMutex);
-    return this->_players.size() >= this->_nbPlayerMax;
+    return this->_players.size() > this->_nbPlayerMax;
 }

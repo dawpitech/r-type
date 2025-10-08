@@ -43,20 +43,23 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
         return;
     }
     auto &client = this->_clients.back();
-    this->_setupReadSocket(*client);
-
+    
     auto& tcpSocket = client->getSocket();
     auto socketIp = tcpSocket.remote_endpoint().address().to_string();
     auto socketPort = tcpSocket.remote_endpoint().port();
-    std::string msg = std::format("New connection accepted from: {}:{}", socketIp, socketPort);
-
+    
     ConnectionInfo info(socketIp, socketPort);
     this->notify(info);
 
     ClientTCPSentInfo dataToSend(info.uuid, this->_port, 0);
     client->send(dataToSend);
-    utils::Logger::debug(msg);
+    
+    utils::Logger::debug(std::format("New connection accepted from: {}:{}", socketIp, socketPort));
+    
+    this->_setupReadSocket(*client);
+    
     this->_setupAcceptNewSocket();
 }
+
 
 void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client) { client.async_read(*this); }
