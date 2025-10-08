@@ -20,7 +20,7 @@ void HealthSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         const flux::Entity& entity = entities[i];
         auto& health = ecs.GetComponent<component::Health>(entity);
         if (health.healthPoint <= 0) {
-            continue;
+            ecs.DeleteEntity(entity);
         }
     }
 }
