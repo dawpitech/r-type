@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <format>
+
 #include <string>
 
 #include "network/TCP/TCPInfo.hpp"
 
 namespace game
 {
-
     class Player
     {
         public:

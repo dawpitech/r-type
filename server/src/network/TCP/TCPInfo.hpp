@@ -31,7 +31,7 @@ namespace network
                 acceptor.async_accept(this->_socket, std::forward<Handler>(handler));
             };
 
-            void async_read(Network& network)
+            void async_read(ServerNetwork& network)
             {
                 boost::asio::async_read(
                     this->_socket, boost::asio::buffer(&this->_data, sizeof(ClientTCPReceivedInfo)),
@@ -54,7 +54,7 @@ namespace network
 
             [[nodiscard]] tcp::socket& getSocket() { return this->_socket; };
 
-            void addData(Network& network, const ClientTCPReceivedInfo& data) { network.notify(data); }
+            void addData(ServerNetwork& network, const ClientTCPReceivedInfo& data) { network.notify(data); }
 
         private:
             tcp::socket _socket;

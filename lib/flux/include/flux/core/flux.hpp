@@ -8,6 +8,7 @@
 #pragma once
 
 #include <algorithm>
+#include <any>
 #include <bitset>
 #include <cassert>
 #include <chrono>
@@ -15,12 +16,13 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <queue>
 #include <stdexcept>
 #include <thread>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include "flux/core/Serialization.hpp"
+#include "utils/logger.hpp"
 
 namespace flux
 {
@@ -31,6 +33,14 @@ namespace flux
     typedef uint32_t Entity;
     typedef std::bitset<MAX_COMPONENTS> ComponentMask;
     typedef ComponentMask View;
+    typedef uint32_t ComponentTypeID;
+
+    struct ComponentTypeInfo
+    {
+        std::function<std::string(Entity& entity, std::any)> serialize;
+        std::function<void(Entity&, const std::string& data)> unserialize;
+        std::string name;
+    };
 
     enum class systemType
     {
@@ -398,6 +408,52 @@ namespace flux
             bool& getMasterRunState()
             {
                 return this->_running;
+            }
+
+            std::unordered_map<ComponentTypeID, ComponentTypeInfo> componentTypeRegistry;
+
+            ComponentTypeID getUniqueComponentTypeID()
+            {
+                static ComponentTypeID lastID = -1;
+                lastID += 1;
+                return lastID;
+            }
+
+            template <typename T>
+            ComponentTypeID getComponentTypeID()
+            {
+                static ComponentTypeID id = getUniqueComponentTypeID();
+                return id;
+            }
+
+            template <typename T>
+            void registerComponentType(const std::string& name)
+            {
+                auto id = getComponentTypeID<T>();
+
+                componentTypeRegistry[id] = {[](flux::Entity& entity, T& component) -> std::string
+                                             { return flux::SerializerHandler<T>::serialize(entity, component); },
+                                             [](flux::ECS& ecs, flux::Entity& entity, const std::string& data)
+                                             {
+                                                 T component = SerializerHandler<T>::unserialize(ecs, entity, data);
+                                                 // ecs.AddOrReplace(entity, component); // Method should be added in the ECS
+                                             },
+                                             name};
+            }
+
+            void unserializeSingleComponent(const std::string& data)
+            {
+                std::istringstream in(data);
+                ComponentTypeID typeID;
+                flux::Entity entity;
+
+                in >> typeID >> entity;
+
+                auto it = this->componentTypeRegistry.find(typeID);
+                if (it == this->componentTypeRegistry.end())
+                    utils::Logger::debug(std::format("Can't find component with id {}", typeID));
+                std::string dataLeft = data.substr(in.tellg());
+                it->second.unserialize(entity, dataLeft);
             }
     };
 }

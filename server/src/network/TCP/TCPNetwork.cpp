@@ -14,7 +14,7 @@
 #include "TCPNetwork.hpp"
 
 network::TCPNetwork::TCPNetwork(const uint16_t port) :
-    Network(port), _acceptor(this->_ioContext), _endpoint(tcp::v4(), port)
+    ServerNetwork(port), _acceptor(this->_ioContext), _endpoint(tcp::v4(), port)
 {
     this->_acceptor.open(this->_endpoint.protocol());
     this->_acceptor.set_option(tcp::acceptor::reuse_address(true));
