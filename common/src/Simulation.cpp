@@ -73,19 +73,21 @@ void Simulation::runSimulation(const bool hasGUI)
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
-    ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
 
-    flux::runtimeHooks hooks = {
-        .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
-        .hookBeforeRender = [] { render::SDLManager::clear(); },
-    };
+    if (hasGUI) {
+        ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
+        flux::runtimeHooks hooks = {
+            .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
+            .hookBeforeRender = [] { render::SDLManager::clear(); },
+        };
 
-    if (hasGUI)
         hooks.hookAfterRender = [] { render::SDLManager::render(); };
-
-    render::SDLManager::setLastTime();
-    ecs.handExecution(hooks);
+        render::SDLManager::setLastTime();
+        ecs.handExecution(hooks);
+    }
+    else
+        ecs.handExecution();
 }
 
 #ifdef IS_CLIENT
