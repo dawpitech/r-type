@@ -25,5 +25,6 @@ namespace render
 
             void _setPlayerSprite(render::SpriteData &sprite);
             void _setMobSprite(render::SpriteData &sprite);
+            void _setPlayerProjectile(render::SpriteData &sprite);
     };
 } // namespace sprite

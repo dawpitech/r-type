@@ -5,12 +5,13 @@
 ** Simulation.cpp
 */
 
-#include "components/Collider.hpp"
-#include "utils/error.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
 #endif
 
+#include "components/Projectile.hpp"
+#include "components/Player.hpp"
+#include "components/Collider.hpp"
 #include "components/Animation.hpp"
 #include "components/Mob.hpp"
 #include "components/PlayerInput.hpp"
@@ -20,10 +21,12 @@
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "flux/core/flux.hpp"
+#include "flux/core/Serialization.hpp"
 #include "sdlManager.hpp"
 #include "Simulation.hpp"
 #include "spriteHandler.hpp"
 #include "utils/logger.hpp"
+#include "utils/error.hpp"
 
 #include "systems/animationSystem.hpp"
 #include "systems/collisionSystem.hpp"
@@ -32,6 +35,8 @@
 #include "systems/renderSystem.hpp"
 #include "systems/damageSystem.hpp"
 #include "systems/healthSystem.hpp"
+#include "systems/shootSystem.hpp"
+#include "systems/projectileSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI, const std::string& serverIP, uint16_t serverPort)
 {
@@ -49,6 +54,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     const flux::Entity mobEntity = ecs.newEntity();
 
     ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(render::SDLManager::load("./assets/player.gif").texture)));
+    ecs.Add<component::Player>(playerEntity);
     ecs.Add<component::animation>(playerEntity, component::animation(render::SDLManager::load("./assets/player.gif").spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
@@ -73,8 +79,12 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
             render::Rect{0, 0, render::SDLManager::load("./assets/mob1.gif").frameSize.x, render::SDLManager::load("./assets/mob1.gif").frameSize.y}));
     ecs.Add<component::Health>(playerEntity);
     ecs.Add<component::Health>(mobEntity, component::Health(100));
+    flux::Entity newEntity = ecs.newEntity();
+    ecs.Add<component::Projectile>(newEntity);
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);

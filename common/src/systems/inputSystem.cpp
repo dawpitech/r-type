@@ -47,6 +47,9 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                     case utils::Keys::ARROW_RIGHT:
                         playerInput.move_right = true;
                         break;
+                    // case utils::Keys::SPECIAL_KEY_SPACE:
+                    //     playerInput.shoot = true;
+                    //     break;
                     default:
                         break;
                 }
@@ -63,6 +66,9 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                         break;
                     case utils::Keys::ARROW_RIGHT:
                         playerInput.move_right = false;
+                        break;
+                    case utils::Keys::SPECIAL_KEY_SPACE:
+                        playerInput.shoot = true;
                         break;
                     default:
                         break;

@@ -6,6 +6,7 @@
 //
 
 #include <SDL3/SDL_render.h>
+#include <cstdint>
 #include <string>
 #include "sdlManager.hpp"
 
@@ -16,16 +17,17 @@ constexpr uint8_t NB_PLAYER_SPRITE_Y = 5;
 constexpr uint8_t MOB_1_Y_EMPLACEMENT = 110;
 constexpr uint8_t NB_MOB_1_SPRITE_X = 4;
 constexpr uint8_t MOB_1_SIZE_Y = 40;
-
+constexpr uint8_t PLAYER_PROJ_SIZE_Y = 184 - 168;
+constexpr uint8_t NB_PLAYER_PROJECTILE = 2;
 
 void render::SpriteHandler::setSprite(render::SpriteData &sprite, const std::string& path)
 {
-    if (path == "./assets/player.gif") {
+    if (path == "./assets/player.gif")
         this->_setPlayerSprite(sprite);
-    }
-    if (path == "./assets/mob1.gif") {
+    if (path == "./assets/mob1.gif")
         this->_setMobSprite(sprite);
-    }
+    if (path == "./assets/playerProjectile-mod-resize.gif")
+        this->_setPlayerProjectile(sprite);
 }
 
 void render::SpriteHandler::_setPlayerSprite(render::SpriteData &sprite)
@@ -52,6 +54,19 @@ void render::SpriteHandler::_setMobSprite(render::SpriteData &sprite)
     sprite.frameSize.y = frameHeight;
     for (int i = 0; i < NB_MOB_1_SPRITE_X; i++) {
         Rect rect{static_cast<float>(i) * frameWidth, MOB_1_Y_EMPLACEMENT, frameWidth, frameHeight};
+        sprite.spriteMap.emplace_back(rect);
+    }
+}
+
+void render::SpriteHandler::_setPlayerProjectile(render::SpriteData &sprite) {
+    sprite.size.x = 150;
+    sprite.size.y = 105;
+    const float frameWidth = sprite.size.x / NB_PLAYER_PROJECTILE;
+    const float frameHeight = 40;
+    sprite.frameSize.x = frameWidth;
+    sprite.frameSize.y = frameHeight;
+    for (int i = 0; i < NB_PLAYER_PROJECTILE; i++) {
+        Rect rect{static_cast<float>(i) * frameWidth, 30, frameWidth, frameHeight};
         sprite.spriteMap.emplace_back(rect);
     }
 }
