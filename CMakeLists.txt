@@ -22,6 +22,8 @@ CPMGetPackage(boost)
 CPMGetPackage(sdl3)
 CPMGetPackage(sdl3_ttf)
 CPMGetPackage(sdl3_image)
+CPMGetPackage(raylib)
+CPMGetPackage(raylib-cpp)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

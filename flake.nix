@@ -44,6 +44,8 @@
             wayland
             wayland-protocols
             freetype
+
+            xorg.libXi
           ];
         };
 
