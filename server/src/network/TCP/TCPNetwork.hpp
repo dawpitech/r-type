@@ -24,8 +24,6 @@ namespace network
             explicit TCPNetwork(uint16_t port);
             ~TCPNetwork();
 
-            void connect();
-
         private:
             tcp::acceptor _acceptor;
             tcp::endpoint _endpoint;

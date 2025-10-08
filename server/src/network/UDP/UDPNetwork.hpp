@@ -9,8 +9,8 @@
 
 #include <boost/asio.hpp>
 
-#include "network/Network.hpp"
 #include "network/datatype.hpp"
+#include "network/Network.hpp"
 
 using boost::asio::ip::udp;
 

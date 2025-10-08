@@ -8,7 +8,10 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 
+#include "Simulation.hpp"
+#include "flux/core/flux.hpp"
 #include "player/Player.hpp"
 
 namespace Room {
@@ -19,13 +22,16 @@ namespace Room {
         explicit Room(std::size_t roomNumber, std::uint8_t nbPlayers = BASEROOMPLAYER);
         ~Room() = default;
 
-        void update( std::uint8_t nbFrames);
+        void run();
         void clear(std::uint8_t nbPlayers);
 
         bool addPlayer(game::Player &player);
-        bool removePlayer();
+        bool _isRoomFull();
 
        private:
+        std::mutex _roomMutex;
+        flux::ECS _ecs;
+        Simulation _simulation;
         std::vector<std::reference_wrapper<game::Player>> _players;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;

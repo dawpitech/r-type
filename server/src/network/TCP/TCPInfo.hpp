@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <utility>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <utility>
 
-#include "network/Network.hpp"
 #include "network/datatype.hpp"
+#include "network/Network.hpp"
 #include "utils/logger.hpp"
 
 using boost::asio::ip::tcp;
@@ -24,6 +24,11 @@ namespace network
         public:
             explicit ClientTCP(boost::asio::io_context& io_context) : _socket(io_context) {};
             ~ClientTCP() = default;
+
+            void send(const ClientTCPSentInfo& data)
+            {
+                boost::asio::write(this->_socket, boost::asio::buffer(&data, sizeof(data)));
+            }
 
             template <typename Handler>
             void acceptConnection(tcp::acceptor& acceptor, Handler&& handler)
