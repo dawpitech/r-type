@@ -5,23 +5,26 @@
 ** Simulation.cpp
 */
 
+#include "components/Collider.hpp"
 #ifdef IS_CLIENT
-    #include "network/TCPClient.hpp"
+#include "network/TCPClient.hpp"
 #endif
 
-#include "Simulation.hpp"
 #include "components/Animation.hpp"
+#include "components/Mob.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 #include "sdlManager.hpp"
+#include "Simulation.hpp"
 #include "spriteHandler.hpp"
 #include "textureManager.hpp"
 #include "utils/logger.hpp"
 
 #include "systems/animationSystem.hpp"
+#include "systems/collisionSystem.hpp"
 #include "systems/inputSystem.hpp"
 #include "systems/movementSystem.hpp"
 #include "systems/renderSystem.hpp"
@@ -41,26 +44,45 @@ void Simulation::runSimulation(const bool hasGUI)
     const sprite::SpriteHandler spriteHandler(TextureManager, render::SDLManager::getRenderer());
 
     const flux::Entity playerEntity = ecs.newEntity();
+    const flux::Entity mobEntity = ecs.newEntity();
 
-    ecs.Add<component::sprite>(
-        playerEntity, component::sprite(spriteHandler.getPlayerSprite().texture, true));
-    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap));
+    ecs.Add<component::sprite>(playerEntity, component::sprite(spriteHandler.getPlayerSprite().texture));
+    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
+    ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
+    ecs.Add<component::sprite>(mobEntity, component::sprite(spriteHandler.getMobSprite().texture));
+    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, true));
+    ecs.Add<component::Transform>(mobEntity, component::Transform(200, 400, 0, 1, 1));
+    ecs.Add<component::Velocity>(mobEntity);
+    ecs.Add<component::collider>(
+        playerEntity,
+        component::collider(
+            component::CollisionLayer::PLAYER,
+            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
+            {0, 0, spriteHandler.getPlayerSprite().frameSize.x, spriteHandler.getPlayerSprite().frameSize.y}));
+
+    ecs.Add<component::collider>(
+        mobEntity,
+        component::collider(
+            component::CollisionLayer::MOB,
+            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
+            sprite::Rect{0, 0, spriteHandler.getMobSprite().frameSize.x, spriteHandler.getMobSprite().frameSize.y}));
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
+    ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
 
     flux::runtimeHooks hooks = {
         .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
-        .hookBeforeRender = []{ render::SDLManager::clear(); },
+        .hookBeforeRender = [] { render::SDLManager::clear(); },
     };
 
     if (hasGUI)
-        hooks.hookAfterRender = []{ render::SDLManager::render(); };
+        hooks.hookAfterRender = [] { render::SDLManager::render(); };
 
     render::SDLManager::setLastTime();
     ecs.handExecution(hooks);
@@ -75,7 +97,8 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort)
     try {
         this->_networkClient->connect();
         utils::Logger::debug("Network setup completed");
-    } catch (const client::network::NetworkError& e) {
+    }
+    catch (const client::network::NetworkError& e) {
         utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }

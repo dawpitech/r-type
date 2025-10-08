@@ -75,8 +75,8 @@ namespace flux
 
         Entity nextEntityID = 0;
 
-        std::vector<std::tuple<std::function<void(ECS& ecs, Entity)>, View>> systemsLogicList;
-        std::vector<std::tuple<std::function<void(ECS& ecs, Entity)>, View>> systemsRenderList;
+        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsLogicList;
+        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsRenderList;
 
         bool _running = true;
 
@@ -354,7 +354,7 @@ namespace flux
                 return result;
             }
 
-            void registerSystem(std::function<void(ECS& ecs, Entity entity)> handler, const View& view, const systemType& type)
+            void registerSystem(std::function<void(ECS& ecs, const std::vector<Entity>& entities)> handler, const View& view, const systemType& type)
             {
                 if (type == systemType::LOGIC)
                     this->systemsLogicList.emplace_back(std::make_tuple(handler, view));
@@ -378,8 +378,7 @@ namespace flux
                         if (hooks && hooks->hookBeforeLogic)
                             hooks->hookBeforeLogic.value()();
                         for (const auto& [handler, view] : this->systemsLogicList)
-                            for (const auto entity : this->QueryViewNotExclusive(view))
-                                handler(*this, entity);
+                                handler(*this, this->QueryViewNotExclusive(view));
                         if (hooks && hooks->hookAfterLogic)
                             hooks->hookAfterLogic.value()();
                         accumulator -= LOGIC_STEP;
@@ -388,8 +387,7 @@ namespace flux
                     if (hooks && hooks->hookBeforeRender)
                         hooks->hookBeforeRender.value()();
                     for (const auto& [handler, view] : this->systemsRenderList)
-                        for (const auto entity : this->QueryViewNotExclusive(view))
-                            handler(*this, entity);
+                            handler(*this, this->QueryViewNotExclusive(view));
                     if (hooks && hooks->hookAfterRender)
                         hooks->hookAfterRender.value()();
 

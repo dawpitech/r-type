@@ -28,6 +28,7 @@ namespace sprite
         SDL_Texture *texture;
         utils::Vector2<float> size{0, 0};
         std::vector<Rect> spriteMap;
+        utils::Vector2<float> frameSize{0, 0};
     };
 
     class SpriteHandler

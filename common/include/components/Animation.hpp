@@ -22,8 +22,9 @@ namespace component
 
         bool loop = true;
         bool playing = true;
+        bool isAnimate = true;
 
-        explicit animation(const std::vector<sprite::Rect>& rect)
+        explicit animation(const std::vector<sprite::Rect>& rect, bool isAnimate) : isAnimate(isAnimate)
         {
             for (auto it : rect) {
                 SDL_FRect rect{it.srcX, it.srcY, it.destX, it.destY};

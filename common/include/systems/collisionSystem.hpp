@@ -10,5 +10,5 @@
 #include <vector>
 #include "flux/core/flux.hpp"
 
-void AnimationSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities);
-flux::View AnimationSystemView(const flux::ECS& ecs);
+void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities);
+flux::View CollisionSystemView(const flux::ECS& ecs);
