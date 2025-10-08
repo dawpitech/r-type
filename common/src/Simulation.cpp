@@ -80,9 +80,9 @@ void Simulation::runSimulation(const bool hasGUI)
         flux::runtimeHooks hooks = {
             .hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
             .hookBeforeRender = [] { render::SDLManager::clear(); },
+            .hookAfterRender = [] { render::SDLManager::render(); },
         };
 
-        hooks.hookAfterRender = [] { render::SDLManager::render(); };
         render::SDLManager::setLastTime();
         ecs.handExecution(hooks);
     }
