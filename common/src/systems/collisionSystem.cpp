@@ -49,8 +49,8 @@ void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         if (!collider.isActive)
             continue;
         for (int y = i - 1; y >= 0; --y) {
-            auto colliderOther = ecs.GetComponent<component::collider>(entities[y]);
-            auto transformOther = ecs.GetComponent<component::Transform>(entities[y]);
+            auto& colliderOther = ecs.GetComponent<component::collider>(entities[y]);
+            auto& transformOther = ecs.GetComponent<component::Transform>(entities[y]);
 
             if (!colliderOther.isActive)
                 continue;
