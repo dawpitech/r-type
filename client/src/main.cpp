@@ -5,10 +5,12 @@
 ** main.cpp
 */
 
+#include <boost/program_options/variables_map.hpp>
 #include <cstdlib>
+#include <flux/core/flux.hpp>
 #include <format>
 #include <iostream>
-#include <boost/program_options/variables_map.hpp>
+#include <sdlManager.hpp>
 
 #include "parseArgs.hpp"
 #include "Simulation.hpp"
@@ -48,8 +50,13 @@ int main(int argc, char **argv)
         auto ip = variables["ip"].as<std::string>();
         std::uint16_t port = variables["port"].as<uint16_t>();
 
+        flux::runtimeHooks hooks = {
+            .hookBeforeRender = [] { render::SDLManager::clear(); },
+            .hookAfterRender = [] { render::SDLManager::render(); },
+        };
+
         Simulation simulation;
-        simulation.runSimulationWithNetwork(true, ip, port);
+        simulation.runSimulationWithNetwork(hooks, true, ip, port);
     }
     catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;

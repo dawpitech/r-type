@@ -5,6 +5,7 @@
 // healthSystem
 //
 
+#include <iostream>
 #include <SDL3/SDL_render.h>
 #include <vector>
 
@@ -20,7 +21,8 @@ flux::View RenderSystemView(const flux::ECS& ecs)
 
 void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    for (const auto& entity : entities) {
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
+        const flux::Entity& entity = entities[i];
         auto& sprite = ecs.GetComponent<component::sprite>(entity);
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 

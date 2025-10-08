@@ -8,8 +8,8 @@
 #pragma once
 
 #include <SDL3/SDL_rect.h>
-#include <spriteHandler.hpp>
 #include <vector>
+#include "sdlManager.hpp"
 
 namespace component
 {
@@ -17,17 +17,17 @@ namespace component
     {
         std::vector<SDL_FRect> frames;
         int currentFrame = 0;
-        const float frameTime = 0.1f;
+        float frameTime = 0.1f;
         float elapsedTime = 0.0f;
 
         bool loop = true;
         bool playing = true;
         bool isAnimate = true;
 
-        explicit animation(const std::vector<sprite::Rect>& rect, bool isAnimate) : isAnimate(isAnimate)
+        explicit animation(const std::vector<render::Rect>& rect, bool isAnimate) : isAnimate(isAnimate)
         {
             for (auto it : rect) {
-                SDL_FRect rect{it.srcX, it.srcY, it.destX, it.destY};
+                SDL_FRect rect{it.srcX, it.srcY, it.srcw, it.srch};
                 frames.emplace_back(rect);
             }
         }
