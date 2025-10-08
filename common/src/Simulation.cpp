@@ -50,13 +50,13 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     const flux::Entity mobEntity = ecs.newEntity();
 
     ecs.Add<component::sprite>(playerEntity, component::sprite(spriteHandler.getPlayerSprite().texture));
-    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, false));
+    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
     ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
     ecs.Add<component::sprite>(mobEntity, component::sprite(spriteHandler.getMobSprite().texture));
-    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, false));
+    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, true));
     ecs.Add<component::Transform>(mobEntity, component::Transform(200, 400, 0, 1, 1));
     ecs.Add<component::Velocity>(mobEntity);
     ecs.Add<component::collider>(
