@@ -10,8 +10,8 @@
 #include <boost/asio.hpp>
 #include <functional>
 
-#include "utils/error.hpp"
 #include "network/datatype.hpp"
+#include "utils/error.hpp"
 
 namespace network
 {
@@ -21,15 +21,26 @@ namespace network
             NetworkError(const std::string& what, const std::string& where) : BaseError(what, where) {}
     };
 
-    class Network
+    class ServerNetwork
     {
         public:
-            explicit Network(uint16_t port);
-            ~Network();
+            explicit ServerNetwork(uint16_t port);
+            ~ServerNetwork();
 
             template <typename T>
-                requires NetworkDataType<T>
-            void attach(std::function<void(const T&)> callback);
+                requires network::NetworkDataType<T>
+            void attach(const std::function<void(const T&)>&& callback)
+            {
+                if constexpr (std::is_same_v<T, ClientTCPReceivedInfo>) {
+                    this->_tcpReceivedCallback = std::move(callback);
+                    return;
+                }
+                if constexpr (std::is_same_v<T, ConnectionInfo>) {
+                    this->_connectionCallback = std::move(callback);
+                    return;
+                }
+            }
+
             void notify(const NetworkData& data);
 
         protected:

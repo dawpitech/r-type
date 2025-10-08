@@ -10,24 +10,11 @@
 #include "Network.hpp"
 #include "network/datatype.hpp"
 
-network::Network::Network(const uint16_t port) : _port(port) {}
+network::ServerNetwork::ServerNetwork(const uint16_t port) : _port(port) {}
 
-network::Network::~Network() {}
+network::ServerNetwork::~ServerNetwork() {}
 
-template <typename T> requires network::NetworkDataType<T>
-void network::Network::attach(std::function<void(const T&)> callback)
-{
-    if constexpr(std::is_same_v<T, ClientTCPReceivedInfo>) {
-        this->_tcpReceivedCallback = std::move(callback);
-        return;
-    }
-    if constexpr(std::is_same_v<T, ConnectionInfo>) {
-        this->_connectionCallback = std::move(callback);
-        return;
-    }
-}
-
-void network::Network::notify(const NetworkData& data)
+void network::ServerNetwork::notify(const NetworkData& data)
 {
     std::visit(
         [this](auto&& arg)
@@ -51,9 +38,3 @@ void network::Network::notify(const NetworkData& data)
         },
         data);
 }
-
-template void network::Network::attach<network::ClientTCPReceivedInfo>(
-    std::function<void(const network::ClientTCPReceivedInfo&)>);
-template void network::Network::attach<network::UDPReceivedInfo>(
-    std::function<void(const network::UDPReceivedInfo&)>);
-template void network::Network::attach<network::ConnectionInfo>(std::function<void(const network::ConnectionInfo&)>);

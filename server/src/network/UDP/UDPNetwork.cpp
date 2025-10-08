@@ -13,7 +13,7 @@
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
-network::UDPNetwork::UDPNetwork(std::uint16_t port) : Network(port), _endpoint(udp::v4(), port)
+network::UDPNetwork::UDPNetwork(std::uint16_t port) : ServerNetwork(port), _endpoint(udp::v4(), port)
 {
     this->_socket = std::make_unique<udp::socket>(this->_ioContext, this->_endpoint);
     this->async_read();

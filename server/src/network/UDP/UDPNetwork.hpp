@@ -16,7 +16,7 @@ using boost::asio::ip::udp;
 
 namespace network
 {
-    class UDPNetwork final : public Network
+    class UDPNetwork final : public ServerNetwork
     {
         public:
             explicit UDPNetwork(uint16_t port);

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <cstring>
+#include <cstdint>
 #include <variant>
 #include "components/PlayerInput.hpp"
 #include "utils/uuidGenerator.hpp"
@@ -53,7 +53,7 @@ namespace network
                 std::memset(this->userID, 0, BUFFERSIZE);
             }
 
-            explicit ClientTCPSentInfo(std::string id, uint16_t port, uint16_t score) : portUDP(port), score(score)
+            explicit ClientTCPSentInfo(const std::string& id, uint16_t port, uint16_t score) : portUDP(port), score(score)
             {
                 std::strcpy(this->userID, id.c_str());
             };
@@ -64,4 +64,10 @@ namespace network
             char uuid[BUFFERSIZE] = "";
             component::PlayerInput game;
     };
+    
+    struct UDPSentInfo final
+    {
+        std::string serializedData;
+    };
+
 } // namespace network
