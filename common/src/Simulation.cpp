@@ -6,6 +6,7 @@
 */
 
 #include "components/Collider.hpp"
+#include "components/Health.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
 #endif
@@ -28,6 +29,8 @@
 #include "systems/inputSystem.hpp"
 #include "systems/movementSystem.hpp"
 #include "systems/renderSystem.hpp"
+#include "systems/damageSystem.hpp"
+#include "systems/healthSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI, const std::string& serverIP, uint16_t serverPort)
 {
@@ -47,13 +50,13 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     const flux::Entity mobEntity = ecs.newEntity();
 
     ecs.Add<component::sprite>(playerEntity, component::sprite(spriteHandler.getPlayerSprite().texture));
-    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, true));
+    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, false));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
     ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
     ecs.Add<component::sprite>(mobEntity, component::sprite(spriteHandler.getMobSprite().texture));
-    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, true));
+    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, false));
     ecs.Add<component::Transform>(mobEntity, component::Transform(200, 400, 0, 1, 1));
     ecs.Add<component::Velocity>(mobEntity);
     ecs.Add<component::collider>(
@@ -69,11 +72,16 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
             component::CollisionLayer::MOB,
             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
             sprite::Rect{0, 0, spriteHandler.getMobSprite().frameSize.x, spriteHandler.getMobSprite().frameSize.y}));
+    ecs.Add<component::Health>(playerEntity);
+    ecs.Add<component::Health>(mobEntity, component::Health(100));
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+
 
     if (hasGUI) {
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);

@@ -5,6 +5,7 @@
 // movementSystem
 //
 
+#include <iostream>
 #include <vector>
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
@@ -19,7 +20,8 @@ flux::View MovementSystemView(const flux::ECS& ecs)
 
 void MovementSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    for (const auto& entity : entities) {
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
+        const flux::Entity& entity = entities[i];
         auto& transform = ecs.GetComponent<component::Transform>(entity);
         auto& velocity = ecs.GetComponent<component::Velocity>(entity);
 

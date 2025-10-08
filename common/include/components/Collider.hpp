@@ -32,8 +32,11 @@ namespace component
             uint8_t mask;
             sprite::Rect rect;
             bool isActive;
+            bool hasCollide;
 
-            explicit collider(uint8_t layer, uint8_t mask, sprite::Rect rect, bool isActive = true) 
-            : layer(layer), mask(mask), rect(rect), isActive(isActive) {}
+            explicit collider(uint8_t layer, uint8_t mask, sprite::Rect rect, bool isActive = true,
+                              bool hasCollide = false) :
+                layer(layer), mask(mask), rect(rect), isActive(isActive), hasCollide(hasCollide)
+            {}
     };
 } // namespace component

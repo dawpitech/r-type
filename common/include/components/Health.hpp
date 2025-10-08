@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace component
 {
     struct Health
     {
-            uint8_t healthPoint = 100;
+            int healthPoint;
+
+            explicit Health(int healthPoint = 1): healthPoint(healthPoint) {}
     };
 } // namespace component

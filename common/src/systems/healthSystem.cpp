@@ -5,19 +5,23 @@
 // healthSystem
 //
 
-#include "flux/core/flux.hpp"
+#include <iostream>
 #include "components/Health.hpp"
+#include "flux/core/flux.hpp"
 
-void HealthSystem(flux::ECS &ecs, flux::Entity entity)
+flux::View HealthSystemView(const flux::ECS& ecs)
 {
-    if (!ecs.HasComponent<component::Health>(entity))
-        return;
-    auto& [healthPoint] = ecs.GetComponent<component::Health>(entity);
-    // TODO: This code is temporary and will be updated in the future.
-    // It serves as an example for adapting the code architecture.
-    if (healthPoint >= 10) {
-        healthPoint -= 10;
-    } else {
-        healthPoint = 0;
+    return ecs.GenerateViewFromComponents<component::Health>();
+}
+
+void HealthSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
+{
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
+        const flux::Entity& entity = entities[i];
+        auto& health = ecs.GetComponent<component::Health>(entity);
+        std::cout << "hp = " << health.healthPoint << '\n';
+        if (health.healthPoint <= 0) {
+            std::cout << "DEATH\n";
+        }
     }
 }

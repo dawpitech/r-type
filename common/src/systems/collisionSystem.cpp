@@ -6,6 +6,7 @@
 //
 
 #include <cstddef>
+#include <iostream>
 #include <vector>
 #include "components/Collider.hpp"
 #include "components/Transform.hpp"
@@ -33,17 +34,21 @@ static bool checkRectCollision(sprite::Rect firstRect, component::Transform firs
     return (left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2);
 }
 
-static void handleCollision(const flux::ECS& ecs, flux::Entity firstEntity, flux::Entity secondEntity) {}
+static void handleCollision(component::collider& collider, component::collider& colliderOther)
+{
+    collider.hasCollide = true;
+    colliderOther.hasCollide = true;
+}
 
 void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    for (size_t i = 0; i < entities.size(); ++i) {
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         auto& collider = ecs.GetComponent<component::collider>(entities[i]);
         auto& transform = ecs.GetComponent<component::Transform>(entities[i]);
 
         if (!collider.isActive)
             continue;
-        for (size_t y = i + 1; y < entities.size(); ++y) {
+        for (int y = i - 1; y >= 0; --y) {
             auto colliderOther = ecs.GetComponent<component::collider>(entities[y]);
             auto transformOther = ecs.GetComponent<component::Transform>(entities[y]);
 
@@ -54,7 +59,7 @@ void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             if (!canCollide)
                 continue;
             if (checkRectCollision(collider.rect, transform, colliderOther.rect, transformOther))
-                handleCollision(ecs, entities[i], entities[y]);
+                handleCollision(collider, colliderOther);
         }
     }
 }
