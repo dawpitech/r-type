@@ -28,10 +28,12 @@ namespace component
     };
     struct collider
     {
-            CollisionLayer type;
+            uint8_t layer;
+            uint8_t mask;
             sprite::Rect rect;
             bool isActive;
 
-            explicit collider(sprite::Rect rect, bool isActive = true) : rect(rect), isActive(isActive) {}
+            explicit collider(uint8_t layer, uint8_t mask, sprite::Rect rect, bool isActive = true) 
+            : layer(layer), mask(mask), rect(rect), isActive(isActive) {}
     };
 } // namespace component

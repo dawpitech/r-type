@@ -72,8 +72,8 @@ namespace flux
 
             Entity nextEntityID = 0;
 
-            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entity)>, View>> systemsLogicList;
-            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entity)>, View>> systemsRenderList;
+            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsLogicList;
+            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsRenderList;
 
             bool _running = true;
 
@@ -354,7 +354,7 @@ namespace flux
                 return result;
             }
 
-            void registerSystem(std::function<void(ECS& ecs, const std::vector<Entity>& entity)> handler, const View& view,
+            void registerSystem(std::function<void(ECS& ecs, const std::vector<Entity>& entities)> handler, const View& view,
                                 const systemType& type)
             {
                 if (type == systemType::LOGIC)
