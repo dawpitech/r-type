@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <SDL3_image/SDL_image.h>
 #include <iostream>
 #include <map>
 #include <SDL3/SDL_events.h>
@@ -17,15 +16,34 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3_image/SDL_image.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "spriteHandler.hpp"
 #include "utils/error.hpp"
 #include "utils/eventManager.hpp"
+#include "vector2.hpp"
 
 namespace render
 {
+    struct Rect
+    {
+            float srcX;
+            float srcY;
+            float srcw;
+            float srch;
+    };
+
+    struct SpriteData
+    {
+            SDL_Texture* texture;
+            utils::Vector2<float> size{0, 0};
+            std::vector<render::Rect> spriteMap;
+            utils::Vector2<float> frameSize{0, 0};
+    };
+
     class SDLManager
     {
         public:
@@ -43,8 +61,6 @@ namespace render
             static void init() { SDLManager::instance(); }
 
             static void setLastTime() { instance()._lastTime = SDL_GetTicks(); }
-
-            static float getDeltaTime() { return instance()._deltaTime; }
 
             static std::vector<utils::EventManager>& getKeysEvent() { return instance()._keyEvent; }
 
@@ -94,9 +110,6 @@ namespace render
                                                               {utils::Keys::ARROW_UP, SDLK_UP},
                                                               {utils::Keys::ARROW_LEFT, SDLK_LEFT},
                                                               {utils::Keys::ARROW_RIGHT, SDLK_RIGHT}};
-                instance()._currentTime = SDL_GetTicks();
-                instance()._deltaTime = static_cast<float>(instance()._currentTime - instance()._lastTime) / 1000.0f;
-                instance()._lastTime = instance()._currentTime;
 
                 while (SDL_PollEvent(&instance()._event)) {
                     switch (instance()._event.type) {
@@ -133,15 +146,18 @@ namespace render
                 }
             }
 
-            static SDL_Texture* load(const std::string& path)
+            static SpriteData load(const std::string& path)
             {
-                if (!instance()._textures.contains(path)) {
-                    SDL_Texture* texture = IMG_LoadTexture(instance()._renderer, path.c_str());
-                    if (!texture)
+                if (!instance()._gameSprite.contains(path)) {
+                    SpriteData newSprite;
+                    newSprite.texture = IMG_LoadTexture(instance()._renderer, path.c_str());
+
+                    if (!newSprite.texture)
                         throw utils::BaseError("failed to load texture", "load");
-                    instance()._textures[path] = texture;
+                    instance().spriteInfo.setSprite(newSprite, path);
+                    instance()._gameSprite[path] = newSprite;
                 }
-                return instance()._textures[path];
+                return instance()._gameSprite[path];
             }
 
             ~SDLManager()
@@ -161,8 +177,9 @@ namespace render
             uint32_t _lastTime = SDL_GetTicks();
             uint32_t _currentTime = SDL_GetTicks();
             std::vector<utils::EventManager> _keyEvent;
-            std::unordered_map<std::string, SDL_Texture*> _textures;
-            float _deltaTime = 0;
+            std::unordered_map<std::string, SpriteData> _gameSprite;
+            SpriteHandler spriteInfo;
+            
 
             explicit SDLManager()
             {

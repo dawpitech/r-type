@@ -42,19 +42,18 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     flux::ECS ecs;
     if (hasGUI)
         render::SDLManager::init();
-    const sprite::SpriteHandler spriteHandler;
 
     const flux::Entity playerEntity = ecs.newEntity();
     const flux::Entity mobEntity = ecs.newEntity();
 
-    ecs.Add<component::sprite>(playerEntity, component::sprite(spriteHandler.getPlayerSprite().texture));
-    ecs.Add<component::animation>(playerEntity, component::animation(spriteHandler.getPlayerSprite().spriteMap, true));
+    ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(render::SDLManager::load("./assets/player.gif").texture)));
+    ecs.Add<component::animation>(playerEntity, component::animation(render::SDLManager::load("./assets/player.gif").spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
     ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
-    ecs.Add<component::sprite>(mobEntity, component::sprite(spriteHandler.getMobSprite().texture));
-    ecs.Add<component::animation>(mobEntity, component::animation(spriteHandler.getMobSprite().spriteMap, true));
+    ecs.Add<component::sprite>(mobEntity, component::sprite(render::SDLManager::load("./assets/mob1.gif").texture));
+    ecs.Add<component::animation>(mobEntity, component::animation(render::SDLManager::load("./assets/mob1.gif").spriteMap, true));
     ecs.Add<component::Transform>(mobEntity, component::Transform(200, 400, 0, 1, 1));
     ecs.Add<component::Velocity>(mobEntity);
     ecs.Add<component::collider>(
@@ -62,14 +61,14 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
         component::collider(
             component::CollisionLayer::PLAYER,
             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
-            {0, 0, spriteHandler.getPlayerSprite().frameSize.x, spriteHandler.getPlayerSprite().frameSize.y}));
+            {0, 0, render::SDLManager::load("./assets/player.gif").frameSize.x, render::SDLManager::load("./assets/player.gif").frameSize.y}));
 
     ecs.Add<component::collider>(
         mobEntity,
         component::collider(
             component::CollisionLayer::MOB,
             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
-            sprite::Rect{0, 0, spriteHandler.getMobSprite().frameSize.x, spriteHandler.getMobSprite().frameSize.y}));
+            render::Rect{0, 0, render::SDLManager::load("./assets/mob1.gif").frameSize.x, render::SDLManager::load("./assets/mob1.gif").frameSize.y}));
     ecs.Add<component::Health>(playerEntity);
     ecs.Add<component::Health>(mobEntity, component::Health(100));
 

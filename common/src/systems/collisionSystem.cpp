@@ -5,31 +5,28 @@
 // collisionSystem
 //
 
-#include <cstddef>
-#include <iostream>
 #include <vector>
 #include "components/Collider.hpp"
 #include "components/Transform.hpp"
 #include "flux/core/flux.hpp"
-#include "spriteHandler.hpp"
 
 flux::View CollisionSystemView(const flux::ECS& ecs)
 {
     return ecs.GenerateViewFromComponents<component::collider, component::Transform>();
 }
 
-static bool checkRectCollision(sprite::Rect firstRect, component::Transform firstTransform, sprite::Rect secondRect,
+static bool checkRectCollision(render::Rect firstRect, component::Transform firstTransform, render::Rect secondRect,
                                component::Transform secondTransform)
 {
     float left1 = firstTransform.pos.x;
-    float right1 = firstTransform.pos.x + firstRect.destX;
+    float right1 = firstTransform.pos.x + firstRect.srch;
     float top1 = firstTransform.pos.y;
-    float bottom1 = firstTransform.pos.y + firstRect.destY;
+    float bottom1 = firstTransform.pos.y + firstRect.srch;
 
     float left2 = secondTransform.pos.x;
-    float right2 = secondTransform.pos.x + secondRect.destX;
+    float right2 = secondTransform.pos.x + secondRect.srcw;
     float top2 = secondTransform.pos.y;
-    float bottom2 = secondTransform.pos.y + secondRect.destY;
+    float bottom2 = secondTransform.pos.y + secondRect.srcw;
 
     return (left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2);
 }

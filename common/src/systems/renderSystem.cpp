@@ -5,6 +5,7 @@
 // healthSystem
 //
 
+#include <iostream>
 #include <SDL3/SDL_render.h>
 #include <vector>
 
