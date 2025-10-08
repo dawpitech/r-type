@@ -27,6 +27,8 @@ namespace network
             explicit ServerNetwork(uint16_t port);
             ~ServerNetwork();
 
+            virtual void connect();
+
             template <typename T>
                 requires network::NetworkDataType<T>
             void attach(const std::function<void(const T&)>&& callback)

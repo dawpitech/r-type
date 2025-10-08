@@ -12,6 +12,7 @@
 #include "player/PlayersManager.hpp"
 #include "network/TCP/TCPNetwork.hpp"
 #include "network/UDP/UDPNetwork.hpp"
+#include "rooms/Rooms.hpp"
 
 namespace Room {
     constexpr uint16_t BASENBROOMS = 10;
@@ -32,5 +33,6 @@ namespace Room {
 
         game::PlayersManager _playerManager;
         std::vector<std::thread> _threads;
+        std::vector<std::unique_ptr<Room>> _rooms;
     };
 }  // namespace Room

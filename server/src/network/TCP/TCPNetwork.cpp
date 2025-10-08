@@ -26,8 +26,6 @@ network::TCPNetwork::TCPNetwork(const uint16_t port) :
 
 network::TCPNetwork::~TCPNetwork() {}
 
-void network::TCPNetwork::connect() { unsigned hasRun = this->_ioContext.poll_one(); }
-
 void network::TCPNetwork::_setupAcceptNewSocket()
 {
     this->_clients.emplace_back(std::make_unique<ClientTCP>(this->_ioContext));
@@ -44,15 +42,19 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
         utils::Logger::debug(std::format("Error in TCP accept: {}", error.message()));
         return;
     }
-    this->_setupReadSocket(*this->_clients.back());
+    auto &client = this->_clients.back();
+    this->_setupReadSocket(*client);
 
-    auto& tcpSocket = this->_clients.back()->getSocket();
+    auto& tcpSocket = client->getSocket();
     auto socketIp = tcpSocket.remote_endpoint().address().to_string();
     auto socketPort = tcpSocket.remote_endpoint().port();
     std::string msg = std::format("New connection accepted from: {}:{}", socketIp, socketPort);
 
     ConnectionInfo info(socketIp, socketPort);
     this->notify(info);
+
+    ClientTCPSentInfo dataToSend(info.uuid, this->_port, 0);
+    client->send(dataToSend);
     utils::Logger::debug(msg);
     this->_setupAcceptNewSocket();
 }
