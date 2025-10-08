@@ -5,6 +5,7 @@
 // inputSystem
 //
 
+#include <iostream>
 #include <vector>
 #include "components/PlayerInput.hpp"
 #include "components/Velocity.hpp"
@@ -25,7 +26,8 @@ flux::View InputSystemView(const flux::ECS& ecs)
 
 void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    for (const auto& entity : entities) {
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
+        const flux::Entity& entity = entities[i];
         auto& playerInput = ecs.GetComponent<component::PlayerInput>(entity);
         auto& playerVelocity = ecs.GetComponent<component::Velocity>(entity);
 

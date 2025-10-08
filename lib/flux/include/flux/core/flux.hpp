@@ -74,6 +74,7 @@ namespace flux
         struct IComponentVector
         {
             virtual ~IComponentVector() = default;
+            virtual void Remove(Entity id) = 0;
         };
 
         std::unordered_map<std::type_index, std::size_t> componentMaskOffsetStore;
@@ -402,6 +403,27 @@ namespace flux
                         hooks->hookAfterRender.value()();
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+                }
+            }
+
+            /**
+             * Delete an entity and remove all its components
+             * @param entity The entity to delete
+             */
+            void DeleteEntity(const Entity entity)
+            {
+                for (auto& [type_idx, storage] : componentsStore) {
+                    auto* base = storage.get();
+                    base->Remove(entity);
+                }
+                if (entity < entitiesComponentMask.size()) {
+                    const ComponentMask mask = entitiesComponentMask[entity];
+                    auto groupIt = componentMaskGroups.find(mask);
+                    if (groupIt != componentMaskGroups.end()) {
+                        auto& vec = groupIt->second;
+                        std::erase(vec, entity);
+                    }
+                    entitiesComponentMask[entity].reset();
                 }
             }
 

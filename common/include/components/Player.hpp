@@ -9,7 +9,7 @@
 
 namespace component
 {
-    struct player
+    struct Player
     {
             int score = 0;
             int lvl = 0;
