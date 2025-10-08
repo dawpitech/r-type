@@ -19,7 +19,26 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     this->_connectionNetwork.attach<network::ConnectionInfo>(
         [this](const network::ConnectionInfo& info)
         {
+            std::cout << "In attach" << std::endl;
             this->_playerManager.createNewPlayer(info);
+
+            std::cout << "After create" << std::endl;
+            auto playerOpt = this->_playerManager.getPlayer(info.uuid);
+            std::cout << "after get" << std::endl;
+            if (!playerOpt.has_value()) {
+                std::cout << "Coucou de pas de value" << std::endl;
+                return;
+            }
+            std::cout << "After check" << std::endl;
+            for (auto& room : this->_rooms) {
+                std::cout << "turn" << std::endl;
+                if (!room->_isRoomFull()) {
+                    std::cout << "room not empty" << std::endl;
+                    room->addPlayer(playerOpt.value());
+                    break;
+                }
+            };
+            std::cout << "Coucou d'ici" << std::endl;
         });
     this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>([this](network::ClientTCPReceivedInfo info)
                                                                     { this->_playerManager.storeInfo(info); });
@@ -27,9 +46,7 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
 
     for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_rooms.push_back(std::make_unique<Room>(i));
-        this->_threads.emplace_back([&] {
-            this->_rooms.back()->run();
-        });
+        this->_threads.emplace_back([&] { this->_rooms.back()->run(); });
     }
     while (true) {
         this->_connectionNetwork.connect();

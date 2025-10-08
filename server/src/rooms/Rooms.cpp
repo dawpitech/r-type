@@ -25,30 +25,33 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
 void Room::Room::run()
 {
     this->_simulation.runSimulation();
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    };
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
 {
-    auto lock = std::lock_guard<std::mutex>(this->_roomMutex);
+    std::lock_guard<std::mutex> lock(this->_roomMutex);
     this->_players.erase(this->_players.begin(), this->_players.end());
     this->_nbPlayerMax = nbPlayers;
 }
 
 bool Room::Room::addPlayer(game::Player& player)
 {
-    auto lock = std::lock_guard<std::mutex>(this->_roomMutex);
     if (this->_isRoomFull()) {
         auto log = std::format("Too many player ! Can't add user in room {}", this->_roomNumber);
         utils::Logger::debug(log);
         return false;
     }
 
+    std::lock_guard<std::mutex> lock(this->_roomMutex);
     this->_players.emplace_back(player);
     return true;
 }
 
 bool Room::Room::_isRoomFull()
 {
-    auto lock = std::lock_guard<std::mutex>(this->_roomMutex);
+    std::lock_guard<std::mutex> lock(this->_roomMutex);
     return this->_players.size() >= this->_nbPlayerMax;
 }
