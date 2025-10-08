@@ -6,6 +6,7 @@
 */
 
 #include "components/Collider.hpp"
+#include "utils/error.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
 #endif

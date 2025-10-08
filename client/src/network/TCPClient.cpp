@@ -5,6 +5,7 @@
 ** TCPClient.cpp
 */
 
+#include <cstdint>
 #include <functional>
 #include <boost/system/error_code.hpp>
 
@@ -67,6 +68,11 @@ bool client::network::TCPClient::isConnected() const
     return this->_connected;
 }
 
+uint16_t client::network::TCPClient::getPortUDP() const
+{
+    return this->_portUDP;
+}
+
 void client::network::TCPClient::_connectHandler(const boost::system::error_code& error)
 {
     if (error) {
@@ -77,12 +83,31 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
     this->_connected = true;
     utils::Logger::debug(std::format("Successfully connected to {}:{}", this->_serverIp, this->_serverPort));
     this->_setupRead();
-    if (this->_uuid == "") {
-        utils::Logger::debug(std::format("Error, client UUID was \"\""));
+
+    if (this->_uuid.empty()) {
+        utils::Logger::debug("Error, client UUID was empty");
         return;
     }
+
     utils::Logger::debug(std::format("Client UUID: {}", this->_uuid));
-    utils::Logger::debug(std::format("UDP port: {}", this->_portUDP));
+
+    this->_networkClientUDP = std::make_unique<client::network::UDPClient>(
+        this->_serverIp, this->_portUDP);
+
+    ::network::ClientTCPSentInfo info;
+    std::strncpy(info.userID, this->_uuid.c_str(), sizeof(info.userID) - 1);
+    info.userID[sizeof(info.userID) - 1] = '\0';
+    utils::Logger::debug(std::format("uuid {}", info.userID));
+    info.portUDP = this->_networkClientUDP->getLocalPort();
+
+    try {
+        boost::asio::write(this->_socket, boost::asio::buffer(&info, sizeof(info)));
+        utils::Logger::debug(std::format("Sent ClientTCPSentInfo via TCP ({} bytes)", sizeof(info)));
+    } catch (const boost::system::system_error& e) {
+        utils::Logger::debug(std::format("Failed to send ClientTCPSentInfo via TCP: {}", e.what()));
+    }
+
+    utils::Logger::debug(std::format("UDP client local port: {}", info.portUDP));
 }
 
 void client::network::TCPClient::_setupRead()
