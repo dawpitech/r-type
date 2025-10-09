@@ -29,33 +29,22 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
     _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
 {}
 
-template <typename T>
-void getEntities(const flux::ECS& ecs,
-                             std::unordered_map<flux::Entity, std::vector<std::any>>& componentStore)
-{
-    auto view = ecs.GenerateViewFromComponents<component::Health>();
-    auto entities = ecs.QueryViewNotExclusive(view);
-
-    for (auto& it : entities)
-        componentStore[it];
-}
-
 void Room::Room::run()
 {
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    };
-
     flux::runtimeHooks hooks;
     hooks.hooksNetwork = [this](flux::ECS& ecs)
     {
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
-        getEntities<component::Health>(ecs, componentStore);
-        getEntities<component::mob>(ecs, componentStore);
-        getEntities<component::player>(ecs, componentStore);
-        getEntities<component::Transform>(ecs, componentStore);
-        getEntities<component::Velocity>(ecs, componentStore);
+        // ecs.getEntities<component::Health>(ecs, componentStore);
+        ecs.getEntities<component::mob>(ecs, componentStore);
+        // ecs.getEntities<component::player>(ecs, componentStore);
+        ecs.getEntities<component::Transform>(ecs, componentStore);
+        ecs.getEntities<component::Velocity>(ecs, componentStore);
+        for (const auto& [key, value]: componentStore) {
+                // std::cout << "Key = " << key << std::endl;
+        };
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     };
 
     this->_simulation.runSimulation(hooks);
