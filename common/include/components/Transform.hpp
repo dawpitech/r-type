@@ -9,6 +9,7 @@
 
 #include <cstdint>
 
+#include "flux/core/Serialization.hpp"
 #include "vector2.hpp"
 
 namespace component
@@ -23,5 +24,6 @@ namespace component
                       const float scaleX, const float scaleY) :
                 pos(x, y), rotation(rotation), scale(scaleX, scaleY)
             {}
+            REFLECT(pos, rotation, scale)
     };
 } // namespace component

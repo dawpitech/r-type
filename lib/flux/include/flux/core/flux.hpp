@@ -21,6 +21,7 @@
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+
 #include "flux/core/Serialization.hpp"
 #include "utils/logger.hpp"
 
@@ -473,4 +474,29 @@ namespace flux
                 it->second.unserialize(entity, dataLeft);
             }
     };
+
+    template <typename T>
+    std::string SerializerHandler<T>::serialize(flux::ECS& ecs, const flux::Entity entity, const T& component)
+    {
+        std::ostringstream out;
+        component.reflect(
+            [&](auto&&... fields)
+            {
+                auto id = ecs.getComponentTypeID<T>();
+                out << id << " " << entity << " ";
+                ((out << fields << " "), ...);
+            });
+        return out.str();
+    }
+
+    template <typename T>
+    T SerializerHandler<T>::unserialize(flux::ECS& ecs, const flux::Entity entity, const std::string& data)
+    {
+        std::istringstream in(data);
+        T component{};
+
+        ComponentTypeID typeID;
+        component.reflect([&](auto&&... fields) { ((in >> fields), ...); });
+        return component;
+    }
 } // namespace flux

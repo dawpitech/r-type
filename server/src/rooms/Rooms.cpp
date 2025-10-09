@@ -41,9 +41,29 @@ void Room::Room::run()
         // ecs.getEntities<component::player>(ecs, componentStore);
         ecs.getEntities<component::Transform>(ecs, componentStore);
         ecs.getEntities<component::Velocity>(ecs, componentStore);
-        for (const auto& [key, value]: componentStore) {
-                // std::cout << "Key = " << key << std::endl;
+
+        std::ostringstream serializedData;
+        for (const auto& [entity, components] : componentStore) {
+            for (const auto& component : components) {
+                if (component.type() == typeid(component::mob)) {
+                    auto comp = std::any_cast<const component::mob>(component);
+                    serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp) << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Transform)) {
+                    auto& comp = std::any_cast<const component::Transform&>(component);
+                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp) << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Velocity)) {
+                    auto& comp = std::any_cast<const component::Velocity&>(component);
+                    serializedData << flux::SerializerHandler<component::Velocity>::serialize(ecs, entity, comp) << std::endl;
+                    continue;
+                }
+            }
         };
+
+        std::cout << "Data = " << serializedData.str();
         std::this_thread::sleep_for(std::chrono::seconds(1));
     };
 

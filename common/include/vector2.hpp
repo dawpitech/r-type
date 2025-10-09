@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <ostream>
 namespace utils
 {
     template <typename T>
@@ -16,4 +17,18 @@ namespace utils
             T y;
             Vector2(T x, T y) : x(x), y(y) {}
     };
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& stream, const utils::Vector2<T>& vec)
+    {
+        stream << vec.x << " " << vec.y;
+        return stream;
+    }
+
+    template <typename T>
+    std::istream& operator>>(std::istream& stream, utils::Vector2<T>& vec)
+    {
+        stream >> vec.x >> vec.y;
+        return stream;
+    }
 } // namespace utils

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include "flux/core/Serialization.hpp"
 #include "spriteHandler.hpp"
 
 constexpr uint8_t NONE_BIT = 0;
@@ -26,6 +27,7 @@ namespace component
         PLAYER_PROJECTILE = PLAYER_PROJECTILE_BIT,
         MOB_PROJECTILE = MOB_PROJECTILE_BIT
     };
+
     struct collider
     {
             uint8_t layer;
@@ -35,5 +37,6 @@ namespace component
 
             explicit collider(uint8_t layer, uint8_t mask, sprite::Rect rect, bool isActive = true) 
             : layer(layer), mask(mask), rect(rect), isActive(isActive) {}
+            REFLECT(layer, mask, rect, isActive)
     };
 } // namespace component

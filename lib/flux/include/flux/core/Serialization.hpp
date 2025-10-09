@@ -13,9 +13,9 @@
 
 #define REFLECT(...)                                                                                                   \
     template <typename T>                                                                                              \
-    void reflect(T&& function)                                                                                         \
+    void reflect(T&& function) const                                                                                   \
     {                                                                                                                  \
-        f(__VA_ARGS__);                                                                                                \
+        function(__VA_ARGS__);                                                                                         \
     }
 
 namespace flux
@@ -29,8 +29,8 @@ namespace flux
     class SerializerHandler
     {
         public:
-            static std::string serialize(flux::ECS& ecs, flux::Entity& entity, const T& component);
+            static std::string serialize(flux::ECS& ecs, flux::Entity entity, const T& component);
 
-            static T unserialize(flux::ECS& ecs, flux::Entity& entity, const std::string& data);
+            static T unserialize(flux::ECS& ecs, flux::Entity entity, const std::string& data);
     };
 } // namespace flux

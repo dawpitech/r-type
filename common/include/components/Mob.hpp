@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "flux/core/Serialization.hpp"
 namespace component
 {
     struct mob
@@ -19,5 +20,6 @@ namespace component
 
             mob(int damage, int type, bool canShoot = false, float shootCooldown = 0.0f, float shootRate = 0.0f) :
                 damage(damage), type(type), canShoot(false), shootCooldown(shootCooldown), shootRate(shootRate) {};
+            REFLECT(damage, shootCooldown, shootRate, type, canShoot)
     };
 } // namespace component
