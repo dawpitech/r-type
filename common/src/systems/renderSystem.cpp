@@ -26,9 +26,9 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         auto& sprite = ecs.GetComponent<component::sprite>(entity);
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
-        sprite.destRect.x = transform.pos.x;
-        sprite.destRect.y = transform.pos.y;
+        SDL_FRect destRect = {transform.pos.x, transform.pos.y, sprite.srcRect.w * transform.scale.x,
+                              sprite.srcRect.h * transform.scale.y};
 
-        render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, sprite.destRect);
+        render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, destRect);
     };
 }

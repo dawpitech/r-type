@@ -19,14 +19,14 @@ static bool checkRectCollision(render::Rect firstRect, component::Transform firs
                                component::Transform secondTransform)
 {
     float left1 = firstTransform.pos.x;
-    float right1 = firstTransform.pos.x + firstRect.srcw;
+    float right1 = firstTransform.pos.x + (firstRect.srcw * firstTransform.scale.x);
     float top1 = firstTransform.pos.y;
-    float bottom1 = firstTransform.pos.y + firstRect.srch;
+    float bottom1 = firstTransform.pos.y + (firstRect.srch * firstTransform.scale.y);
 
     float left2 = secondTransform.pos.x;
-    float right2 = secondTransform.pos.x + secondRect.srcw;
+    float right2 = secondTransform.pos.x + (secondRect.srcw * secondTransform.scale.x);
     float top2 = secondTransform.pos.y;
-    float bottom2 = secondTransform.pos.y + secondRect.srch;
+    float bottom2 = secondTransform.pos.y + (secondRect.srch * secondTransform.scale.y);
 
     return (left1 < right2 && right1 > left2 && top1 < bottom2 && bottom1 > top2);
 }

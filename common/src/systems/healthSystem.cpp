@@ -5,7 +5,6 @@
 // healthSystem
 //
 
-#include <iostream>
 #include "components/Health.hpp"
 #include "flux/core/flux.hpp"
 

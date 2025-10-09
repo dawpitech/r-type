@@ -40,6 +40,6 @@ namespace component
                               bool hasCollide = false) :
                 layer(layer), mask(mask), rect(rect), isActive(isActive), hasCollide(hasCollide)
             {}
-            REFLECT(layer, mask, rect, isActive)
+            REFLECT(layer, mask, rect, isActive, hasCollide)
     };
 } // namespace component
