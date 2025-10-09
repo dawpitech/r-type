@@ -60,7 +60,9 @@ namespace render
 
             static void init() { SDLManager::instance(); }
 
-            static void setLastTime() { instance()._lastTime = SDL_GetTicks(); }
+            static int getWindowWidth() { return instance()._windowWith; }
+
+            static int getWindowHeight() { return instance()._windowHeight; }
 
             static std::vector<utils::EventManager>& getKeysEvent() { return instance()._keyEvent; }
 
@@ -172,21 +174,22 @@ namespace render
         private:
             SDL_Renderer* _renderer;
             SDL_Window* _window;
-            std::string _windowTitle = "La windows";
+            std::string _windowTitle = "R-Type";
             SDL_Event _event = {};
             uint32_t _lastTime = SDL_GetTicks();
             uint32_t _currentTime = SDL_GetTicks();
             std::vector<utils::EventManager> _keyEvent;
             std::unordered_map<std::string, SpriteData> _gameSprite;
             SpriteHandler spriteInfo;
-            
+            int _windowWith = 800;
+            int _windowHeight = 600;
 
             explicit SDLManager()
             {
                 if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
                     throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
-                this->_window = SDL_CreateWindow(this->_windowTitle.c_str(), 800, 600, 0);
+                this->_window = SDL_CreateWindow(this->_windowTitle.c_str(), this->_windowWith, this->_windowHeight, 0);
                 if (this->_window == nullptr) {
                     throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }

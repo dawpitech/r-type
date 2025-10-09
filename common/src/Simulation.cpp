@@ -37,6 +37,7 @@
 #include "systems/projectileSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/shootSystem.hpp"
+#include "systems/mobSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
                                           const std::string& serverIP, uint16_t serverPort)
@@ -84,17 +85,17 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.Add<component::Projectile>(newEntity, component::Projectile(component::ProjectileType::PLAYER));
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
-    ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
-    ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
 
     if (hasGUI) {
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
-        render::SDLManager::setLastTime();
         if (hooks.has_value())
             hooks->hookBeforeLogic =
                 flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
