@@ -9,7 +9,10 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
+#include <cstdint>
+#include <memory>
 #include "Network.hpp"
+#include "UDPClient.hpp"
 #include "network/datatype.hpp"
 
 using boost::asio::ip::tcp;
@@ -27,10 +30,15 @@ namespace client::network
 
             void sendData(const ::network::ClientTCPReceivedInfo& data);
             bool isConnected() const;
+            uint16_t getPortUDP() const;
 
         private:
             tcp::socket _socket;
             bool _connected;
+            std::string _uuid;
+            uint16_t _portUDP = 0;
+            uint16_t _score = 0;
+	    std::unique_ptr<client::network::UDPClient> _networkClientUDP;
 
             void _connectHandler(const boost::system::error_code& error);
             void _setupRead();

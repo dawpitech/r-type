@@ -9,4 +9,5 @@
 
 #include "flux/core/flux.hpp"
 
-void HealthSystem(flux::ECS &ecs, flux::Entity e1);
+void HealthSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities);
+flux::View HealthSystemView(const flux::ECS& ecs);

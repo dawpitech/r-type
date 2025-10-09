@@ -70,59 +70,58 @@ namespace flux
 
     class ECS
     {
-            struct IComponentVector
-            {
-                    virtual ~IComponentVector() = default;
-            };
+        struct IComponentVector
+        {
+            virtual ~IComponentVector() = default;
+            virtual void Remove(Entity id) = 0;
+        };
 
-            std::unordered_map<std::type_index, std::size_t> componentMaskOffsetStore;
-            std::size_t nextComponentMaskOffsetBit = 0;
-            std::vector<ComponentMask> entitiesComponentMask;
-            std::unordered_map<ComponentMask, std::vector<Entity>> componentMaskGroups;
+        std::unordered_map<std::type_index, std::size_t> componentMaskOffsetStore;
+        std::size_t nextComponentMaskOffsetBit = 0;
+        std::vector<ComponentMask> entitiesComponentMask;
+        std::unordered_map<ComponentMask, std::vector<Entity>> componentMaskGroups;
 
-            std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
+        std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
 
-            Entity nextEntityID = 0;
+        Entity nextEntityID = 0;
 
-            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
-                systemsLogicList;
-            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
-                systemsRenderList;
+        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsLogicList;
+        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsRenderList;
 
-            bool _running = true;
+        bool _running = true;
 
-            template <typename T>
-            struct ComponentVector final : IComponentVector
-            {
-                    std::vector<T> data;
-                    std::vector<Entity> entityIDS;
+        template <typename T>
+        struct ComponentVector final : IComponentVector
+        {
+            std::vector<T> data;
+            std::vector<Entity> entityIDS;
 
-                    void Add(const Entity id, T&& value)
-                    {
-                        entityIDS.push_back(id);
-                        data.push_back(std::move(value));
+            void Add(const Entity id, T&& value)
+                {
+                    entityIDS.push_back(id);
+                    data.push_back(std::move(value));
+                }
+
+                void Add(const Entity id, const T& value)
+                {
+                    entityIDS.push_back(id);
+                    data.push_back(value);
+                }
+
+                void Add(const Entity id)
+                {
+                    entityIDS.push_back(id);
+                    data.push_back(T{});
+                }
+
+                void Remove(const Entity id)
+                {
+                    if (const auto it = std::find(entityIDS.begin(), entityIDS.end(), id); it != entityIDS.end()) {
+                        size_t idx = std::distance(entityIDS.begin(), it);
+                        entityIDS.erase(entityIDS.begin() + static_cast<long>(idx));
+                        data.erase(data.begin() + idx);
                     }
-
-                    void Add(const Entity id, const T& value)
-                    {
-                        entityIDS.push_back(id);
-                        data.push_back(value);
-                    }
-
-                    void Add(const Entity id)
-                    {
-                        entityIDS.push_back(id);
-                        data.push_back(T{});
-                    }
-
-                    void Remove(const Entity id)
-                    {
-                        if (const auto it = std::find(entityIDS.begin(), entityIDS.end(), id); it != entityIDS.end()) {
-                            size_t idx = std::distance(entityIDS.begin(), it);
-                            entityIDS.erase(entityIDS.begin() + static_cast<long>(idx));
-                            data.erase(data.begin() + idx);
-                        }
-                    }
+                }
             };
 
             template <typename T>
@@ -409,6 +408,27 @@ namespace flux
                         hooks->hooksNetwork.value()(*this);
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+                }
+            }
+
+            /**
+             * Delete an entity and remove all its components
+             * @param entity The entity to delete
+             */
+            void DeleteEntity(const Entity entity)
+            {
+                for (auto& [type_idx, storage] : componentsStore) {
+                    auto* base = storage.get();
+                    base->Remove(entity);
+                }
+                if (entity < entitiesComponentMask.size()) {
+                    const ComponentMask mask = entitiesComponentMask[entity];
+                    auto groupIt = componentMaskGroups.find(mask);
+                    if (groupIt != componentMaskGroups.end()) {
+                        auto& vec = groupIt->second;
+                        std::erase(vec, entity);
+                    }
+                    entitiesComponentMask[entity].reset();
                 }
             }
 

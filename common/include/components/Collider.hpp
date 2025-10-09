@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include "flux/core/Serialization.hpp"
-#include "spriteHandler.hpp"
+#include "sdlManager.hpp"
 
 constexpr uint8_t NONE_BIT = 0;
 constexpr uint8_t PLAYER_BIT = 1 << 0;
@@ -32,11 +32,14 @@ namespace component
     {
             uint8_t layer;
             uint8_t mask;
-            sprite::Rect rect;
+            render::Rect rect;
             bool isActive;
+            bool hasCollide;
 
-            explicit collider(uint8_t layer, uint8_t mask, sprite::Rect rect, bool isActive = true) 
-            : layer(layer), mask(mask), rect(rect), isActive(isActive) {}
+            explicit collider(uint8_t layer, uint8_t mask, render::Rect rect, bool isActive = true,
+                              bool hasCollide = false) :
+                layer(layer), mask(mask), rect(rect), isActive(isActive), hasCollide(hasCollide)
+            {}
             REFLECT(layer, mask, rect, isActive)
     };
 } // namespace component
