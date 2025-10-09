@@ -36,11 +36,12 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, 10.0f));
             ecs.Add<component::sprite>(projectile, proj.texture);
             ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
-            ecs.Add<component::Transform>(projectile,
-                                          component::Transform(playerTransform.pos.x + player.frameSize.x + 10,
-                                                               playerTransform.pos.y + player.frameSize.y / 2, 0, 1,
-                                                               1));
-            ecs.Add<component::Velocity>(projectile, component::Velocity(1, 0));
+            ecs.Add<component::Transform>(
+                projectile,
+                component::Transform(playerTransform.pos.x + (player.frameSize.x * playerTransform.scale.x),
+                                     playerTransform.pos.y + (player.frameSize.y * playerTransform.scale.y) / 2, 0, 0.5,
+                                     0.5));
+            ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
             ecs.Add<component::collider>(projectile,
                                          component::collider(component::PLAYER_PROJECTILE, component::MOB,
                                                              {0, 0, proj.frameSize.x, proj.frameSize.y}));
