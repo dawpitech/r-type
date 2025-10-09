@@ -13,13 +13,13 @@
 #include "components/Player.hpp"
 #include "components/Collider.hpp"
 #include "components/Animation.hpp"
+#include "components/Collider.hpp"
+#include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
-#include "components/Collider.hpp"
-#include "components/Health.hpp"
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
 #include "sdlManager.hpp"
@@ -30,15 +30,16 @@
 
 #include "systems/animationSystem.hpp"
 #include "systems/collisionSystem.hpp"
-#include "systems/inputSystem.hpp"
-#include "systems/movementSystem.hpp"
-#include "systems/renderSystem.hpp"
 #include "systems/damageSystem.hpp"
 #include "systems/healthSystem.hpp"
-#include "systems/shootSystem.hpp"
+#include "systems/inputSystem.hpp"
+#include "systems/movementSystem.hpp"
 #include "systems/projectileSystem.hpp"
+#include "systems/renderSystem.hpp"
+#include "systems/shootSystem.hpp"
 
-void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI, const std::string& serverIP, uint16_t serverPort)
+void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
+                                          const std::string& serverIP, uint16_t serverPort)
 {
     this->_setupNetwork(serverIP, serverPort);
     this->runSimulation(hooks, hasGUI);
@@ -52,35 +53,35 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
 
     const flux::Entity playerEntity = ecs.newEntity();
     const flux::Entity mobEntity = ecs.newEntity();
+    const render::SpriteData& playerSprite = render::SDLManager::load("./assets/player.gif");
+    const render::SpriteData& mobSprite = render::SDLManager::load("./assets/mob1.gif");
 
-    ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(render::SDLManager::load("./assets/player.gif").texture)));
+    ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(playerSprite.texture)));
     ecs.Add<component::Player>(playerEntity);
-    ecs.Add<component::animation>(playerEntity, component::animation(render::SDLManager::load("./assets/player.gif").spriteMap, true));
+    ecs.Add<component::animation>(playerEntity, component::animation(playerSprite.spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
     ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
-    ecs.Add<component::sprite>(mobEntity, component::sprite(render::SDLManager::load("./assets/mob1.gif").texture));
-    ecs.Add<component::animation>(mobEntity, component::animation(render::SDLManager::load("./assets/mob1.gif").spriteMap, true));
-    ecs.Add<component::Transform>(mobEntity, component::Transform(200, 400, 0, 1, 1));
+    ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
+    ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
+    ecs.Add<component::Transform>(mobEntity, component::Transform(700, 150, 0, 1, 1));
     ecs.Add<component::Velocity>(mobEntity);
     ecs.Add<component::collider>(
         playerEntity,
-        component::collider(
-            component::CollisionLayer::PLAYER,
-            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
-            {0, 0, render::SDLManager::load("./assets/player.gif").frameSize.x, render::SDLManager::load("./assets/player.gif").frameSize.y}));
+        component::collider(component::CollisionLayer::PLAYER,
+                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
+                            {0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y}));
 
     ecs.Add<component::collider>(
         mobEntity,
-        component::collider(
-            component::CollisionLayer::MOB,
-            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
-            render::Rect{0, 0, render::SDLManager::load("./assets/mob1.gif").frameSize.x, render::SDLManager::load("./assets/mob1.gif").frameSize.y}));
+        component::collider(component::CollisionLayer::MOB,
+                            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
+                            render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
     ecs.Add<component::Health>(playerEntity);
     ecs.Add<component::Health>(mobEntity, component::Health(100));
     flux::Entity newEntity = ecs.newEntity();
-    ecs.Add<component::Projectile>(newEntity);
+    ecs.Add<component::Projectile>(newEntity, component::Projectile(component::ProjectileType::PLAYER));
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
@@ -91,13 +92,13 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
 
-
     if (hasGUI) {
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
         render::SDLManager::setLastTime();
         if (hooks.has_value())
-            hooks->hookBeforeLogic = flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
-        ecs.handExecution(hooks);
+            hooks->hookBeforeLogic =
+                flux::make_hook(render::SDLManager::handleEvent, std::ref(ecs.getMasterRunState())),
+            ecs.handExecution(hooks);
     }
     else
         ecs.handExecution(hooks);

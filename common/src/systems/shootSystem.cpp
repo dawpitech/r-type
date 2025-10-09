@@ -31,31 +31,20 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         if (input.shoot) {
             auto& playerTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
-
-            ecs.Add<component::Projectile>(projectile);
-            ecs.Add<component::sprite>(
-                projectile,
-                component::sprite(render::SDLManager::load("./assets/playerProjectile-mod-resize.gif").texture));
-
-            ecs.Add<component::animation>(
-                projectile,
-                component::animation(render::SDLManager::load("./assets/playerProjectile-mod-resize.gif").spriteMap,
-                                     true));
-
-            ecs.Add<component::Transform>(
-                projectile,
-                component::Transform(
-                    playerTransform.pos.x + render::SDLManager::load("./assets/player.gif").frameSize.x + 10,
-                    playerTransform.pos.y + render::SDLManager::load("./assets/player.gif").frameSize.y / 2, 0, 1, 1));
+            render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile-mod-resize.gif");
+            render::SpriteData player = render::SDLManager::load("./assets/player.gif");
+            ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, 10.0f));
+            ecs.Add<component::sprite>(projectile, proj.texture);
+            ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
+            ecs.Add<component::Transform>(projectile,
+                                          component::Transform(playerTransform.pos.x + player.frameSize.x + 10,
+                                                               playerTransform.pos.y + player.frameSize.y / 2, 0, 1,
+                                                               1));
             ecs.Add<component::Velocity>(projectile, component::Velocity(1, 0));
-            ecs.Add<component::collider>(
-                projectile,
-                component::collider(
-                    component::PLAYER_PROJECTILE, component::MOB,
-                    {0, 0, render::SDLManager::load("./assets/playerProjectile-mod-resize.gif").frameSize.x,
-                     render::SDLManager::load("./assets/playerProjectile-mod-resize.gif").frameSize.y}));
+            ecs.Add<component::collider>(projectile,
+                                         component::collider(component::PLAYER_PROJECTILE, component::MOB,
+                                                             {0, 0, proj.frameSize.x, proj.frameSize.y}));
             ecs.Add<component::Health>(projectile);
-
             input.shoot = false;
         }
     }
