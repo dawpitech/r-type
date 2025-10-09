@@ -5,7 +5,6 @@
 // shootSystem
 //
 
-#include <iostream>
 #include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
@@ -17,6 +16,11 @@
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 #include "sdlManager.hpp"
+
+constexpr float SCALE_X = 0.5;
+constexpr float SCALE_Y = 0.5;
+constexpr int ROTATION = 0;
+constexpr float PROJECTILE_SPEED = 10.0f;
 
 flux::View ShootSystemView(const flux::ECS& ecs)
 {
@@ -33,14 +37,14 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             flux::Entity projectile = ecs.newEntity();
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
             render::SpriteData player = render::SDLManager::load("./assets/player.gif");
-            ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, 10.0f));
+            ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, PROJECTILE_SPEED));
             ecs.Add<component::sprite>(projectile, proj.texture);
             ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
             ecs.Add<component::Transform>(
                 projectile,
                 component::Transform(playerTransform.pos.x + (player.frameSize.x * playerTransform.scale.x),
-                                     playerTransform.pos.y + (player.frameSize.y * playerTransform.scale.y) / 2, 0, 0.5,
-                                     0.5));
+                                     playerTransform.pos.y + (player.frameSize.y * playerTransform.scale.y) / 2, ROTATION, SCALE_X,
+                                     SCALE_Y));
             ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
             ecs.Add<component::collider>(projectile,
                                          component::collider(component::PLAYER_PROJECTILE, component::MOB,
