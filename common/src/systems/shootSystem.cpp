@@ -31,7 +31,7 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         if (input.shoot) {
             auto& playerTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
-            render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile-mod-resize.gif");
+            render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
             render::SpriteData player = render::SDLManager::load("./assets/player.gif");
             ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, 10.0f));
             ecs.Add<component::sprite>(projectile, proj.texture);

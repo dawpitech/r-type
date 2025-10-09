@@ -26,7 +26,7 @@ void render::SpriteHandler::setSprite(render::SpriteData &sprite, const std::str
         this->_setPlayerSprite(sprite);
     if (path == "./assets/mob1.gif")
         this->_setMobSprite(sprite);
-    if (path == "./assets/playerProjectile-mod-resize.gif")
+    if (path == "./assets/playerProjectile.gif")
         this->_setPlayerProjectile(sprite);
 }
 
