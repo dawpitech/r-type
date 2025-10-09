@@ -5,6 +5,7 @@
 // projectile System
 //
 
+#include <iostream>
 #include "components/Projectile.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
@@ -26,6 +27,12 @@ void ProjectileSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             velocity.x = proj.speed;
             if (transform.pos.x > 3000)
                 ecs.DeleteEntity(entity);
+        }
+        if (proj.type == component::ProjectileType::MOB) {
+            velocity.x = (-proj.speed);
+            if (transform.pos.x <= 0) {
+                ecs.DeleteEntity(entity);
+            }
         }
     }
 }

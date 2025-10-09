@@ -25,7 +25,7 @@ void MobSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         auto& mob = ecs.GetComponent<component::mob>(entity);
 
         velocity.x = (-mob.speed);
-        if (tranform.pos.x > 0 && tranform.pos.y <= static_cast<float>(render::SDLManager::getWindowWidth()))
+        if (tranform.pos.x > 0 && tranform.pos.x < static_cast<float>(render::SDLManager::getWindowWidth()))
             mob.isShooting = true;
     }
 }

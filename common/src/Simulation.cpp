@@ -38,6 +38,7 @@
 #include "systems/renderSystem.hpp"
 #include "systems/shootSystem.hpp"
 #include "systems/mobSystem.hpp"
+#include "systems/mobShootSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
                                           const std::string& serverIP, uint16_t serverPort)
@@ -63,30 +64,42 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
-    ecs.Add<component::mob>(mobEntity, component::mob(10, 0, false, 0.0f, 1.0f));
-    ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
-    ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
-    ecs.Add<component::Transform>(mobEntity, component::Transform(700, 150, 0, 1, 1));
-    ecs.Add<component::Velocity>(mobEntity);
+    ecs.Add<component::Health>(playerEntity);
     ecs.Add<component::collider>(
         playerEntity,
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
                             {0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y}));
-
+    ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.0f));
+    ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
+    ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
+    ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
+    ecs.Add<component::Velocity>(mobEntity);
     ecs.Add<component::collider>(
         mobEntity,
         component::collider(component::CollisionLayer::MOB,
                             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
                             render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
-    ecs.Add<component::Health>(playerEntity);
     ecs.Add<component::Health>(mobEntity, component::Health(100));
+    const flux::Entity mobEntity2 = ecs.newEntity();
+    ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 0.8f));
+    ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
+    ecs.Add<component::animation>(mobEntity2, component::animation(mobSprite.spriteMap, true));
+    ecs.Add<component::Transform>(mobEntity2, component::Transform(1900, 300, 0, 1, 1));
+    ecs.Add<component::Velocity>(mobEntity2);
+    ecs.Add<component::collider>(
+        mobEntity2,
+        component::collider(component::CollisionLayer::MOB,
+                            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
+                            render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
+    ecs.Add<component::Health>(mobEntity2, component::Health(100));
     flux::Entity newEntity = ecs.newEntity();
     ecs.Add<component::Projectile>(newEntity, component::Projectile(component::ProjectileType::PLAYER));
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
