@@ -5,7 +5,6 @@
 // movementSystem
 //
 
-#include <iostream>
 #include <vector>
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
