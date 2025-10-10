@@ -6,6 +6,7 @@
 //
 
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/ip/address.hpp>
 #include <boost/system/detail/error_code.hpp>
 #include <memory>
 
@@ -17,6 +18,12 @@ network::UDPNetwork::UDPNetwork(std::uint16_t port) : ServerNetwork(port), _endp
 {
     this->_socket = std::make_unique<udp::socket>(this->_ioContext, this->_endpoint);
     this->async_read();
+}
+
+void network::UDPNetwork::sendData(std::string &ip, uint16_t port, const std::string &data)
+{
+    udp::endpoint remoteEndpoint(boost::asio::ip::make_address(ip), port);
+    this->_socket->send_to(boost::asio::buffer(data), remoteEndpoint);
 }
 
 void network::UDPNetwork::async_read()

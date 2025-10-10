@@ -5,6 +5,7 @@
 // Logic for each rooms
 //
 
+#include <any>
 #include <chrono>
 #include <format>
 #include <mutex>
@@ -47,31 +48,34 @@ void Room::Room::run()
             for (const auto& component : components) {
                 if (component.type() == typeid(component::mob)) {
                     auto comp = std::any_cast<const component::mob>(component);
-                    serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp) << std::endl;
+                    serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp)
+                                   << std::endl;
                     continue;
                 }
                 if (component.type() == typeid(component::Transform)) {
                     auto& comp = std::any_cast<const component::Transform&>(component);
-                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp) << std::endl;;
+                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    ;
                     continue;
                 }
                 if (component.type() == typeid(component::Velocity)) {
                     auto& comp = std::any_cast<const component::Velocity&>(component);
-                    serializedData << flux::SerializerHandler<component::Velocity>::serialize(ecs, entity, comp) << std::endl;
+                    serializedData << flux::SerializerHandler<component::Velocity>::serialize(ecs, entity, comp)
+                                   << std::endl;
                     continue;
                 }
             }
         };
 
-        std::cout << "Data = " << serializedData.str();
-        // ecs.unserializeSingleComponent(serializedData.str());
+        ecs.unserializeAllComponents(serializedData.str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
+        for (auto& it : this->_players) {
+            it.get().sendData(serializedData.str());
+        }
     };
 
     this->_simulation.runSimulation(hooks);
-    // while (true) {
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    // };
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)

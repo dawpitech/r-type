@@ -22,6 +22,8 @@ namespace network
             explicit UDPNetwork(uint16_t port);
             ~UDPNetwork() = default;
 
+            void sendData(std::string &ip, uint16_t port, const std::string &data);
+
         private:
             udp::endpoint _endpoint;
             udp::endpoint _remoteEndpoint;

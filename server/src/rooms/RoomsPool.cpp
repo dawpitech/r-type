@@ -8,6 +8,7 @@
 #include "RoomsPool.hpp"
 #include <thread>
 
+#include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "Rooms.hpp"
 
@@ -19,7 +20,7 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     this->_connectionNetwork.attach<network::ConnectionInfo>(
         [this](const network::ConnectionInfo& info)
         {
-            this->_playerManager.createNewPlayer(info);
+            this->_playerManager.createNewPlayer(info, this->_gameUpdateNetwork);
             auto playerOpt = this->_playerManager.getPlayer(info.uuid);
             if (!playerOpt.has_value()) {
                 return;
