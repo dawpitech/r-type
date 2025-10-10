@@ -5,7 +5,6 @@
 // mob shoot system
 //
 
-#include <iostream>
 #include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
@@ -20,7 +19,7 @@
 constexpr float SCALE_X = 0.5;
 constexpr float SCALE_Y = 0.5;
 constexpr int ROTATION = 0;
-constexpr float PROJECTILE_SPEED = 10.0f;
+constexpr float PROJECTILE_SPEED = 5.0f;
 
 flux::View MobShootSystemView(const flux::ECS& ecs)
 {

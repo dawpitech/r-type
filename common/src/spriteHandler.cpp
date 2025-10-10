@@ -7,6 +7,7 @@
 
 #include <SDL3/SDL_render.h>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include "sdlManager.hpp"
 
@@ -28,6 +29,8 @@ void render::SpriteHandler::setSprite(render::SpriteData &sprite, const std::str
         this->_setMobSprite(sprite);
     if (path == "./assets/playerProjectile.gif")
         this->_setPlayerProjectile(sprite);
+    if (path == "./assets/starfield2.jpg")
+        this->_setBackgroundSprite(sprite);
 }
 
 void render::SpriteHandler::_setPlayerSprite(render::SpriteData &sprite)
@@ -67,6 +70,19 @@ void render::SpriteHandler::_setPlayerProjectile(render::SpriteData &sprite) {
     sprite.frameSize.y = frameHeight;
     for (int i = 0; i < NB_PLAYER_PROJECTILE; i++) {
         Rect rect{static_cast<float>(i) * frameWidth, 30, frameWidth, frameHeight};
+        sprite.spriteMap.emplace_back(rect);
+    }
+}
+
+void render::SpriteHandler::_setBackgroundSprite(render::SpriteData &sprite) {
+    sprite.size.x = 3100;
+    sprite.size.y = 1740;
+    const float frameWidth = sprite.size.x;
+    const float frameHeight = 540;
+    sprite.frameSize.x = frameWidth;
+    sprite.frameSize.y = frameHeight;
+    for (int i = 0; i < 1; i++) {
+        Rect rect{static_cast<float>(i) * frameWidth, 0, frameWidth, frameHeight};
         sprite.spriteMap.emplace_back(rect);
     }
 }

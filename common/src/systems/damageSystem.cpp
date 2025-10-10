@@ -5,9 +5,6 @@
 // damageSystem
 //
 
-#include <cstddef>
-#include <iostream>
-
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "flux/core/flux.hpp"

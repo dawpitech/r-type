@@ -193,8 +193,8 @@ namespace render
             std::vector<utils::EventManager> _keyEvent;
             std::unordered_map<std::string, SpriteData> _gameSprite;
             SpriteHandler spriteInfo;
-            int _windowWith = 800;
-            int _windowHeight = 600;
+            int _windowWith = 960;
+            int _windowHeight = 540;
 
             explicit SDLManager()
             {

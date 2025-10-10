@@ -5,6 +5,7 @@
 ** Simulation.cpp
 */
 
+#include "components/backgroundComponent.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
 #endif
@@ -39,6 +40,7 @@
 #include "systems/shootSystem.hpp"
 #include "systems/mobSystem.hpp"
 #include "systems/mobShootSystem.hpp"
+#include "systems/backgroundSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
                                           const std::string& serverIP, uint16_t serverPort)
@@ -53,10 +55,12 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     if (hasGUI)
         render::SDLManager::init();
 
+    flux::Entity background = ecs.newEntity();
     const flux::Entity playerEntity = ecs.newEntity();
     const flux::Entity mobEntity = ecs.newEntity();
     const render::SpriteData& playerSprite = render::SDLManager::load("./assets/player.gif");
     const render::SpriteData& mobSprite = render::SDLManager::load("./assets/mob1.gif");
+    const render::SpriteData& backgroundSprite = render::SDLManager::load("./assets/starfield2.jpg");
 
     // ecs.registerComponentType<component::sprite>("Sprite");
     // ecs.registerComponentType<component::Player>("Player");
@@ -68,6 +72,9 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.registerComponentType<component::collider>("Collider");
     ecs.registerComponentType<component::mob>("Mob");
     // ecs.registerComponentType<component::Projectile>("Projectile");
+    ecs.Add<component::background>(background, component::background(backgroundSprite.spriteMap, 100.0f));
+    ecs.Add<component::sprite>(background, component::sprite(backgroundSprite.texture));
+    ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(playerSprite.texture)));
     ecs.Add<component::Player>(playerEntity);
     ecs.Add<component::animation>(playerEntity, component::animation(playerSprite.spriteMap, true));
@@ -80,7 +87,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
                             {0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y}));
-    ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.0f));
+    ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.3f, 0.3));
     ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
     ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
     ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
@@ -92,7 +99,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
                             render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
     ecs.Add<component::Health>(mobEntity, component::Health(100));
     const flux::Entity mobEntity2 = ecs.newEntity();
-    ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 0.8f));
+    ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.5f, 0.5));
     ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
     ecs.Add<component::animation>(mobEntity2, component::animation(mobSprite.spriteMap, true));
     ecs.Add<component::Transform>(mobEntity2, component::Transform(1900, 300, 0, 1, 1));
@@ -115,6 +122,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(BackgroundSystem, BackgroundSystemView(ecs), flux::systemType::RENDER);
     ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
 
     if (hasGUI) {
