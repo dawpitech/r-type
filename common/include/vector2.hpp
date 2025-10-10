@@ -15,7 +15,7 @@ namespace utils
     {
             T x;
             T y;
-            Vector2(T x, T y) : x(x), y(y) {}
+            explicit Vector2(T x = 0, T y = 0) : x(x), y(y) {}
     };
 
     template <typename T>

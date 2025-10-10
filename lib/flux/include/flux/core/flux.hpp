@@ -38,8 +38,8 @@ namespace flux
 
     struct ComponentTypeInfo
     {
-            std::function<std::string(Entity& entity, std::any)> serialize;
-            std::function<void(Entity&, const std::string& data)> unserialize;
+            std::function<std::string(flux::ECS &ecs, Entity entity, void *)> serialize;
+            std::function<void(flux::ECS &ecs, Entity, const std::string& data)> unserialize;
             std::string name;
     };
 
@@ -468,15 +468,18 @@ namespace flux
             {
                 auto id = getComponentTypeID<T>();
 
-                componentTypeRegistry[id] = {[](flux::Entity& entity, T& component) -> std::string
-                                             { return flux::SerializerHandler<T>::serialize(entity, component); },
-                                             [](flux::ECS& ecs, flux::Entity& entity, const std::string& data)
-                                             {
-                                                 T component = SerializerHandler<T>::unserialize(ecs, entity, data);
+                componentTypeRegistry[id] = {
+                    [](flux::ECS& ecs, flux::Entity entity, void* compPtr) -> std::string {
+                        T& component = *static_cast<T*>(compPtr);
+                        return flux::SerializerHandler<T>::serialize(ecs, entity, component);
+                    },
+                    [](flux::ECS& ecs, flux::Entity entity, const std::string& data) {
+                        flux::SerializerHandler<T>::unserialize(ecs, entity, data);
                                                  // ecs.AddOrReplace(entity, component); // Method should be added in
                                                  // the ECS
-                                             },
-                                             name};
+                    },
+                    name
+                };
             }
 
             void unserializeSingleComponent(const std::string& data)
@@ -491,7 +494,7 @@ namespace flux
                 if (it == this->componentTypeRegistry.end())
                     utils::Logger::debug(std::format("Can't find component with id {}", typeID));
                 std::string dataLeft = data.substr(in.tellg());
-                it->second.unserialize(entity, dataLeft);
+                it->second.unserialize(*this, entity, dataLeft);
             }
     };
 
@@ -510,13 +513,12 @@ namespace flux
     }
 
     template <typename T>
-    T SerializerHandler<T>::unserialize(flux::ECS& ecs, const flux::Entity entity, const std::string& data)
+    void SerializerHandler<T>::unserialize(flux::ECS& ecs, const flux::Entity entity, const std::string& data)
     {
         std::istringstream in(data);
         T component{};
 
         ComponentTypeID typeID;
         component.reflect([&](auto&&... fields) { ((in >> fields), ...); });
-        return component;
     }
 } // namespace flux

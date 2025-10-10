@@ -36,9 +36,9 @@ void Room::Room::run()
     {
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
-        // ecs.getEntities<component::Health>(ecs, componentStore);
+        ecs.getEntities<component::Health>(ecs, componentStore);
         ecs.getEntities<component::mob>(ecs, componentStore);
-        // ecs.getEntities<component::player>(ecs, componentStore);
+        ecs.getEntities<component::Player>(ecs, componentStore);
         ecs.getEntities<component::Transform>(ecs, componentStore);
         ecs.getEntities<component::Velocity>(ecs, componentStore);
 
@@ -52,7 +52,7 @@ void Room::Room::run()
                 }
                 if (component.type() == typeid(component::Transform)) {
                     auto& comp = std::any_cast<const component::Transform&>(component);
-                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp) << std::endl;
+                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp) << std::endl;;
                     continue;
                 }
                 if (component.type() == typeid(component::Velocity)) {
@@ -64,6 +64,7 @@ void Room::Room::run()
         };
 
         std::cout << "Data = " << serializedData.str();
+        // ecs.unserializeSingleComponent(serializedData.str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     };
 

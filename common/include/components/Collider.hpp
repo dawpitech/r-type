@@ -36,6 +36,7 @@ namespace component
             bool isActive;
             bool hasCollide;
 
+            collider() = default;
             explicit collider(uint8_t layer, uint8_t mask, render::Rect rect, bool isActive = true,
                               bool hasCollide = false) :
                 layer(layer), mask(mask), rect(rect), isActive(isActive), hasCollide(hasCollide)

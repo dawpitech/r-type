@@ -22,7 +22,8 @@ namespace component
         ProjectileType type;
         float speed;
 
-        explicit Projectile(ProjectileType type, float speed = 5.0f): type(type), speed(speed) {}
-        REFLECT(type, speed)
+        Projectile() = default;
+        Projectile(ProjectileType type, float speed = 5.0f): type(type), speed(speed) {}
+        REFLECT(speed)
     };
 } // namespace component

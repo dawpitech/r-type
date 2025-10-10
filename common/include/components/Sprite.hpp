@@ -9,6 +9,7 @@
 
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include "flux/core/Serialization.hpp"
 
 namespace component
 {
@@ -27,6 +28,8 @@ namespace component
             int layer = 0;
             bool visible = true;
 
-            explicit sprite(SDL_Texture* texture) : texture(texture) {};
+            sprite() = default;
+            sprite(SDL_Texture* texture) : texture(texture) {};
+            REFLECT()
     };
 } // namespace component

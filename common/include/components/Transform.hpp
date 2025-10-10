@@ -20,6 +20,7 @@ namespace component
             int8_t rotation;
             utils::Vector2<float> scale;
 
+            Transform() = default;
             Transform(const float x, const float y, const char rotation,
                       const float scaleX, const float scaleY) :
                 pos(x, y), rotation(rotation), scale(scaleX, scaleY)
