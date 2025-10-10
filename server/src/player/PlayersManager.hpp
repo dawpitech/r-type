@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "Player.hpp"
+#include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "network/TCP/TCPInfo.hpp"
 
@@ -22,7 +23,7 @@ namespace game
 
             std::optional<std::reference_wrapper<Player>> getPlayer(const std::string &id);
 
-            void createNewPlayer(const network::ConnectionInfo& info);
+            void createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork& network);
             void storeInfo(const network::ClientTCPReceivedInfo &info);
 
         private:

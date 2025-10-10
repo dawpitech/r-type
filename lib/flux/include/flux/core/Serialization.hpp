@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -15,8 +16,14 @@
     template <typename T>                                                                                              \
     void reflect(T&& function)                                                                                         \
     {                                                                                                                  \
-        f(__VA_ARGS__);                                                                                                \
+        function(__VA_ARGS__);                                                                                         \
+    }                                                                                                                  \
+    template <typename T>                                                                                              \
+    void reflect(T&& function) const                                                                                   \
+    {                                                                                                                  \
+        function(__VA_ARGS__);                                                                                         \
     }
+
 
 namespace flux
 {
@@ -29,8 +36,8 @@ namespace flux
     class SerializerHandler
     {
         public:
-            static std::string serialize(flux::ECS& ecs, flux::Entity& entity, const T& component);
+            static std::string serialize(flux::ECS& ecs, flux::Entity entity, const T& component);
 
-            static T unserialize(flux::ECS& ecs, flux::Entity& entity, const std::string& data);
+            static void unserialize(flux::ECS& ecs, flux::Entity entity, std::istream& in);
     };
 } // namespace flux

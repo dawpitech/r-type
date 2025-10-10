@@ -5,29 +5,77 @@
 // Logic for each rooms
 //
 
+#include <any>
 #include <chrono>
 #include <format>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 
-#include "rooms/Rooms.hpp"
-#include "Simulation.hpp"
+#include "components/Collider.hpp"
+#include "components/Health.hpp"
+#include "components/Mob.hpp"
+#include "components/Player.hpp"
+#include "components/Transform.hpp"
+#include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
+#include "flux/core/Serialization.hpp"
 #include "network/TCP/TCPInfo.hpp"
 #include "player/Player.hpp"
+#include "rooms/Rooms.hpp"
+#include "Simulation.hpp"
 #include "utils/logger.hpp"
 
 Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
     _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
-{
-}
+{}
 
 void Room::Room::run()
 {
-    this->_simulation.runSimulation();
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    flux::runtimeHooks hooks;
+    hooks.hooksNetwork = [this](flux::ECS& ecs)
+    {
+        std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
+
+        ecs.getEntities<component::Health>(ecs, componentStore);
+        ecs.getEntities<component::mob>(ecs, componentStore);
+        ecs.getEntities<component::Player>(ecs, componentStore);
+        ecs.getEntities<component::Transform>(ecs, componentStore);
+        ecs.getEntities<component::Velocity>(ecs, componentStore);
+
+        std::ostringstream serializedData;
+        for (const auto& [entity, components] : componentStore) {
+            for (const auto& component : components) {
+                if (component.type() == typeid(component::mob)) {
+                    auto comp = std::any_cast<const component::mob>(component);
+                    serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Transform)) {
+                    auto& comp = std::any_cast<const component::Transform&>(component);
+                    serializedData << flux::SerializerHandler<component::Transform>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    ;
+                    continue;
+                }
+                if (component.type() == typeid(component::Velocity)) {
+                    auto& comp = std::any_cast<const component::Velocity&>(component);
+                    serializedData << flux::SerializerHandler<component::Velocity>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+            }
+        };
+
+        ecs.unserializeAllComponents(serializedData.str());
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        for (auto& it : this->_players) {
+            it.get().sendData(serializedData.str());
+        }
     };
+
+    this->_simulation.runSimulation(hooks);
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
@@ -53,5 +101,5 @@ bool Room::Room::addPlayer(game::Player& player)
 bool Room::Room::_isRoomFull()
 {
     std::lock_guard<std::mutex> lock(this->_roomMutex);
-    return this->_players.size() >= this->_nbPlayerMax;
+    return this->_players.size() > this->_nbPlayerMax;
 }

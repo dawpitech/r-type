@@ -38,21 +38,28 @@ namespace network
 
             void async_read(ServerNetwork& network)
             {
+                auto data = std::make_unique<ClientTCPReceivedInfo>();
+                auto* dataPtr = data.get();
+                std::memset(dataPtr, 0, sizeof(ClientTCPReceivedInfo));
+
                 boost::asio::async_read(
-                    this->_socket, boost::asio::buffer(&this->_data, sizeof(ClientTCPReceivedInfo)),
-                    [this, &network](const boost::system::error_code& error, size_t bytesRead)
+                    this->_socket, boost::asio::buffer(dataPtr, sizeof(ClientTCPReceivedInfo)),
+                    [this, data = std::move(data), &network](const boost::system::error_code& error, size_t bytesRead)
                     {
                         if (error) {
                             utils::Logger::debug(std::format("Error in TCP read: {}", error.message()));
                             return;
                         }
 
-                        if (bytesRead != sizeof(ClientTCPReceivedInfo)) {
-                            utils::Logger::debug(std::format("Error in TCP read size\nexpected: {}\nbut got: {}",
-                                                             sizeof(ClientTCPReceivedInfo), bytesRead));
-                            return;
+                        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data.get());
+                        for (size_t i = 0; i < bytesRead && i < 20; ++i) {
+                            std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i])
+                                      << " ";
                         }
-                        network.notify(this->_data);
+                        std::cout << std::dec << std::endl;
+                        std::cout << "UUID string: '" << data->uuid << "'" << std::endl;
+
+                        network.notify(*data);
                         this->async_read(network);
                     });
             }

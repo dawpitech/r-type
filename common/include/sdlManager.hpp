@@ -36,6 +36,18 @@ namespace render
             float srch;
     };
 
+    inline std::ostream& operator<<(std::ostream& stream, const Rect& rect)
+    {
+        stream << rect.srcX << " " << rect.srcY << " " << rect.srcw << " " << rect.srch;
+        return stream;
+    }
+
+    inline std::istream& operator>>(std::istream& stream, Rect& rect)
+    {
+        stream >> rect.srcX >> rect.srcY >> rect.srcw >> rect.srch;
+        return stream;
+    }
+
     struct SpriteData
     {
             SDL_Texture* texture;

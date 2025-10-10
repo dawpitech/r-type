@@ -62,6 +62,16 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     const render::SpriteData& mobSprite = render::SDLManager::load("./assets/mob1.gif");
     const render::SpriteData& backgroundSprite = render::SDLManager::load("./assets/starfield2.jpg");
 
+    // ecs.registerComponentType<component::sprite>("Sprite");
+    // ecs.registerComponentType<component::Player>("Player");
+    // ecs.registerComponentType<component::animation>("Animation");
+    // ecs.registerComponentType<component::PlayerInput>("PlayerInput");
+    ecs.registerComponentType<component::Transform>("Transform");
+    ecs.registerComponentType<component::Velocity>("Velocity");
+    ecs.registerComponentType<component::Health>("Health");
+    ecs.registerComponentType<component::collider>("Collider");
+    ecs.registerComponentType<component::mob>("Mob");
+    // ecs.registerComponentType<component::Projectile>("Projectile");
     ecs.Add<component::background>(background, component::background(backgroundSprite.spriteMap, 100.0f));
     ecs.Add<component::sprite>(background, component::sprite(backgroundSprite.texture));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));

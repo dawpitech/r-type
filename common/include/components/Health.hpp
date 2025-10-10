@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "flux/core/Serialization.hpp"
+
 namespace component
 {
     struct Health
@@ -14,5 +16,6 @@ namespace component
             int healthPoint;
 
             explicit Health(int healthPoint = 1): healthPoint(healthPoint) {}
+            REFLECT(healthPoint)
     };
 } // namespace component

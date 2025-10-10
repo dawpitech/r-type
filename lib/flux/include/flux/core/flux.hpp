@@ -16,11 +16,14 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 #include <thread>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include <istream>
+
 #include "flux/core/Serialization.hpp"
 #include "utils/logger.hpp"
 
@@ -37,9 +40,9 @@ namespace flux
 
     struct ComponentTypeInfo
     {
-        std::function<std::string(Entity& entity, std::any)> serialize;
-        std::function<void(Entity&, const std::string& data)> unserialize;
-        std::string name;
+            std::function<std::string(flux::ECS& ecs, Entity entity, void*)> serialize;
+            std::function<void(flux::ECS& ecs, Entity, std::istream&)> unserialize;
+            std::string name;
     };
 
     enum class systemType
@@ -50,114 +53,115 @@ namespace flux
 
     struct runtimeHooks
     {
-        std::optional<std::function<void()>> hookBeforeLogic;
-        std::optional<std::function<void()>> hookAfterLogic;
-        std::optional<std::function<void()>> hookBeforeRender;
-        std::optional<std::function<void()>> hookAfterRender;
+            std::optional<std::function<void()>> hookBeforeLogic;
+            std::optional<std::function<void()>> hookAfterLogic;
+            std::optional<std::function<void()>> hookBeforeRender;
+            std::optional<std::function<void()>> hookAfterRender;
+            std::optional<std::function<void(ECS&)>> hooksNetwork;
     };
 
-    template<typename Fn, typename... Args>
+    template <typename Fn, typename... Args>
     std::function<void()> make_hook(Fn&& fn, Args&&... args)
     {
         using FnT = std::decay_t<Fn>;
         auto callable = FnT(std::forward<Fn>(fn));
         auto tup = std::make_tuple(std::forward<Args>(args)...);
-        return [callable = std::move(callable), tup = std::move(tup)]() mutable {
-            std::apply([&callable](auto&&... a){
-                std::invoke(callable, std::forward<decltype(a)>(a)...);
-            }, tup);
-        };
+        return [callable = std::move(callable), tup = std::move(tup)]() mutable
+        { std::apply([&callable](auto&&... a) { std::invoke(callable, std::forward<decltype(a)>(a)...); }, tup); };
     }
 
     class ECS
     {
-        struct IComponentVector
-        {
-            virtual ~IComponentVector() = default;
-            virtual void Remove(Entity id) = 0;
-        };
-
-        std::unordered_map<std::type_index, std::size_t> componentMaskOffsetStore;
-        std::size_t nextComponentMaskOffsetBit = 0;
-        std::vector<ComponentMask> entitiesComponentMask;
-        std::unordered_map<ComponentMask, std::vector<Entity>> componentMaskGroups;
-
-        std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
-
-        Entity nextEntityID = 0;
-
-        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsLogicList;
-        std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>> systemsRenderList;
-
-        bool _running = true;
-
-        template <typename T>
-        struct ComponentVector final : IComponentVector
-        {
-            std::vector<T> data;
-            std::vector<Entity> entityIDS;
-
-            void Add(const Entity id, T&& value)
+            struct IComponentVector
             {
-                entityIDS.push_back(id);
-                data.push_back(std::move(value));
+                    virtual ~IComponentVector() = default;
+                    virtual void Remove(Entity id) = 0;
+            };
+
+            std::unordered_map<std::type_index, std::size_t> componentMaskOffsetStore;
+            std::size_t nextComponentMaskOffsetBit = 0;
+            std::vector<ComponentMask> entitiesComponentMask;
+            std::unordered_map<ComponentMask, std::vector<Entity>> componentMaskGroups;
+
+            std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
+
+            Entity nextEntityID = 0;
+
+            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
+                systemsLogicList;
+            std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
+                systemsRenderList;
+
+            bool _running = true;
+
+            template <typename T>
+            struct ComponentVector final : IComponentVector
+            {
+                    std::vector<T> data;
+                    std::vector<Entity> entityIDS;
+
+                    void Add(const Entity id, T&& value)
+                    {
+                        entityIDS.push_back(id);
+                        data.push_back(std::move(value));
+                    }
+
+                    void Add(const Entity id, const T& value)
+                    {
+                        entityIDS.push_back(id);
+                        data.push_back(value);
+                    }
+
+                    void Add(const Entity id)
+                    {
+                        entityIDS.push_back(id);
+                        data.push_back(T{});
+                    }
+
+                    void Remove(const Entity id)
+                    {
+                        if (const auto it = std::find(entityIDS.begin(), entityIDS.end(), id); it != entityIDS.end()) {
+                            size_t idx = std::distance(entityIDS.begin(), it);
+                            entityIDS.erase(entityIDS.begin() + static_cast<long>(idx));
+                            data.erase(data.begin() + idx);
+                        }
+                    }
+            };
+
+            template <typename T>
+            std::size_t getComponentMaskOffset() const
+            {
+                const auto it = this->componentMaskOffsetStore.find(typeid(T));
+                assert(it != this->componentMaskOffsetStore.end());
+                return it->second;
             }
 
-            void Add(const Entity id, const T& value)
+            template <typename T>
+            std::size_t getOrRegisterComponentMaskOffset()
             {
-                entityIDS.push_back(id);
-                data.push_back(value);
+                const auto it = this->componentMaskOffsetStore.find(typeid(T));
+                if (it == this->componentMaskOffsetStore.end()) {
+                    assert(this->nextComponentMaskOffsetBit < MAX_COMPONENTS);
+                    this->componentMaskOffsetStore[typeid(T)] = this->nextComponentMaskOffsetBit++;
+                    return this->nextComponentMaskOffsetBit - 1;
+                }
+                return it->second;
             }
 
-            void Add(const Entity id)
+            void updateComponentMaskGroup(const Entity entity, const ComponentMask& oldMask,
+                                          const ComponentMask& newMask)
             {
-                entityIDS.push_back(id);
-                data.push_back(T{});
-            }
-
-            void Remove(const Entity id)
-            {
-                if (const auto it = std::find(entityIDS.begin(), entityIDS.end(), id); it != entityIDS.end()) {
-                    size_t idx = std::distance(entityIDS.begin(), it);
-                    entityIDS.erase(entityIDS.begin() + static_cast<long>(idx));
-                    data.erase(data.begin() + idx);
+                if (componentMaskGroups.count(oldMask)) {
+                    auto& group = componentMaskGroups[oldMask];
+                    group.erase(std::remove(group.begin(), group.end(), entity), group.end());
+                    if (group.empty())
+                        componentMaskGroups.erase(oldMask);
+                }
+                if (auto& newGroup = componentMaskGroups[newMask];
+                    std::find(newGroup.begin(), newGroup.end(), entity) == newGroup.end()) {
+                    newGroup.push_back(entity);
                 }
             }
-        };
-
-        template<typename T>
-        std::size_t getComponentMaskOffset() const
-        {
-            const auto it = this->componentMaskOffsetStore.find(typeid(T));
-            assert(it != this->componentMaskOffsetStore.end());
-            return it->second;
-        }
-
-        template<typename T>
-        std::size_t getOrRegisterComponentMaskOffset()
-        {
-            const auto it = this->componentMaskOffsetStore.find(typeid(T));
-            if (it == this->componentMaskOffsetStore.end()) {
-                assert(this->nextComponentMaskOffsetBit < MAX_COMPONENTS);
-                this->componentMaskOffsetStore[typeid(T)] = this->nextComponentMaskOffsetBit++;
-                return this->nextComponentMaskOffsetBit - 1;
-            }
-            return it->second;
-        }
-
-        void updateComponentMaskGroup(const Entity entity, const ComponentMask& oldMask, const ComponentMask& newMask)
-        {
-            if (componentMaskGroups.count(oldMask)) {
-                auto& group = componentMaskGroups[oldMask];
-                group.erase(std::remove(group.begin(), group.end(), entity), group.end());
-                if (group.empty())
-                    componentMaskGroups.erase(oldMask);
-            }
-            if (auto& newGroup = componentMaskGroups[newMask];
-                std::find(newGroup.begin(), newGroup.end(), entity) == newGroup.end()) {
-                newGroup.push_back(entity);
-            }
-        }
 
         public:
             // ReSharper disable CppClassCanBeFinal
@@ -169,7 +173,9 @@ namespace flux
             class InvalidComponentQuery : FluxException
             {
                 public:
-                    explicit InvalidComponentQuery() : FluxException("Component not yet registered cannot be used as query") {}
+                    explicit InvalidComponentQuery() :
+                        FluxException("Component not yet registered cannot be used as query")
+                    {}
             };
             class NoComponentFoundPanic : FluxException
             {
@@ -178,10 +184,7 @@ namespace flux
             };
             // ReSharper restore CppClassCanBeFinal
 
-            explicit ECS()
-            {
-                this->entitiesComponentMask.resize(DEFAULT_INIT_PAGE_MULTIPLIER * PAGE_SIZE);
-            }
+            explicit ECS() { this->entitiesComponentMask.resize(DEFAULT_INIT_PAGE_MULTIPLIER * PAGE_SIZE); }
 
             /**
              * Generate a new entity
@@ -227,7 +230,8 @@ namespace flux
              * @param entity The entity to add to
              */
             template <typename Component>
-            void Add(Entity entity) {
+            void Add(Entity entity)
+            {
                 auto& storePtr = this->componentsStore[typeid(Component)];
                 if (!storePtr)
                     storePtr = std::make_unique<ComponentVector<Component>>();
@@ -344,13 +348,15 @@ namespace flux
             {
                 static const std::vector<Entity> empty;
                 const auto it = componentMaskGroups.find(mask);
-                if (it == componentMaskGroups.end()) return empty;
+                if (it == componentMaskGroups.end())
+                    return empty;
                 return it->second;
             }
 
             /**
              * Query the ECS to retrieve the list of entities matching the view
-             * @warning This variant is Not Exclusive, return entities are assured to have at least the required components but might have more
+             * @warning This variant is Not Exclusive, return entities are assured to have at least the required
+             * components but might have more
              * @param mask View to apply
              * @return List of entities that match the view
              */
@@ -365,7 +371,8 @@ namespace flux
                 return result;
             }
 
-            void registerSystem(std::function<void(ECS& ecs, const std::vector<Entity>& entities)> handler, const View& view, const systemType& type)
+            void registerSystem(std::function<void(ECS& ecs, const std::vector<Entity>& entities)> handler,
+                                const View& view, const systemType& type)
             {
                 if (type == systemType::LOGIC)
                     this->systemsLogicList.emplace_back(std::make_tuple(handler, view));
@@ -389,7 +396,7 @@ namespace flux
                         if (hooks && hooks->hookBeforeLogic)
                             hooks->hookBeforeLogic.value()();
                         for (const auto& [handler, view] : this->systemsLogicList)
-                                handler(*this, this->QueryViewNotExclusive(view));
+                            handler(*this, this->QueryViewNotExclusive(view));
                         if (hooks && hooks->hookAfterLogic)
                             hooks->hookAfterLogic.value()();
                         accumulator -= LOGIC_STEP;
@@ -398,9 +405,11 @@ namespace flux
                     if (hooks && hooks->hookBeforeRender)
                         hooks->hookBeforeRender.value()();
                     for (const auto& [handler, view] : this->systemsRenderList)
-                            handler(*this, this->QueryViewNotExclusive(view));
+                        handler(*this, this->QueryViewNotExclusive(view));
                     if (hooks && hooks->hookAfterRender)
                         hooks->hookAfterRender.value()();
+                    if (hooks && hooks->hooksNetwork)
+                        hooks->hooksNetwork.value()(*this);
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(100));
                 }
@@ -427,9 +436,18 @@ namespace flux
                 }
             }
 
-            bool& getMasterRunState()
+            bool& getMasterRunState() { return this->_running; }
+
+            template <typename T>
+            void getEntities(flux::ECS& ecs, std::unordered_map<flux::Entity, std::vector<std::any>>& componentStore)
             {
-                return this->_running;
+                auto view = ecs.GenerateViewFromComponents<T>();
+                auto entities = ecs.QueryViewNotExclusive(view);
+
+                for (auto entity : entities) {
+                    T component = ecs.GetComponent<T>(entity);
+                    componentStore[entity].push_back(component);
+                }
             }
 
             std::unordered_map<ComponentTypeID, ComponentTypeInfo> componentTypeRegistry;
@@ -453,29 +471,55 @@ namespace flux
             {
                 auto id = getComponentTypeID<T>();
 
-                componentTypeRegistry[id] = {[](flux::Entity& entity, T& component) -> std::string
-                                             { return flux::SerializerHandler<T>::serialize(entity, component); },
-                                             [](flux::ECS& ecs, flux::Entity& entity, const std::string& data)
+                componentTypeRegistry[id] = {[](flux::ECS& ecs, flux::Entity entity, void* compPtr) -> std::string
                                              {
-                                                 T component = SerializerHandler<T>::unserialize(ecs, entity, data);
-                                                 // ecs.AddOrReplace(entity, component); // Method should be added in the ECS
+                                                 T& component = *static_cast<T*>(compPtr);
+                                                 return flux::SerializerHandler<T>::serialize(ecs, entity, component);
                                              },
-                                             name};
+                                             [](flux::ECS& ecs, flux::Entity entity, std::istream& in)
+                                             { flux::SerializerHandler<T>::unserialize(ecs, entity, in); }, name};
             }
 
-            void unserializeSingleComponent(const std::string& data)
+            void unserializeAllComponents(const std::string& data)
             {
                 std::istringstream in(data);
                 ComponentTypeID typeID;
                 flux::Entity entity;
 
-                in >> typeID >> entity;
+                while (in >> typeID >> entity) {
+                    auto it = this->componentTypeRegistry.find(typeID);
+                    if (it == this->componentTypeRegistry.end()) {
+                        utils::Logger::debug(std::format("Can't find component with id {}", typeID));
+                        continue;
+                    }
 
-                auto it = this->componentTypeRegistry.find(typeID);
-                if (it == this->componentTypeRegistry.end())
-                    utils::Logger::debug(std::format("Can't find component with id {}", typeID));
-                std::string dataLeft = data.substr(in.tellg());
-                it->second.unserialize(entity, dataLeft);
+                    it->second.unserialize(*this, entity, in);
+                }
             }
     };
-}
+
+    template <typename T>
+    std::string SerializerHandler<T>::serialize(flux::ECS& ecs, const flux::Entity entity, const T& component)
+    {
+        std::ostringstream out;
+        component.reflect(
+            [&](auto&&... fields)
+            {
+                auto id = ecs.getComponentTypeID<T>();
+                out << id << " " << entity << " ";
+                ((out << fields << " "), ...);
+            });
+        return out.str();
+    }
+
+    template <typename T>
+    void SerializerHandler<T>::unserialize(flux::ECS& ecs, const flux::Entity entity, std::istream& in)
+    {
+        if (!in)
+            return;
+
+        T component;
+        component.reflect([&](auto&&... fields) { ((in >> fields), ...); });
+        // ecs.AddOrReplace<T>(entity, component);
+    }
+} // namespace flux

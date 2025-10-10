@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "flux/core/Serialization.hpp"
 namespace component
 {
     struct Velocity
@@ -14,7 +15,8 @@ namespace component
         float x = 0;
         float y = 0;
 
-        Velocity() {}
+        Velocity() = default;
         Velocity(const float x, const float y): x(x), y(y) {}
+        REFLECT(x, y)
     };
 } // namespace component

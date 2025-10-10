@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include "player/PlayersManager.hpp"
+#include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "player/Player.hpp"
 #include "utils/logger.hpp"
@@ -25,10 +26,10 @@ std::optional<std::reference_wrapper<game::Player>> game::PlayersManager::getPla
     return std::nullopt;
 }
 
-void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info)
+void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork &network)
 {
     utils::Logger::debug(std::format("New player added with uuid: {}", info.uuid));
-    this->_players.emplace_back(std::make_unique<Player>(info));
+    this->_players.emplace_back(std::make_unique<Player>(info, network));
 }
 
 void game::PlayersManager::storeInfo(const network::ClientTCPReceivedInfo& info)

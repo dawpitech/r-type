@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "flux/core/Serialization.hpp"
 namespace component
 {
     struct PlayerInput
@@ -16,5 +17,6 @@ namespace component
             bool move_up = false;
             bool move_down = false;
             bool shoot = false;
+            REFLECT(move_right, move_left, move_up, move_down, shoot)
     };
 } // namespace component

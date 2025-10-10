@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include "flux/core/Serialization.hpp"
 
 namespace component
 {
@@ -21,6 +22,8 @@ namespace component
         ProjectileType type;
         float speed;
 
-        explicit Projectile(ProjectileType type, float speed = 5.0f): type(type), speed(speed) {}
+        Projectile() = default;
+        Projectile(ProjectileType type, float speed = 5.0f): type(type), speed(speed) {}
+        REFLECT(speed)
     };
 } // namespace component
