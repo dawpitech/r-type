@@ -62,11 +62,11 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     // ecs.registerComponentType<component::Player>("Player");
     // ecs.registerComponentType<component::animation>("Animation");
     // ecs.registerComponentType<component::PlayerInput>("PlayerInput");
-    // ecs.registerComponentType<component::Transform>("Transform");
-    // ecs.registerComponentType<component::Velocity>("Velocity");
+    ecs.registerComponentType<component::Transform>("Transform");
+    ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::Health>("Health");
-    // ecs.registerComponentType<component::collider>("Collider");
-    // ecs.registerComponentType<component::mob>("Mob");
+    ecs.registerComponentType<component::collider>("Collider");
+    ecs.registerComponentType<component::mob>("Mob");
     // ecs.registerComponentType<component::Projectile>("Projectile");
     ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(playerSprite.texture)));
     ecs.Add<component::Player>(playerEntity);

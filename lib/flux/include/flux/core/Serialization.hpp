@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <istream>
 #include <sstream>
 #include <string>
 
@@ -37,6 +38,6 @@ namespace flux
         public:
             static std::string serialize(flux::ECS& ecs, flux::Entity entity, const T& component);
 
-            static void unserialize(flux::ECS& ecs, flux::Entity entity, const std::string& data);
+            static void unserialize(flux::ECS& ecs, flux::Entity entity, std::istream& in);
     };
 } // namespace flux
