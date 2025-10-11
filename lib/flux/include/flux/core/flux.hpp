@@ -209,6 +209,8 @@ namespace flux
                 auto& storePtr = this->componentsStore[typeid(Component)];
                 if (!storePtr)
                     storePtr = std::make_unique<ComponentVector<Component>>();
+
+                this->getOrRegisterComponentMaskOffset<Component>();
             }
 
             /**
