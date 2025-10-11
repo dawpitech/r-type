@@ -151,7 +151,7 @@ void Simulation::_createEntities()
     this->_ecs.Add<component::Velocity>(player4Entity, component::Velocity());
     this->_ecs.Add<component::Health>(player4Entity);
     this->_ecs.Add<component::collider>(
-        playerEntity,
+        player4Entity,
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
@@ -225,8 +225,18 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
             this->_ecs.unserializeAllComponents(info.serializedData);
         });
     hooks->hooksNetwork = [this](flux::ECS& ecs) { this->_networkUDPClient->connect(); };
+
+    this->_lastInputSend = std::chrono::steady_clock::now();
+
     hooks->hookPlayerInput = [this](flux::ECS& ecs)
     {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
+
+        if (elapsed.count() < 100) {
+            return;
+        }
+
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
         ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
         ecs.getEntities<component::PlayerInput>(ecs, componentStore);
@@ -249,16 +259,20 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
                     network::UDPReceivedInfo data;
                     std::strcpy(data.uuid, this->gameInfo.userID);
                     data.game = *playerInput;
-                    if (data.game.move_left || data.game.move_right || data.game.move_down || data.game.move_up || data.game.shoot) {
+
+                    static component::PlayerInput lastSentInput;
+                    if (lastSentInput != data.game) {
                         std::cout << "Sending data to client" << std::endl;
+
                         this->_networkUDPClient->async_write(data);
+                        lastSentInput = data.game;
+                        this->_lastInputSend = now;
                     }
-                    return;
+                    continue;
                 }
             }
         }
     };
-
     try {
         this->_networkTCPClient->connect();
         utils::Logger::debug("Network setup completed");

@@ -435,6 +435,8 @@ namespace flux
                     accumulator += frameTime.count();
 
                     while (accumulator > LOGIC_STEP) {
+                        if (hooks && hooks->hookBeforeUpdate)
+                            hooks->hookBeforeUpdate.value()(*this);
                         if (hooks && hooks->hookBeforeLogic)
                             hooks->hookBeforeLogic.value()();
                         for (const auto& [handler, view] : this->systemsLogicList)

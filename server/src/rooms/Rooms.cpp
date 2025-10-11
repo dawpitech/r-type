@@ -36,6 +36,56 @@ void Room::Room::run()
 {
     flux::runtimeHooks hooks;
 
+    auto lastUpdate = std::chrono::steady_clock::now();
+    hooks.hookBeforeUpdate = [this, &lastUpdate](flux::ECS& ecs)
+    {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate);
+
+        if (elapsed.count() < 50) {
+            return;
+        }
+        lastUpdate = now;
+
+        // std::lock_guard<std::mutex> lock(this->_roomMutex);
+        auto view = ecs.GenerateViewFromComponents<component::NetworkIdentification, component::PlayerInput>();
+        auto entities = ecs.QueryViewNotExclusive(view);
+
+        for (auto& playerRef : this->_players) {
+            auto& player = playerRef.get();
+            const auto& uuid = player.getId();
+            bool inputApplied = false;
+
+            for (auto entity : entities) {
+                try {
+                    auto& idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
+
+                    if (!ecs.HasComponent<component::Health>(entity)) {
+                        continue;
+                    }
+                    auto health = ecs.GetComponent<component::Health>(entity);
+                    if (health.healthPoint == 0) {
+                        continue;
+                    }
+
+                    if (uuid == idComp.uuid) {
+                        auto inputComp = player.getInput();
+                        ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
+
+                        inputApplied = true;
+                        break;
+                    }
+                }
+                catch (const flux::ECS::FluxException& e) {
+                    continue;
+                }
+            }
+        }
+        for (auto& player : this->_players) {
+            player.get().storeInput(component::PlayerInput{});
+        }
+    };
+
     hooks.hooksNetwork = [this](flux::ECS& ecs)
     {
         uint8_t playerIndex = 0;
@@ -76,14 +126,12 @@ void Room::Room::run()
                     auto& comp = std::any_cast<const component::Player&>(component);
                     serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
                                    << std::endl;
-                    if (this->_players.size() > playerIndex) {
-                        component::NetworkIdentification id{};
-                        std::strcpy(id.uuid, this->_players[playerIndex].get().getId().c_str());
-                        ecs.AddOrReplace(entity, id);
-                        serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity, id);
-                    }
-                    playerIndex += 1;
-                    continue;
+                }
+                if (component.type() == typeid(component::NetworkIdentification)) {
+                    auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+                    serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity,
+                                                                                                           existingId)
+                                   << std::endl;
                 }
                 if (component.type() == typeid(component::PlayerInput)) {
                     auto& comp = std::any_cast<const component::PlayerInput&>(component);
@@ -113,9 +161,14 @@ void Room::Room::run()
             }
         };
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         for (auto& it : this->_players) {
-            it.get().sendData(serializedData.str());
+            try {
+                it.get().sendData(serializedData.str());
+            }
+            catch (const boost::system::system_error& e) {
+                utils::Logger::debug(std::format("Failed to send data to player: {}", e.what()));
+            }
         }
     };
 
@@ -139,6 +192,8 @@ bool Room::Room::addPlayer(game::Player& player)
 
     std::lock_guard<std::mutex> lock(this->_roomMutex);
     this->_players.emplace_back(player);
+
+    this->_assignPlayerToEntity(player);
     return true;
 }
 
@@ -146,4 +201,30 @@ bool Room::Room::_isRoomFull()
 {
     std::lock_guard<std::mutex> lock(this->_roomMutex);
     return this->_players.size() > this->_nbPlayerMax;
+}
+
+void Room::Room::_assignPlayerToEntity(game::Player& player)
+{
+    auto& ecs = this->_simulation.getEcs();
+    auto playerView = ecs.GenerateViewFromComponents<component::Player>();
+    auto allPlayerEntities = ecs.QueryViewNotExclusive(playerView);
+
+    for (auto entity : allPlayerEntities) {
+        if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
+            auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+            if (std::strcmp(existingId.uuid, player.getId().c_str()) == 0) {
+                return;
+            }
+        }
+    }
+
+    for (auto entity : allPlayerEntities) {
+        if (!ecs.HasComponent<component::NetworkIdentification>(entity)) {
+            component::NetworkIdentification id{};
+            std::strcpy(id.uuid, player.getId().c_str());
+            ecs.AddOrReplace(entity, id);
+            utils::Logger::debug(std::format("Assigned uuid {} to entity {}", player.getId(), entity));
+            return;
+        }
+    }
 }

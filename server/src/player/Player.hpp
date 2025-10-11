@@ -34,6 +34,7 @@ namespace game
             void storeInput(component::PlayerInput input) { this->_lastInput = input; }
 
             void sendData(const std::string& string) { this->_network.sendData(this->_ip, this->_udpPort, string); }
+            component::PlayerInput getInput() {return this->_lastInput;};
 
         private:
             network::UDPNetwork& _network;

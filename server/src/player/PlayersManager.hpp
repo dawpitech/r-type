@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "Player.hpp"
+#include "components/PlayerInput.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "network/TCP/TCPInfo.hpp"

@@ -17,6 +17,8 @@ namespace component
             bool move_up = false;
             bool move_down = false;
             bool shoot = false;
+            
+            bool operator==(const PlayerInput &) const = default;
             REFLECT(move_right, move_left, move_up, move_down, shoot)
     };
 } // namespace component

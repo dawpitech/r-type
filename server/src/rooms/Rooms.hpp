@@ -35,6 +35,7 @@ namespace Room {
         std::vector<std::reference_wrapper<game::Player>> _players;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
-        
+
+        void _assignPlayerToEntity(game::Player& player);
     };
 }  // namespace Room

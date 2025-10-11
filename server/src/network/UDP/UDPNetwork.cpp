@@ -48,11 +48,7 @@ void network::UDPNetwork::async_read()
                 this->async_read();
                 return;
             }
-            // std::cout << "Before notify" << std::endl;
-            // std::cout << data->uuid << std::endl;
-            // std::cout << data->game.move_down << std::endl;
             this->notify(*data);
-            // std::cout << "After notify" << std::endl;
             this->async_read();
         });
 }
