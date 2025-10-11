@@ -109,7 +109,7 @@ void Simulation::_createEntities() {
         playerEntity,
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
-                            {0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y}));
+                            0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y));
     this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.3f, 0.3));
     this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
@@ -120,7 +120,7 @@ void Simulation::_createEntities() {
         component::collider(component::CollisionLayer::MOB,
                                   component::CollisionLayer::PLAYER |
                                       component::CollisionLayer::PLAYER_PROJECTILE,
-                                  render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
+                                  0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y));
     this->_ecs.Add<component::Health>(mobEntity, component::Health(100));
     const flux::Entity mobEntity2 = this->_ecs.newEntity();
     this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.5f, 0.5));
@@ -132,7 +132,7 @@ void Simulation::_createEntities() {
         mobEntity2,
         component::collider(component::CollisionLayer::MOB,
                             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
-                            render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
+                            0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y));
 }
 
 void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, bool hasGUI)

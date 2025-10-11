@@ -9,6 +9,7 @@
 #include "components/Collider.hpp"
 #include "components/Transform.hpp"
 #include "flux/core/flux.hpp"
+#include "sdlManager.hpp"
 
 flux::View CollisionSystemView(const flux::ECS& ecs)
 {
@@ -55,7 +56,12 @@ void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             bool canCollide = (collider.mask & colliderOther.layer) != 0 || (colliderOther.mask & collider.layer) != 0;
             if (!canCollide)
                 continue;
-            if (checkRectCollision(collider.rect, transform, colliderOther.rect, transformOther))
+            render::Rect rect{};
+            rect.srcX = collider.srcX;
+            rect.srcY = collider.srcY;
+            rect.srch = collider.srch;
+            rect.srcw = collider.srcw;
+            if (checkRectCollision(rect, transform, rect, transformOther))
                 handleCollision(collider, colliderOther);
         }
     }

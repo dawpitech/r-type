@@ -25,6 +25,7 @@
 #include "utils/error.hpp"
 #include "utils/eventManager.hpp"
 #include "vector2.hpp"
+#include "flux/core/Serialization.hpp"
 
 namespace render
 {
@@ -34,9 +35,10 @@ namespace render
             float srcY;
             float srcw;
             float srch;
+            REFLECT(srcX, srcY, srcw, srch)
     };
 
-    inline std::ostream& operator<<(std::ostream& stream, const Rect& rect)
+    inline std::ostream& operator<<(std::ostream& stream, const render::Rect& rect)
     {
         stream << rect.srcX << " " << rect.srcY << " " << rect.srcw << " " << rect.srch;
         return stream;

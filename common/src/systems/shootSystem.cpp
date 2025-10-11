@@ -48,7 +48,7 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
             ecs.Add<component::collider>(projectile,
                                          component::collider(component::PLAYER_PROJECTILE, component::MOB,
-                                                             {0, 0, proj.frameSize.x, proj.frameSize.y}));
+                                                             0, 0, proj.frameSize.x, proj.frameSize.y));
             ecs.Add<component::Health>(projectile);
             input.shoot = false;
         }
