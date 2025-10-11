@@ -200,6 +200,18 @@ namespace flux
             }
 
             /**
+             * Register the given component in the ECS component store
+             * @tparam Component The component to register
+             */
+            template <typename Component>
+            void Register()
+            {
+                auto& storePtr = this->componentsStore[typeid(Component)];
+                if (!storePtr)
+                    storePtr = std::make_unique<ComponentVector<Component>>();
+            }
+
+            /**
              * Add a component to an entity while passing params to component constructor
              * @tparam Component The component to add
              * @param entity The entity to add to
