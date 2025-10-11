@@ -5,19 +5,21 @@
 ** Simulation.cpp
 */
 
+#include <memory>
 #include "components/backgroundComponent.hpp"
+#include "network/datatype.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
+#include "network/UDPClient.hpp"
 #endif
 
-#include "components/Projectile.hpp"
-#include "components/Player.hpp"
-#include "components/Collider.hpp"
 #include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
+#include "components/Projectile.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
@@ -26,21 +28,21 @@
 #include "sdlManager.hpp"
 #include "Simulation.hpp"
 #include "spriteHandler.hpp"
-#include "utils/logger.hpp"
 #include "utils/error.hpp"
+#include "utils/logger.hpp"
 
 #include "systems/animationSystem.hpp"
+#include "systems/backgroundSystem.hpp"
 #include "systems/collisionSystem.hpp"
 #include "systems/damageSystem.hpp"
 #include "systems/healthSystem.hpp"
 #include "systems/inputSystem.hpp"
+#include "systems/mobShootSystem.hpp"
+#include "systems/mobSystem.hpp"
 #include "systems/movementSystem.hpp"
 #include "systems/projectileSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/shootSystem.hpp"
-#include "systems/mobSystem.hpp"
-#include "systems/mobShootSystem.hpp"
-#include "systems/backgroundSystem.hpp"
 
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
                                           const std::string& serverIP, uint16_t serverPort)
@@ -136,19 +138,26 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
         ecs.handExecution(hooks);
 }
 
-#ifdef IS_CLIENT
 void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort)
 {
+#ifdef IS_CLIENT
     utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIp, serverPort));
-    this->_networkClient = std::make_unique<client::network::TCPClient>(serverIp, serverPort);
+    this->_networkUDPClient = std::make_unique<client::network::UDPClient>(serverIp, serverPort);
+    this->_networkTCPClient =
+        std::make_unique<client::network::TCPClient>(serverIp, serverPort, this->_networkUDPClient->getLocalPort());
 
+    this->_networkTCPClient->attach<network::ClientTCPSentInfo>(
+        [this](const network::ClientTCPSentInfo& info)
+        {
+            this->gameInfo = info;
+        });
     try {
-        this->_networkClient->connect();
+        this->_networkTCPClient->connect();
         utils::Logger::debug("Network setup completed");
     }
     catch (const client::network::NetworkError& e) {
         utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }
-}
 #endif
+}

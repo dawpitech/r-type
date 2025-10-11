@@ -42,6 +42,7 @@ namespace client::network
 
       std::function<void(const ::network::ClientTCPSentInfo&)> _tcpSentCallback;
       std::function<void(const ::network::UDPReceivedInfo&)> _udpReceivedCallback;
+      std::function<void(const ::network::UDPSentInfo&)> _udpSentCallback;
       std::function<void(const ::network::ConnectionInfo&)> _connectionCallback;
   };
 } // namespace client::network
