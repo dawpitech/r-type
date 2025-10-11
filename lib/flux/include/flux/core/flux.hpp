@@ -559,6 +559,6 @@ namespace flux
 
         T component;
         component.reflect([&](auto&&... fields) { ((in >> fields), ...); });
-        // ecs.AddOrReplace<T>(entity, component);
+        ecs.AddOrReplace<T>(entity, component);
     }
 } // namespace flux
