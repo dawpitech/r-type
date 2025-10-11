@@ -6,13 +6,15 @@
 */
 
 #include "UDPClient.hpp"
-#include "utils/logger.hpp"
 #include <memory>
+#include "network/datatype.hpp"
+#include "utils/logger.hpp"
 
-client::network::UDPClient::UDPClient(const std::string &serverIp, uint16_t serverPort)
-    : _serverEndpoint(boost::asio::ip::make_address(serverIp), serverPort), client::network::Network(serverIp, serverPort)
+client::network::UDPClient::UDPClient(const std::string& serverIp, uint16_t serverPort) :
+    _serverEndpoint(boost::asio::ip::make_address(serverIp), serverPort), client::network::Network(serverIp, serverPort)
 {
     this->_socket = std::make_unique<udp::socket>(this->_ioContext, udp::endpoint(udp::v4(), 0));
+    this->async_read();
 }
 
 void client::network::UDPClient::async_write(const ::network::UDPReceivedInfo& data)
@@ -40,4 +42,27 @@ void client::network::UDPClient::async_write(const ::network::UDPReceivedInfo& d
 
 void client::network::UDPClient::async_read()
 {
+    auto buffer = std::make_shared<std::vector<char>>(8192);
+    auto remoteEndpoint = std::make_shared<udp::endpoint>();
+
+    this->_socket->async_receive_from(
+        boost::asio::buffer(*buffer),
+        *remoteEndpoint,
+        [this, buffer, endpoint = remoteEndpoint](const boost::system::error_code& error, size_t bytesRead)
+        {
+            if (error) {
+                utils::Logger::debug(std::format("Error in UDP read: {}", error.message()));
+                this->async_read();
+                return;
+            }
+            
+            ::network::UDPSentInfo info;
+            info.serializedData = std::string(buffer->begin(), buffer->begin() + bytesRead);
+            
+            std::cout << "Data received: " << info.serializedData << std::endl;
+            this->notify(info);
+            this->async_read();
+        });
 }
+
+void client::network::UDPClient::connect() { this->_ioContext.poll_one(); }

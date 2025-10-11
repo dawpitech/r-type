@@ -20,14 +20,15 @@
 class Simulation
 {
     public:
-        void runSimulation(flux::ECS& ecs, std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
+        void runSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
         void runClientSimulation(std::optional<flux::runtimeHooks> hooks, const std::string& serverIP, uint16_t serverPort);
         void runServerSimulation(std::optional<flux::runtimeHooks> hooks);
 
     private:
-        void _createEntities(flux::ECS &ecs);
-        void _registerComponent(flux::ECS &ecs);
-        void _setupNetwork(const std::string& serverIp, uint16_t serverPort);
+        flux::ECS _ecs;
+        void _createEntities();
+        void _registerComponent();
+        void _setupNetwork(const std::string& serverIp, uint16_t serverPort, std::optional<flux::runtimeHooks> &hooks);
 #ifdef IS_CLIENT
         std::unique_ptr<client::network::TCPClient> _networkClient;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient;
