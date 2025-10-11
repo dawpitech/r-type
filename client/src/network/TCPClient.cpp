@@ -13,8 +13,8 @@
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
-client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort) :
-    Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false), _uuid("")
+client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort, uint16_t selfUDPPort) :
+    Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false), _selfUDPPort(selfUDPPort)
 {
     utils::Logger::debug(std::format("TCP Client created for {}:{}", serverIp, serverPort));
 }
@@ -69,11 +69,6 @@ bool client::network::TCPClient::isConnected() const
     return this->_connected;
 }
 
-uint16_t client::network::TCPClient::getPortUDP() const
-{
-    return this->_portUDP;
-}
-
 void client::network::TCPClient::_connectHandler(const boost::system::error_code& error)
 {
     if (error) {
@@ -92,15 +87,12 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
 
     utils::Logger::debug(std::format("Client UUID: {}", this->_uuid));
 
-    this->_networkClientUDP = std::make_unique<client::network::UDPClient>(
-        this->_serverIp, this->_portUDP);
-
     ::network::ClientTCPReceivedInfo info;
     info.ready = true;
     std::strncpy(info.uuid, this->_uuid.c_str(), sizeof(info.uuid) - 1);
     info.uuid[sizeof(info.uuid) - 1] = '\0';
     utils::Logger::debug(std::format("uuid {}", info.uuid));
-    info.portUDP = this->_networkClientUDP->getLocalPort();
+    info.portUDP = this->_selfUDPPort;
 
     try {
         boost::asio::write(this->_socket, boost::asio::buffer(&info, sizeof(info)));

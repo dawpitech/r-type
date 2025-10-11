@@ -10,23 +10,25 @@
 #include <memory>
 
 #include "flux/core/flux.hpp"
+#include "network/datatype.hpp"
 
 #ifdef IS_CLIENT
-  #include "network/TCPClient.hpp"
+#include "network/TCPClient.hpp"
+#include "network/UDPClient.hpp"
 #endif
 
 class Simulation
 {
     public:
         void runSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
-        void runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, bool hasGUI, const std::string& serverIP, uint16_t serverPort);
+        void runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, bool hasGUI, const std::string& serverIP,
+                                      uint16_t serverPort);
 
     private:
-#ifdef IS_CLIENT
-        std::unique_ptr<client::network::TCPClient> _networkClient;
-
         void _setupNetwork(const std::string& serverIp, uint16_t serverPort);
-#else
-        void _setupNetwork(const std::string& serverIp, uint16_t serverPort) { return; };
+#ifdef IS_CLIENT
+        std::unique_ptr<client::network::TCPClient> _networkTCPClient;
+        std::unique_ptr<client::network::UDPClient> _networkUDPClient;
+        network::ClientTCPSentInfo gameInfo;
 #endif
 };

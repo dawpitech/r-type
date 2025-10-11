@@ -22,7 +22,7 @@ namespace client::network
     class TCPClient final : public Network
     {
         public:
-            explicit TCPClient(const std::string& serverIp, uint16_t serverPort);
+            explicit TCPClient(const std::string& serverIp, uint16_t serverPort, uint16_t selfUdpPort);
             ~TCPClient();
 
             void connect() override;
@@ -36,9 +36,9 @@ namespace client::network
             tcp::socket _socket;
             bool _connected;
             std::string _uuid;
-            uint16_t _portUDP = 0;
+            uint16_t _portUDP;
+            uint16_t _selfUDPPort;
             uint16_t _score = 0;
-	    std::unique_ptr<client::network::UDPClient> _networkClientUDP;
 
             void _connectHandler(const boost::system::error_code& error);
             void _setupRead();
