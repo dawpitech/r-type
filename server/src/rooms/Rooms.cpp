@@ -16,6 +16,8 @@
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/Player.hpp"
+#include "components/PlayerInput.hpp"
+#include "components/Projectile.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
@@ -37,18 +39,51 @@ void Room::Room::run()
     {
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
+        ecs.getEntities<component::collider>(ecs, componentStore);
         ecs.getEntities<component::Health>(ecs, componentStore);
         ecs.getEntities<component::mob>(ecs, componentStore);
         ecs.getEntities<component::Player>(ecs, componentStore);
+        ecs.getEntities<component::PlayerInput>(ecs, componentStore);
+        ecs.getEntities<component::Projectile>(ecs, componentStore);
         ecs.getEntities<component::Transform>(ecs, componentStore);
         ecs.getEntities<component::Velocity>(ecs, componentStore);
 
         std::ostringstream serializedData;
         for (const auto& [entity, components] : componentStore) {
             for (const auto& component : components) {
+                if (component.type() == typeid(component::collider)) {
+                    auto comp = std::any_cast<const component::collider>(component);
+                    serializedData << flux::SerializerHandler<component::collider>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Health)) {
+                    auto comp = std::any_cast<const component::Health>(component);
+                    serializedData << flux::SerializerHandler<component::Health>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
                 if (component.type() == typeid(component::mob)) {
                     auto comp = std::any_cast<const component::mob>(component);
                     serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Player)) {
+                    auto comp = std::any_cast<const component::Player>(component);
+                    serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::PlayerInput)) {
+                    auto comp = std::any_cast<const component::PlayerInput>(component);
+                    serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
+                                   << std::endl;
+                    continue;
+                }
+                if (component.type() == typeid(component::Projectile)) {
+                    auto comp = std::any_cast<const component::Projectile>(component);
+                    serializedData << flux::SerializerHandler<component::Projectile>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
@@ -68,7 +103,6 @@ void Room::Room::run()
             }
         };
 
-        ecs.unserializeAllComponents(serializedData.str());
         std::this_thread::sleep_for(std::chrono::seconds(1));
         for (auto& it : this->_players) {
             it.get().sendData(serializedData.str());

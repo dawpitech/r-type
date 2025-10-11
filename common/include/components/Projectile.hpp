@@ -17,6 +17,7 @@ namespace component
         PLAYER = 0,
         MOB = 1
     };
+
     struct Projectile
     {
         ProjectileType type;
