@@ -20,8 +20,9 @@ namespace network
     struct ClientTCPReceivedInfo;
     struct ClientTCPSentInfo;
     struct UDPReceivedInfo;
+    struct UDPSentInfo;
 
-    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ClientTCPSentInfo, network::ConnectionInfo, network::UDPReceivedInfo>;
+    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ClientTCPSentInfo, network::ConnectionInfo, network::UDPReceivedInfo, network::UDPSentInfo>;
 
     template <typename T>
     concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
