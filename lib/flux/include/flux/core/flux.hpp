@@ -326,6 +326,31 @@ namespace flux
             }
 
             /**
+             * Add or replace a component for an entity.
+             * If the entity already has the component, replace it.
+             * If not, add it.
+             * @tparam Component The component type
+             * @param entity The entity to add/replace on
+             * @param value The component value
+             */
+            template <typename Component>
+            void AddOrReplace(Entity entity, const Component& value)
+            {
+                auto& storePtr = this->componentsStore[typeid(Component)];
+                if (!storePtr)
+                    storePtr = std::make_unique<ComponentVector<Component>>();
+                auto* store = static_cast<ComponentVector<Component>*>(storePtr.get());
+
+                auto it = std::find(store->entityIDS.begin(), store->entityIDS.end(), entity);
+                if (it != store->entityIDS.end()) {
+                    size_t idx = std::distance(store->entityIDS.begin(), it);
+                    store->data[idx] = value;
+                } else {
+                    this->Add<Component>(entity, value);
+                }
+            }
+
+            /**
              * Generate a filtering view from a list of components
              * @tparam Components Component to filter from
              * @return Created view matching the components
