@@ -28,25 +28,31 @@ void network::UDPNetwork::sendData(std::string &ip, uint16_t port, const std::st
 
 void network::UDPNetwork::async_read()
 {
-    auto data = std::make_unique<UDPReceivedInfo>();
-    auto remoteEndpoint = std::make_unique<udp::endpoint>();
+    auto data = std::make_shared<UDPReceivedInfo>();
+    auto remoteEndpoint = std::make_shared<udp::endpoint>();
 
     this->_socket->async_receive_from(
-        boost::asio::buffer(&this->_data, sizeof(network::UDPReceivedInfo)), this->_remoteEndpoint,
-        [this, data = std::move(data), endpoint = std::move(remoteEndpoint)](const boost::system::error_code& error,
-                                                                             size_t bytesRead) mutable
+        boost::asio::buffer(data.get(), sizeof(network::UDPReceivedInfo)), 
+        *remoteEndpoint,
+        [this, data, remoteEndpoint](const boost::system::error_code& error, size_t bytesRead)
         {
-            this->async_read();
             if (error) {
                 utils::Logger::debug(std::format("Error in UDP read: {}", error.message()));
+                this->async_read();
                 return;
             }
 
             if (bytesRead != sizeof(UDPReceivedInfo)) {
                 utils::Logger::debug(std::format("Error in UDP read size\nexpected: {}\nbut got: {}",
                                                  sizeof(UDPReceivedInfo), bytesRead));
+                this->async_read();
                 return;
             }
-            this->notify(this->_data);
+            // std::cout << "Before notify" << std::endl;
+            // std::cout << data->uuid << std::endl;
+            // std::cout << data->game.move_down << std::endl;
+            this->notify(*data);
+            // std::cout << "After notify" << std::endl;
+            this->async_read();
         });
 }

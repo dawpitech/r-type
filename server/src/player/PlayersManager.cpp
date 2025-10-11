@@ -42,3 +42,14 @@ void game::PlayersManager::storeInfo(const network::ClientTCPReceivedInfo& info)
     }
     utils::Logger::debug(std::format("No player with uuid: {}", info.uuid));
 }
+
+void game::PlayersManager::storeInput(const network::UDPReceivedInfo& info)
+{
+    for (auto& it : this->_players) {
+        if (it->getId() == info.uuid) {
+            it->storeInput(info.game);
+            return;
+        }
+    }
+    utils::Logger::debug(std::format("No player with uuid: {}", info.uuid));
+}

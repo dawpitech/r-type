@@ -35,6 +35,7 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
 void Room::Room::run()
 {
     flux::runtimeHooks hooks;
+
     hooks.hooksNetwork = [this](flux::ECS& ecs)
     {
         uint8_t playerIndex = 0;
@@ -76,7 +77,6 @@ void Room::Room::run()
                     serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
                                    << std::endl;
                     if (this->_players.size() > playerIndex) {
-                        std::cout << "Attributing the network" << std::endl;
                         component::NetworkIdentification id{};
                         std::strcpy(id.uuid, this->_players[playerIndex].get().getId().c_str());
                         ecs.AddOrReplace(entity, id);
@@ -110,13 +110,6 @@ void Room::Room::run()
                                    << std::endl;
                     continue;
                 }
-                // if (component.type() == typeid(component::NetworkIdentification)) {
-                //     auto& comp = std::any_cast<const component::NetworkIdentification&>(component);
-                //     serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity,
-                //                                                                                            comp)
-                //                    << std::endl;
-                //     continue;
-                // }
             }
         };
 

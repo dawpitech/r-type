@@ -25,6 +25,7 @@ namespace game
 
             void createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork& network);
             void storeInfo(const network::ClientTCPReceivedInfo &info);
+            void storeInput(const network::UDPReceivedInfo &info);
 
         private:
             std::mutex _lock;

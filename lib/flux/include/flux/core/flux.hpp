@@ -58,7 +58,8 @@ namespace flux
             std::optional<std::function<void()>> hookAfterLogic;
             std::optional<std::function<void()>> hookBeforeRender;
             std::optional<std::function<void()>> hookAfterRender;
-            std::optional<std::function<void(component::PlayerInput)>> hookPlayerInput;
+            std::optional<std::function<void(ECS&)>> hookPlayerInput;
+            std::optional<std::function<void(ECS&)>> hookBeforeUpdate;
             std::optional<std::function<void(ECS&)>> hooksNetwork;
     };
 
@@ -451,6 +452,8 @@ namespace flux
                         hooks->hookAfterRender.value()();
                     if (hooks && hooks->hooksNetwork)
                         hooks->hooksNetwork.value()(*this);
+                    if (hooks && hooks->hookPlayerInput)
+                        hooks->hookPlayerInput.value()(*this);
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(100));
                 }

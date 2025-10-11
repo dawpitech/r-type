@@ -221,16 +221,42 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
     this->_networkUDPClient->attach<network::UDPSentInfo>(
         [this](const network::UDPSentInfo& info)
         {
-            std::cout << "Data received through udp are :" << info.serializedData << std::endl;
+            // std::cout << "Data received through udp are :" << info.serializedData << std::endl;
             this->_ecs.unserializeAllComponents(info.serializedData);
         });
     hooks->hooksNetwork = [this](flux::ECS& ecs) { this->_networkUDPClient->connect(); };
-    hooks->hookPlayerInput = [this](component::PlayerInput input)
+    hooks->hookPlayerInput = [this](flux::ECS& ecs)
     {
-        network::UDPReceivedInfo data;
-        std::strcpy(data.uuid, this->gameInfo.userID);
-        data.game = input;
-        this->_networkUDPClient->async_write(data);
+        std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
+        ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
+        ecs.getEntities<component::PlayerInput>(ecs, componentStore);
+
+        for (const auto& [entity, components] : componentStore) {
+            const component::NetworkIdentification* netId = nullptr;
+            const component::PlayerInput* playerInput = nullptr;
+
+            for (const auto& component : components) {
+                if (component.type() == typeid(component::NetworkIdentification)) {
+                    netId = std::any_cast<component::NetworkIdentification>(&component);
+                }
+                if (component.type() == typeid(component::PlayerInput)) {
+                    playerInput = std::any_cast<component::PlayerInput>(&component);
+                }
+            }
+
+            if (netId && playerInput) {
+                if (std::strcmp(netId->uuid, this->gameInfo.userID) == 0) {
+                    network::UDPReceivedInfo data;
+                    std::strcpy(data.uuid, this->gameInfo.userID);
+                    data.game = *playerInput;
+                    if (data.game.move_left || data.game.move_right || data.game.move_down || data.game.move_up || data.game.shoot) {
+                        std::cout << "Sending data to client" << std::endl;
+                        this->_networkUDPClient->async_write(data);
+                    }
+                    return;
+                }
+            }
+        }
     };
 
     try {

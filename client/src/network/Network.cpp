@@ -42,31 +42,28 @@ void client::network::Network::attach(std::function<void(const T&)> callback)
 
 void client::network::Network::notify(const ::network::NetworkData& data)
 {
-    std::cout << "Inside the notify" << std::endl;
+    // std::cout << "Inside the notify" << std::endl;
     std::visit(
         [this](auto&& arg)
         {
             using T = std::decay_t<decltype(arg)>;
             if constexpr (std::is_same_v<T, ::network::ClientTCPSentInfo>) {
-                std::cout << "Enter tcp sent" << std::endl;
                 if (this->_tcpSentCallback)
                     this->_tcpSentCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ::network::UDPReceivedInfo>) {
-                std::cout << "Enter udp received" << std::endl;
+                std::cout << "This is the UDPReceivedInfo" << std::endl;
                 if (this->_udpReceivedCallback)
                     this->_udpReceivedCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ::network::ConnectionInfo>) {
-                std::cout << "Enter tcp received" << std::endl;
                 if (this->_connectionCallback)
                     this->_connectionCallback(arg);
                 return;
             }
             if constexpr (std::is_same_v<T, ::network::UDPSentInfo>) {
-                std::cout << "Enter udp sent" << std::endl;
                 if (this->_udpSentCallback) {
                     this->_udpSentCallback(arg);
                 }

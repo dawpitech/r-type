@@ -11,6 +11,7 @@
 
 #include <string>
 
+#include "components/PlayerInput.hpp"
 #include "network/TCP/TCPInfo.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 
@@ -30,11 +31,13 @@ namespace game
                 utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));
                 this->_udpPort = info.portUDP;
             }
+            void storeInput(component::PlayerInput input) { this->_lastInput = input; }
 
             void sendData(const std::string& string) { this->_network.sendData(this->_ip, this->_udpPort, string); }
 
         private:
             network::UDPNetwork& _network;
+            component::PlayerInput _lastInput;
             std::string _id;
             uint16_t _score = 0;
             uint16_t _udpPort = 0;
