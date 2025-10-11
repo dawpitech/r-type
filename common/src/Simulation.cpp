@@ -7,8 +7,8 @@
 
 #include <memory>
 #include "components/backgroundComponent.hpp"
-#include "network/datatype.hpp"
 #ifdef IS_CLIENT
+#include "network/datatype.hpp"
 #include "network/TCPClient.hpp"
 #include "network/UDPClient.hpp"
 #endif
@@ -47,7 +47,7 @@
 void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
                                           const std::string& serverIP, uint16_t serverPort)
 {
-    this->_setupNetwork(serverIP, serverPort);
+    this->_setupNetwork(serverIP, serverPort, hooks);
     this->runSimulation(hooks, hasGUI);
 }
 
@@ -138,7 +138,7 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
         this->_ecs.handExecution(hooks);
 }
 
-void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort)
+void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort, std::optional<flux::runtimeHooks> &hooks)
 {
 #ifdef IS_CLIENT
     utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIp, serverPort));
@@ -155,6 +155,9 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort)
             std::cout << "Data received through udp are :" << info.serializedData << std::endl;
             this->_ecs.unserializeAllComponents(info.serializedData);
     });
+    hooks->hooksNetwork = [this](flux::ECS &ecs) {
+        this->_networkUDPClient->connect();
+    };
 
     try {
         this->_networkTCPClient->connect();
