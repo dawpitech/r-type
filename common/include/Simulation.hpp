@@ -20,13 +20,16 @@
 class Simulation
 {
     public:
-        void runSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
-        void runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, bool hasGUI, const std::string& serverIP,
-                                      uint16_t serverPort);
+        void runSimulation(flux::ECS& ecs, std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
+        void runClientSimulation(std::optional<flux::runtimeHooks> hooks, const std::string& serverIP, uint16_t serverPort);
+        void runServerSimulation(std::optional<flux::runtimeHooks> hooks);
 
     private:
+        void _createEntities(flux::ECS &ecs);
+        void _registerComponent(flux::ECS &ecs);
         void _setupNetwork(const std::string& serverIp, uint16_t serverPort);
 #ifdef IS_CLIENT
+        std::unique_ptr<client::network::TCPClient> _networkClient;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient;
         std::unique_ptr<client::network::UDPClient> _networkUDPClient;
         network::ClientTCPSentInfo gameInfo;

@@ -75,7 +75,7 @@ void Room::Room::run()
         }
     };
 
-    this->_simulation.runSimulation(hooks);
+    this->_simulation.runServerSimulation(hooks);
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)

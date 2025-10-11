@@ -6,8 +6,8 @@
 //
 
 #include <SDL3/SDL_rect.h>
-#include "components/backgroundComponent.hpp"
 #include "components/Sprite.hpp"
+#include "components/background.hpp"
 #include "flux/core/flux.hpp"
 
 constexpr int SCREEN_SIZE = 960;

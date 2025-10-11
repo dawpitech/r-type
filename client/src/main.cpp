@@ -56,7 +56,7 @@ int main(int argc, char **argv)
         };
 
         Simulation simulation;
-        simulation.runSimulationWithNetwork(hooks, true, ip, port);
+        simulation.runClientSimulation(hooks, ip, port);
     }
     catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;

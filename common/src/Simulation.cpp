@@ -6,7 +6,6 @@
 */
 
 #include <memory>
-#include "components/backgroundComponent.hpp"
 #include "network/datatype.hpp"
 #ifdef IS_CLIENT
 #include "network/TCPClient.hpp"
@@ -22,11 +21,14 @@
 #include "components/Projectile.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
+#include "components/background.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
 #include "sdlManager.hpp"
 #include "Simulation.hpp"
+
+#include <utility>
 #include "spriteHandler.hpp"
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
@@ -44,19 +46,39 @@
 #include "systems/renderSystem.hpp"
 #include "systems/shootSystem.hpp"
 
-void Simulation::runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, const bool hasGUI,
-                                          const std::string& serverIP, uint16_t serverPort)
-{
-    this->_setupNetwork(serverIP, serverPort);
-    this->runSimulation(hooks, hasGUI);
-}
-
-void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bool hasGUI)
+void Simulation::runClientSimulation(std::optional<flux::runtimeHooks> hooks, const std::string& serverIP,
+                                     uint16_t serverPort)
 {
     flux::ECS ecs;
-    if (hasGUI)
-        render::SDLManager::init();
+    this->_setupNetwork(serverIP, serverPort);
+    this->_registerComponent(ecs);
+    this->_createEntities(ecs);
+    this->runSimulation(ecs, hooks, true);
+}
 
+void Simulation::runServerSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt)
+{
+    flux::ECS ecs;
+    this->_registerComponent(ecs);
+    this->_createEntities(ecs);
+    this->runSimulation(ecs, std::move(hooks), false);
+}
+
+void Simulation::_registerComponent(flux::ECS &ecs) {
+    ecs.registerComponentType<component::animation>("Animation");
+    ecs.registerComponentType<component::collider>("Collider");
+    ecs.registerComponentType<component::Health>("Health");
+    ecs.registerComponentType<component::mob>("Mob");
+    ecs.registerComponentType<component::Player>("Player");
+    ecs.registerComponentType<component::PlayerInput>("PlayerInput");
+    ecs.registerComponentType<component::Projectile>("Projectile");
+    ecs.registerComponentType<component::sprite>("Sprite");
+    ecs.registerComponentType<component::Transform>("Transform");
+    ecs.registerComponentType<component::Velocity>("Velocity");
+    ecs.registerComponentType<component::background>("Background");
+}
+
+void Simulation::_createEntities(flux::ECS &ecs) {
     flux::Entity background = ecs.newEntity();
     const flux::Entity playerEntity = ecs.newEntity();
     const flux::Entity mobEntity = ecs.newEntity();
@@ -64,16 +86,6 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     const render::SpriteData& mobSprite = render::SDLManager::load("./assets/mob1.gif");
     const render::SpriteData& backgroundSprite = render::SDLManager::load("./assets/starfield2.jpg");
 
-    // ecs.registerComponentType<component::sprite>("Sprite");
-    // ecs.registerComponentType<component::Player>("Player");
-    // ecs.registerComponentType<component::animation>("Animation");
-    // ecs.registerComponentType<component::PlayerInput>("PlayerInput");
-    ecs.registerComponentType<component::Transform>("Transform");
-    ecs.registerComponentType<component::Velocity>("Velocity");
-    ecs.registerComponentType<component::Health>("Health");
-    ecs.registerComponentType<component::collider>("Collider");
-    ecs.registerComponentType<component::mob>("Mob");
-    // ecs.registerComponentType<component::Projectile>("Projectile");
     ecs.Add<component::background>(background, component::background(backgroundSprite.spriteMap, 100.0f));
     ecs.Add<component::sprite>(background, component::sprite(backgroundSprite.texture));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
@@ -114,6 +126,12 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, const bo
     ecs.Add<component::Health>(mobEntity2, component::Health(100));
     flux::Entity newEntity = ecs.newEntity();
     ecs.Add<component::Projectile>(newEntity, component::Projectile(component::ProjectileType::PLAYER));
+}
+
+void Simulation::runSimulation(flux::ECS& ecs, std::optional<flux::runtimeHooks> hooks, bool hasGUI)
+{
+    if (hasGUI)
+        render::SDLManager::init();
 
     ecs.registerSystem(InputSystem, InputSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
