@@ -24,6 +24,7 @@
 #include <vector>
 #include <istream>
 
+#include "components/PlayerInput.hpp"
 #include "flux/core/Serialization.hpp"
 #include "utils/logger.hpp"
 
@@ -57,6 +58,7 @@ namespace flux
             std::optional<std::function<void()>> hookAfterLogic;
             std::optional<std::function<void()>> hookBeforeRender;
             std::optional<std::function<void()>> hookAfterRender;
+            std::optional<std::function<void(component::PlayerInput)>> hookPlayerInput;
             std::optional<std::function<void(ECS&)>> hooksNetwork;
     };
 

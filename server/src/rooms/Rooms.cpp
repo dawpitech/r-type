@@ -15,6 +15,7 @@
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/NetworkIdentification.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
@@ -22,7 +23,6 @@
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
-#include "network/TCP/TCPInfo.hpp"
 #include "player/Player.hpp"
 #include "rooms/Rooms.hpp"
 #include "Simulation.hpp"
@@ -37,6 +37,7 @@ void Room::Room::run()
     flux::runtimeHooks hooks;
     hooks.hooksNetwork = [this](flux::ECS& ecs)
     {
+        uint8_t playerIndex = 0;
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
         ecs.getEntities<component::collider>(ecs, componentStore);
@@ -47,42 +48,51 @@ void Room::Room::run()
         ecs.getEntities<component::Projectile>(ecs, componentStore);
         ecs.getEntities<component::Transform>(ecs, componentStore);
         ecs.getEntities<component::Velocity>(ecs, componentStore);
+        ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
 
         std::ostringstream serializedData;
         for (const auto& [entity, components] : componentStore) {
             for (const auto& component : components) {
                 if (component.type() == typeid(component::collider)) {
-                    auto comp = std::any_cast<const component::collider>(component);
+                    auto& comp = std::any_cast<const component::collider&>(component);
                     serializedData << flux::SerializerHandler<component::collider>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
                 if (component.type() == typeid(component::Health)) {
-                    auto comp = std::any_cast<const component::Health>(component);
+                    auto& comp = std::any_cast<const component::Health&>(component);
                     serializedData << flux::SerializerHandler<component::Health>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
                 if (component.type() == typeid(component::mob)) {
-                    auto comp = std::any_cast<const component::mob>(component);
+                    auto& comp = std::any_cast<const component::mob&>(component);
                     serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
                 if (component.type() == typeid(component::Player)) {
-                    auto comp = std::any_cast<const component::Player>(component);
+                    auto& comp = std::any_cast<const component::Player&>(component);
                     serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
                                    << std::endl;
+                    if (this->_players.size() > playerIndex) {
+                        std::cout << "Attributing the network" << std::endl;
+                        component::NetworkIdentification id{};
+                        std::strcpy(id.uuid, this->_players[playerIndex].get().getId().c_str());
+                        ecs.AddOrReplace(entity, id);
+                        serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity, id);
+                    }
+                    playerIndex += 1;
                     continue;
                 }
                 if (component.type() == typeid(component::PlayerInput)) {
-                    auto comp = std::any_cast<const component::PlayerInput>(component);
+                    auto& comp = std::any_cast<const component::PlayerInput&>(component);
                     serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
                 if (component.type() == typeid(component::Projectile)) {
-                    auto comp = std::any_cast<const component::Projectile>(component);
+                    auto& comp = std::any_cast<const component::Projectile&>(component);
                     serializedData << flux::SerializerHandler<component::Projectile>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
@@ -100,10 +110,17 @@ void Room::Room::run()
                                    << std::endl;
                     continue;
                 }
+                // if (component.type() == typeid(component::NetworkIdentification)) {
+                //     auto& comp = std::any_cast<const component::NetworkIdentification&>(component);
+                //     serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity,
+                //                                                                                            comp)
+                //                    << std::endl;
+                //     continue;
+                // }
             }
         };
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         for (auto& it : this->_players) {
             it.get().sendData(serializedData.str());
         }

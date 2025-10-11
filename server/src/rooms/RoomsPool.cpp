@@ -12,8 +12,6 @@
 #include "network/datatype.hpp"
 #include "Rooms.hpp"
 
-// this function will be updated later,
-// but should remain the same for now in order to test the functionalities
 Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port)
 {
