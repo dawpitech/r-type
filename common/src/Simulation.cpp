@@ -76,6 +76,17 @@ void Simulation::_registerComponent(flux::ECS &ecs) {
     ecs.registerComponentType<component::Transform>("Transform");
     ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::background>("Background");
+    ecs.Register<component::animation>();
+    ecs.Register<component::collider>();
+    ecs.Register<component::Health>();
+    ecs.Register<component::mob>();
+    ecs.Register<component::Player>();
+    ecs.Register<component::PlayerInput>();
+    ecs.Register<component::Projectile>();
+    ecs.Register<component::sprite>();
+    ecs.Register<component::Transform>();
+    ecs.Register<component::Velocity>();
+    ecs.Register<component::background>();
 }
 
 void Simulation::_createEntities(flux::ECS &ecs) {
@@ -124,8 +135,6 @@ void Simulation::_createEntities(flux::ECS &ecs) {
                             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
                             render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
     ecs.Add<component::Health>(mobEntity2, component::Health(100));
-    flux::Entity newEntity = ecs.newEntity();
-    ecs.Add<component::Projectile>(newEntity, component::Projectile(component::ProjectileType::PLAYER));
 }
 
 void Simulation::runSimulation(flux::ECS& ecs, std::optional<flux::runtimeHooks> hooks, bool hasGUI)
