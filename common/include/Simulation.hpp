@@ -25,6 +25,7 @@ class Simulation
                                       uint16_t serverPort);
 
     private:
+        flux::ECS _ecs;
         void _setupNetwork(const std::string& serverIp, uint16_t serverPort);
 #ifdef IS_CLIENT
         std::unique_ptr<client::network::TCPClient> _networkTCPClient;
