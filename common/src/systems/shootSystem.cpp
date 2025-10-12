@@ -38,8 +38,6 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
             render::SpriteData player = render::SDLManager::load("./assets/player.gif");
             ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, PROJECTILE_SPEED));
-            ecs.Add<component::sprite>(projectile, component::sprite(proj.texture, {255, 255, 255, 255}));
-            ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
             ecs.Add<component::Transform>(
                 projectile,
                 component::Transform(playerTransform.pos.x + (player.frameSize.x * playerTransform.scale.x),
