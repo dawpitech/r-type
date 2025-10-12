@@ -164,6 +164,8 @@ void Room::Room::run()
         };
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        // std::cout << "new DATA:\n";
+        // std::cout << serializedData.str() << "\n\n";
         for (auto& it : this->_players) {
             std::ostringstream localData;
             localData << serializedData.str();

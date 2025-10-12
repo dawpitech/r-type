@@ -155,7 +155,7 @@ void Simulation::_createEntities()
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
-    this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.3f, 0.3));
+    this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 2.0f));
     this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
     this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
@@ -167,7 +167,7 @@ void Simulation::_createEntities()
                             mobSprite.frameSize.x, mobSprite.frameSize.y));
     this->_ecs.Add<component::Health>(mobEntity, component::Health(100));
     const flux::Entity mobEntity2 = this->_ecs.newEntity();
-    this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.5f, 0.5));
+    this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.0f));
     this->_ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity2, component::animation(mobSprite.spriteMap, true));
     this->_ecs.Add<component::Transform>(mobEntity2, component::Transform(1900, 300, 0, 1, 1));
@@ -187,7 +187,9 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, bool has
     this->_ecs.registerSystem(InputSystem, InputSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(MovementSystem, MovementSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(MobSystem, MobSystemView(this->_ecs), flux::systemType::LOGIC);
+    #ifndef IS_CLIENT
     this->_ecs.registerSystem(MobShootSystem, MobShootSystemView(this->_ecs), flux::systemType::LOGIC);
+    #endif
     this->_ecs.registerSystem(ShootSystem, ShootSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(ProjectileSystem, ProjectileSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(CollisionSystem, CollisionSystemView(this->_ecs), flux::systemType::LOGIC);

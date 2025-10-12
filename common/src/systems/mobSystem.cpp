@@ -5,6 +5,7 @@
 // mob System
 //
 
+#include <iostream>
 #include "components/Mob.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"

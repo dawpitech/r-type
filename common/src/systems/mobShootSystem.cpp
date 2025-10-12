@@ -47,6 +47,7 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         mob.shootCooldown -= static_cast<float>(deltaTime);
 
         if (mob.shootCooldown <= 0.0f && mob.isShooting) {
+            std::cout << "Rate = " << mob.shootRate << '\n';
             auto& mobTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
@@ -54,8 +55,6 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
             ecs.Add<component::Projectile>(projectile,
                                            component::Projectile(component::ProjectileType::MOB, PROJECTILE_SPEED));
-            ecs.Add<component::sprite>(projectile, proj.texture);
-            ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
             ecs.Add<component::Transform>(
                 projectile,
                 component::Transform(mobTransform.pos.x,
