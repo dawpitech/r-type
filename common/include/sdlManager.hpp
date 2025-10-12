@@ -21,11 +21,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "flux/core/Serialization.hpp"
 #include "spriteHandler.hpp"
 #include "utils/error.hpp"
 #include "utils/eventManager.hpp"
 #include "vector2.hpp"
-#include "flux/core/Serialization.hpp"
 
 namespace render
 {
@@ -77,6 +77,13 @@ namespace render
             static int getWindowWidth() { return instance()._windowWith; }
 
             static int getWindowHeight() { return instance()._windowHeight; }
+
+            static void applyColor(SDL_Texture* texture, SDL_Color tint)
+            {
+                SDL_SetTextureColorMod(texture, tint.r, tint.g, tint.b);
+                SDL_SetTextureAlphaMod(texture, tint.a);
+                SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+            }
 
             static std::vector<utils::EventManager>& getKeysEvent() { return instance()._keyEvent; }
 

@@ -29,7 +29,7 @@ namespace component
             bool visible = true;
 
             sprite() = default;
-            sprite(SDL_Texture* texture) : texture(texture) {};
+            sprite(SDL_Texture* texture, SDL_Color tint) : texture(texture), tint(tint) {};
             REFLECT()
     };
 } // namespace component

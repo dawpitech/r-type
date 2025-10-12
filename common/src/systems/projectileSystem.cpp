@@ -27,7 +27,7 @@ void ProjectileSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         #ifdef IS_CLIENT
         if (!ecs.HasComponents<component::sprite, component::animation>(entity)) {
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
-            ecs.Add<component::sprite>(entity, proj.texture);
+            ecs.Add<component::sprite>(entity, component::sprite(proj.texture, {255, 255, 255, 255}));
             ecs.Add<component::animation>(entity, component::animation(proj.spriteMap, true));
         }
         #endif

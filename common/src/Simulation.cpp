@@ -105,9 +105,9 @@ void Simulation::_createEntities()
     const render::SpriteData& backgroundSprite = render::SDLManager::load("./assets/starfield2.jpg");
 
     this->_ecs.Add<component::background>(background, component::background(backgroundSprite.spriteMap, 100.0f));
-    this->_ecs.Add<component::sprite>(background, component::sprite(backgroundSprite.texture));
+    this->_ecs.Add<component::sprite>(background, component::sprite(backgroundSprite.texture, {255, 255, 255, 255}));
     this->_ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
-    this->_ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(playerSprite.texture)));
+    this->_ecs.Add<component::sprite>(playerEntity, component::sprite(component::sprite(playerSprite.texture, {0, 0, 0, 255})));
     this->_ecs.Add<component::Player>(playerEntity);
     this->_ecs.Add<component::animation>(playerEntity, component::animation(playerSprite.spriteMap, true));
     this->_ecs.Add<component::PlayerInput>(playerEntity);
@@ -119,7 +119,7 @@ void Simulation::_createEntities()
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
-    this->_ecs.Add<component::sprite>(player2Entity, component::sprite(component::sprite(playerSprite.texture)));
+    this->_ecs.Add<component::sprite>(player2Entity, component::sprite(component::sprite(playerSprite.texture, {255, 255, 255, 255})));
     this->_ecs.Add<component::Player>(player2Entity);
     this->_ecs.Add<component::animation>(player2Entity, component::animation(playerSprite.spriteMap, true));
     this->_ecs.Add<component::PlayerInput>(player2Entity);
@@ -131,7 +131,7 @@ void Simulation::_createEntities()
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
-    this->_ecs.Add<component::sprite>(player3Entity, component::sprite(component::sprite(playerSprite.texture)));
+    this->_ecs.Add<component::sprite>(player3Entity, component::sprite(component::sprite(playerSprite.texture, {255, 255, 0, 255})));
     this->_ecs.Add<component::Player>(player3Entity);
     this->_ecs.Add<component::animation>(player3Entity, component::animation(playerSprite.spriteMap, true));
     this->_ecs.Add<component::PlayerInput>(player3Entity);
@@ -143,7 +143,7 @@ void Simulation::_createEntities()
         component::collider(component::CollisionLayer::PLAYER,
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
-    this->_ecs.Add<component::sprite>(player4Entity, component::sprite(component::sprite(playerSprite.texture)));
+    this->_ecs.Add<component::sprite>(player4Entity, component::sprite(component::sprite(playerSprite.texture, {255, 255, 255, 255})));
     this->_ecs.Add<component::Player>(player4Entity);
     this->_ecs.Add<component::animation>(player4Entity, component::animation(playerSprite.spriteMap, true));
     this->_ecs.Add<component::PlayerInput>(player4Entity);
@@ -156,7 +156,7 @@ void Simulation::_createEntities()
                             component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
                             playerSprite.frameSize.x, playerSprite.frameSize.y));
     this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 2.0f));
-    this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
+    this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture, {255, 255, 255, 255}));
     this->_ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
     this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
     this->_ecs.Add<component::Velocity>(mobEntity);
@@ -168,7 +168,7 @@ void Simulation::_createEntities()
     this->_ecs.Add<component::Health>(mobEntity, component::Health(100));
     const flux::Entity mobEntity2 = this->_ecs.newEntity();
     this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.0f));
-    this->_ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
+    this->_ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture, {255, 255, 255, 255}));
     this->_ecs.Add<component::animation>(mobEntity2, component::animation(mobSprite.spriteMap, true));
     this->_ecs.Add<component::Transform>(mobEntity2, component::Transform(1900, 300, 0, 1, 1));
     this->_ecs.Add<component::Velocity>(mobEntity2);
