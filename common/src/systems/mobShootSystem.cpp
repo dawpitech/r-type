@@ -5,12 +5,10 @@
 // mob shoot system
 //
 
-#include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/Projectile.hpp"
-#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
@@ -47,7 +45,6 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         mob.shootCooldown -= static_cast<float>(deltaTime);
 
         if (mob.shootCooldown <= 0.0f && mob.isShooting) {
-            std::cout << "Rate = " << mob.shootRate << '\n';
             auto& mobTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");

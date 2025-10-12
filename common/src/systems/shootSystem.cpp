@@ -29,10 +29,22 @@ flux::View ShootSystemView(const flux::ECS& ecs)
 
 void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    using clock = std::chrono::steady_clock;
+    static auto prev = clock::now();
+
+    auto now = clock::now();
+    std::chrono::duration<double> frameTime = now - prev;
+    prev = now;
+
+    double deltaTime = frameTime.count();
+
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
         auto& input = ecs.GetComponent<component::PlayerInput>(entity);
-        if (input.shoot) {
+        auto& playerCpn = ecs.GetComponent<component::Player>(entity);
+        
+        playerCpn.shootCooldown -= static_cast<float>(deltaTime);
+        if (playerCpn.shootCooldown <= 0.0f && input.shoot) {
             auto& playerTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
             render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
@@ -48,7 +60,7 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                                          component::collider(component::PLAYER_PROJECTILE, component::MOB,
                                                              0, 0, proj.frameSize.x, proj.frameSize.y));
             ecs.Add<component::Health>(projectile);
-            input.shoot = false;
+            playerCpn.shootCooldown = 0.2;
         }
     }
 }

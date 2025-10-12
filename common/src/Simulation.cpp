@@ -6,6 +6,7 @@
 */
 
 #include <cstring>
+#include <iostream>
 #include <memory>
 #include "components/NetworkIdentification.hpp"
 #ifdef IS_CLIENT
@@ -270,7 +271,6 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
                         this->_networkUDPClient->async_write(data);
                         lastSentInput = data.game;
                         this->_lastInputSend = now;
-                        data.game.shoot = false;
                     }
                     continue;
                 }

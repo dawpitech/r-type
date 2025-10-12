@@ -53,9 +53,9 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                             playerInput.move_right = true;
                             std::cout << "Right\n";
                             break;
-                        // case utils::Keys::SPECIAL_KEY_SPACE:
-                        //     playerInput.shoot = true;
-                        //     break;
+                        case utils::Keys::SPECIAL_KEY_SPACE:
+                            playerInput.shoot = true;
+                            break;
                         default:
                             break;
                     }
@@ -72,11 +72,9 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                             break;
                         case utils::Keys::ARROW_RIGHT:
                             playerInput.move_right = false;
-                            std::cout << "Stop\n";
                             break;
                         case utils::Keys::SPECIAL_KEY_SPACE:
-                            playerInput.shoot = true;
-                            std::cout << "Shoot\n";
+                            playerInput.shoot = false;
                             break;
                         default:
                             break;
@@ -84,6 +82,7 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             }
             render::SDLManager::getKeysEvent().clear();
             SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+            SDL_FlushEvent(SDL_EVENT_KEY_UP);
         }
 #endif
 

@@ -90,6 +90,7 @@ namespace render
             static void handleEvent(bool& running)
             {
                 SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+                SDL_FlushEvent(SDL_EVENT_KEY_UP);
                 const std::map<utils::Keys, SDL_Keycode> code{{utils::Keys::KEY_A, SDLK_A},
                                                               {utils::Keys::KEY_B, SDLK_B},
                                                               {utils::Keys::KEY_C, SDLK_C},
