@@ -82,9 +82,9 @@ void Room::Room::run()
                 }
             }
         }
-        for (auto& player : this->_players) {
-            player.get().storeInput(component::PlayerInput{});
-        }
+        // for (auto& player : this->_players) {
+        //     player.get().storeInput(component::PlayerInput{});
+        // }
     };
 
     hooks.hooksNetwork = [this](flux::ECS& ecs)
@@ -144,12 +144,12 @@ void Room::Room::run()
                 //                                                                                            existingId)
                 //                    << std::endl;
                 // }
-                if (component.type() == typeid(component::PlayerInput)) {
-                    auto& comp = std::any_cast<const component::PlayerInput&>(component);
-                    serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
+                // if (component.type() == typeid(component::PlayerInput)) {
+                //     auto& comp = std::any_cast<const component::PlayerInput&>(component);
+                //     serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
+                //                    << std::endl;
+                //     continue;
+                // }
                 if (component.type() == typeid(component::Projectile)) {
                     auto& comp = std::any_cast<const component::Projectile&>(component);
                     serializedData << flux::SerializerHandler<component::Projectile>::serialize(ecs, entity, comp)
@@ -185,6 +185,14 @@ void Room::Room::run()
                     localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
                                      ecs, it.get().getEntity(), existingId)
                               << std::endl;
+                }
+                else {
+                    if (ecs.HasComponent<component::PlayerInput>(entity)) {
+                        auto& existingId = ecs.GetComponent<component::PlayerInput>(entity);
+                        localData << flux::SerializerHandler<component::PlayerInput>::serialize(
+                                         ecs, it.get().getEntity(), existingId)
+                                  << std::endl;
+                    }
                 }
             }
             try {
