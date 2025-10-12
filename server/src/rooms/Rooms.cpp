@@ -9,6 +9,7 @@
 #include <chrono>
 #include <format>
 #include <mutex>
+#include <sstream>
 #include <thread>
 #include <unordered_map>
 
@@ -127,12 +128,13 @@ void Room::Room::run()
                     serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
                                    << std::endl;
                 }
-                if (component.type() == typeid(component::NetworkIdentification)) {
-                    auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
-                    serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs, entity,
-                                                                                                           existingId)
-                                   << std::endl;
-                }
+                // if (component.type() == typeid(component::NetworkIdentification)) {
+                //     auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+                //     serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs,
+                //     entity,
+                //                                                                                            existingId)
+                //                    << std::endl;
+                // }
                 if (component.type() == typeid(component::PlayerInput)) {
                     auto& comp = std::any_cast<const component::PlayerInput&>(component);
                     serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
@@ -163,8 +165,16 @@ void Room::Room::run()
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         for (auto& it : this->_players) {
+            std::ostringstream localData;
+            localData << serializedData.str();
+            if (it.get().getEntity() != game::BASE_ENTITY) {
+                auto& existingId = ecs.GetComponent<component::NetworkIdentification>(it.get().getEntity());
+                localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
+                                      ecs, it.get().getEntity(), existingId)
+                               << std::endl;
+            }
             try {
-                it.get().sendData(serializedData.str());
+                it.get().sendData(localData.str());
             }
             catch (const boost::system::system_error& e) {
                 utils::Logger::debug(std::format("Failed to send data to player: {}", e.what()));
@@ -223,7 +233,8 @@ void Room::Room::_assignPlayerToEntity(game::Player& player)
             component::NetworkIdentification id{};
             std::strcpy(id.uuid, player.getId().c_str());
             ecs.AddOrReplace(entity, id);
-            utils::Logger::debug(std::format("Assigned uuid {} to entity {}", player.getId(), entity));
+            player.assignEntity(entity);
+            utils::Logger::debug(std::format("Assigned uuid {} to entity {}", player.getId(), player.getEntity()));
             return;
         }
     }

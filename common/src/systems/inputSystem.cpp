@@ -34,6 +34,9 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
 #if IS_CLIENT
         if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
+            // const auto& netId = ecs.GetComponent<component::NetworkIdentification>(entity);
+            // if (localUUID != netId.uuid)
+            //     continue;
             for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
                 if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
                     switch (KeyboardEvent->key) {

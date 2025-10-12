@@ -17,6 +17,9 @@
 
 namespace game
 {
+
+    constexpr unsigned BASE_ENTITY = 999;
+
     class Player
     {
         public:
@@ -32,6 +35,8 @@ namespace game
                 this->_udpPort = info.portUDP;
             }
             void storeInput(component::PlayerInput input) { this->_lastInput = input; }
+            void assignEntity(unsigned entity) {this->_entity = entity;}
+            unsigned getEntity() const {return this->_entity;}
 
             void sendData(const std::string& string) { this->_network.sendData(this->_ip, this->_udpPort, string); }
             component::PlayerInput getInput() {return this->_lastInput;};
@@ -40,6 +45,7 @@ namespace game
             network::UDPNetwork& _network;
             component::PlayerInput _lastInput;
             std::string _id;
+            unsigned _entity = BASE_ENTITY;
             uint16_t _score = 0;
             uint16_t _udpPort = 0;
             std::string _ip;
