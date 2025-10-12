@@ -89,6 +89,15 @@ void Room::Room::run()
 
     hooks.hooksNetwork = [this](flux::ECS& ecs)
     {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_networkClock);
+
+        if (elapsed.count() < 50) {
+            return;
+        }
+
+        this->_networkClock = now;
+
         uint8_t playerIndex = 0;
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
@@ -163,7 +172,7 @@ void Room::Room::run()
             }
         };
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(20));
         // std::cout << "new DATA:\n";
         // std::cout << serializedData.str() << "\n\n";
         for (auto& it : this->_players) {

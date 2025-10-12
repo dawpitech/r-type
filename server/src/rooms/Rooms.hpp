@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <mutex>
 
 #include "Simulation.hpp"
@@ -33,6 +35,7 @@ namespace Room {
         flux::ECS _ecs;
         Simulation _simulation;
         std::vector<std::reference_wrapper<game::Player>> _players;
+        std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
 

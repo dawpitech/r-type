@@ -235,7 +235,7 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
 
-        if (elapsed.count() < 100) {
+        if (elapsed.count() < 50) {
             return;
         }
 
