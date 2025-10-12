@@ -23,11 +23,13 @@ sequenceDiagram
   Client ->> ServerTCP: Connexion TCP
   ServerTCP -->> Client: ClientTCPSentInfo
   Client -->> ServerTCP: ClientTCPReceivedInfo
+
   Note over Client, ServerUDP: Début du jeu (communication UDP)
-  ServerUDP -->> Client: UDPReconciliateData (état du jeu)
-  Client -->> ServerUDP: UDPInputData (actions joueur)
-  ServerUDP -->> Client: UDPReconciliateData
-  Client -->> ServerUDP: UDPInputData
+  loop Gameplay Loop
+    ServerUDP -->> Client: UDPSentInfo (game state)
+    Client -->> ServerUDP: UDPReceivedInfo (player inputs)
+  end
+
   Note over Client, ServerTCP: Fin du jeu (retour TCP)
   ServerTCP -->> Client: ClientTCPSentInfo
   Client -->> ServerTCP: ClientTCPReceivedInfo
