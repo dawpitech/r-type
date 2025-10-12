@@ -159,14 +159,14 @@ void Simulation::_createEntities()
     this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 2.0f));
     this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
-    this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
+    this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2500, 150, 0, 1, 1));
     this->_ecs.Add<component::Velocity>(mobEntity);
     this->_ecs.Add<component::collider>(
         mobEntity,
         component::collider(component::CollisionLayer::MOB,
                             component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE, 0, 0,
                             mobSprite.frameSize.x, mobSprite.frameSize.y));
-    this->_ecs.Add<component::Health>(mobEntity);
+    this->_ecs.Add<component::Health>(mobEntity, component::Health(40));
     const flux::Entity mobEntity2 = this->_ecs.newEntity();
     this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.0f));
     this->_ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
@@ -225,7 +225,6 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
     this->_networkUDPClient->attach<network::UDPSentInfo>(
         [this](const network::UDPSentInfo& info)
         {
-            // std::cout << "Data received through udp are :" << info.serializedData << std::endl;
             this->_ecs.unserializeAllComponents(info.serializedData);
         });
     hooks->hooksNetwork = [this](flux::ECS& ecs) { this->_networkUDPClient->connect(); };
@@ -266,8 +265,6 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
 
                     static component::PlayerInput lastSentInput;
                     if (lastSentInput != data.game) {
-                        std::cout << "Sending data to client" << std::endl;
-
                         this->_networkUDPClient->async_write(data);
                         lastSentInput = data.game;
                         this->_lastInputSend = now;

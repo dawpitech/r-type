@@ -42,7 +42,6 @@ void client::network::Network::attach(std::function<void(const T&)> callback)
 
 void client::network::Network::notify(const ::network::NetworkData& data)
 {
-    // std::cout << "Inside the notify" << std::endl;
     std::visit(
         [this](auto&& arg)
         {
@@ -53,7 +52,6 @@ void client::network::Network::notify(const ::network::NetworkData& data)
                 return;
             }
             if constexpr (std::is_same_v<T, ::network::UDPReceivedInfo>) {
-                std::cout << "This is the UDPReceivedInfo" << std::endl;
                 if (this->_udpReceivedCallback)
                     this->_udpReceivedCallback(arg);
                 return;

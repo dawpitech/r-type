@@ -6,11 +6,13 @@
 //
 
 #include "RoomsPool.hpp"
+#include <format>
 #include <thread>
 
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "Rooms.hpp"
+#include "utils/logger.hpp"
 
 Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port)
@@ -26,7 +28,7 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
             auto cpt = 0;
             for (auto& room : this->_rooms) {
                 if (!room->_isRoomFull()) {
-                    std::cout << "Player added to room " << cpt << std::endl;
+                    utils::Logger::debug(std::format("Player added to room {}", cpt));
                     room->addPlayer(playerOpt.value());
                     break;
                 }

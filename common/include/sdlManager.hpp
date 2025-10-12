@@ -217,7 +217,6 @@ namespace render
                 }
                 this->_renderer = SDL_CreateRenderer(this->_window, nullptr);
                 if (this->_renderer == nullptr) {
-                    std::cout << SDL_GetError() << std::endl;
                     throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
             }
