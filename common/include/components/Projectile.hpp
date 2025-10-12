@@ -12,11 +12,12 @@
 
 namespace component
 {
-    enum class ProjectileType : uint8_t
+    enum class ProjectileType : int
     {
         PLAYER = 0,
         MOB = 1
     };
+
     struct Projectile
     {
         ProjectileType type;

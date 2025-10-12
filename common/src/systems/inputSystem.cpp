@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include "components/NetworkIdentification.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
@@ -32,50 +33,53 @@ void InputSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         auto& playerVelocity = ecs.GetComponent<component::Velocity>(entity);
 
 #if IS_CLIENT
-        for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
-            if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
-                switch (KeyboardEvent->key) {
-                    case utils::Keys::ARROW_DOWN:
-                        playerInput.move_down = true;
-                        break;
-                    case utils::Keys::ARROW_UP:
-                        playerInput.move_up = true;
-                        break;
-                    case utils::Keys::ARROW_LEFT:
-                        playerInput.move_left = true;
-                        break;
-                    case utils::Keys::ARROW_RIGHT:
-                        playerInput.move_right = true;
-                        break;
-                    // case utils::Keys::SPECIAL_KEY_SPACE:
-                    //     playerInput.shoot = true;
-                    //     break;
-                    default:
-                        break;
-                }
-            if (KeyboardEvent->type == utils::KeyEvent::KEY_UP)
-                switch (KeyboardEvent->key) {
-                    case utils::Keys::ARROW_DOWN:
-                        playerInput.move_down = false;
-                        break;
-                    case utils::Keys::ARROW_UP:
-                        playerInput.move_up = false;
-                        break;
-                    case utils::Keys::ARROW_LEFT:
-                        playerInput.move_left = false;
-                        break;
-                    case utils::Keys::ARROW_RIGHT:
-                        playerInput.move_right = false;
-                        break;
-                    case utils::Keys::SPECIAL_KEY_SPACE:
-                        playerInput.shoot = true;
-                        break;
-                    default:
-                        break;
-                }
+        if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
+            for (const auto& [type, KeyboardEvent] : render::SDLManager::getKeysEvent()) {
+                if (KeyboardEvent->type == utils::KeyEvent::KEY_DOWN)
+                    switch (KeyboardEvent->key) {
+                        case utils::Keys::ARROW_DOWN:
+                            playerInput.move_down = true;
+                            break;
+                        case utils::Keys::ARROW_UP:
+                            playerInput.move_up = true;
+                            break;
+                        case utils::Keys::ARROW_LEFT:
+                            playerInput.move_left = true;
+                            break;
+                        case utils::Keys::ARROW_RIGHT:
+                            playerInput.move_right = true;
+                            break;
+                        case utils::Keys::SPECIAL_KEY_SPACE:
+                            playerInput.shoot = true;
+                            break;
+                        default:
+                            break;
+                    }
+                if (KeyboardEvent->type == utils::KeyEvent::KEY_UP)
+                    switch (KeyboardEvent->key) {
+                        case utils::Keys::ARROW_DOWN:
+                            playerInput.move_down = false;
+                            break;
+                        case utils::Keys::ARROW_UP:
+                            playerInput.move_up = false;
+                            break;
+                        case utils::Keys::ARROW_LEFT:
+                            playerInput.move_left = false;
+                            break;
+                        case utils::Keys::ARROW_RIGHT:
+                            playerInput.move_right = false;
+                            break;
+                        case utils::Keys::SPECIAL_KEY_SPACE:
+                            playerInput.shoot = false;
+                            break;
+                        default:
+                            break;
+                    }
+            }
+            render::SDLManager::getKeysEvent().clear();
+            SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+            SDL_FlushEvent(SDL_EVENT_KEY_UP);
         }
-        render::SDLManager::getKeysEvent().clear();
-        SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
 #endif
 
         if (playerInput.move_up)

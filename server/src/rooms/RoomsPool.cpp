@@ -6,14 +6,14 @@
 //
 
 #include "RoomsPool.hpp"
+#include <format>
 #include <thread>
 
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "Rooms.hpp"
+#include "utils/logger.hpp"
 
-// this function will be updated later,
-// but should remain the same for now in order to test the functionalities
 Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
     _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port)
 {
@@ -28,7 +28,7 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
             auto cpt = 0;
             for (auto& room : this->_rooms) {
                 if (!room->_isRoomFull()) {
-                    std::cout << "Player added to room " << cpt << std::endl;
+                    utils::Logger::debug(std::format("Player added to room {}", cpt));
                     room->addPlayer(playerOpt.value());
                     break;
                 }
@@ -37,18 +37,13 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
         });
     this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>([this](network::ClientTCPReceivedInfo info)
                                                                     { this->_playerManager.storeInfo(info); });
-    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info) { return; });
+    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info) {
+        this->_playerManager.storeInput(info);
+    });
 
     for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_rooms.push_back(std::make_unique<Room>(i));
         this->_threads.emplace_back([&] { this->_rooms.back()->run(); });
-    }
-    while (true) {
-        this->_connectionNetwork.connect();
-        this->_gameUpdateNetwork.connect();
-    }
-    for (auto& thread : this->_threads) {
-        thread.join();
     }
 }
 
@@ -57,6 +52,11 @@ Room::RoomsPool::~RoomsPool() {}
 void Room::RoomsPool::run()
 {
     while (this->_isRunning) {
+        this->_connectionNetwork.connect();
+        this->_gameUpdateNetwork.connect();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    for (auto& thread : this->_threads) {
+        thread.join();
     }
 }

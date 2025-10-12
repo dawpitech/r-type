@@ -14,7 +14,8 @@ namespace component
     {
             int score = 0;
             int lvl = 0;
-            REFLECT(score, lvl)
+            float shootCooldown = 0.0f;
+            REFLECT(score, lvl, shootCooldown)
     };
 
 } // namespace component

@@ -41,6 +41,10 @@ namespace network
                     this->_connectionCallback = std::move(callback);
                     return;
                 }
+                if constexpr (std::is_same_v<T, UDPReceivedInfo>) {
+                    this->_udpReceivedCallback = std::move(callback);
+                    return;
+                }
             }
 
             void notify(const NetworkData& data);

@@ -19,7 +19,7 @@ constexpr uint8_t MOB_PROJECTILE_BIT = 1 << 3;
 
 namespace component
 {
-    enum CollisionLayer : uint8_t
+    enum CollisionLayer : int
     {
         NONE = NONE_BIT,
         PLAYER = PLAYER_BIT,
@@ -30,17 +30,17 @@ namespace component
 
     struct collider
     {
-            uint8_t layer;
-            uint8_t mask;
-            render::Rect rect;
+            int layer;
+            int mask;
+            float srcX, srcY, srch, srcw;
             bool isActive;
             bool hasCollide;
 
-            collider() = default;
-            explicit collider(uint8_t layer, uint8_t mask, render::Rect rect, bool isActive = true,
-                              bool hasCollide = false) :
-                layer(layer), mask(mask), rect(rect), isActive(isActive), hasCollide(hasCollide)
+            explicit collider(int layer = 0, int mask = 0, float srcX = 0, float srcY = 0, float srch = 0,
+                              float srcw = 0, bool isActive = true, bool hasCollide = false) :
+                layer(layer), mask(mask), srcX(srcX), srcY(srcY), srch(srch), srcw(srcw), isActive(isActive),
+                hasCollide(hasCollide)
             {}
-            REFLECT(layer, mask, rect, isActive, hasCollide)
+            REFLECT(layer, mask, srcX, srcY, srch, srcw, isActive, hasCollide)
     };
 } // namespace component

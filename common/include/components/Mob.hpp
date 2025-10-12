@@ -13,17 +13,17 @@ namespace component
     struct mob
     {
             int damage;
-            float shootCooldown;
-            float shootRate;
             int type;
             bool canShoot;
-            bool isShooting = false;
+            float shootCooldown;
+            float shootRate;
             float speed;
+            bool isShooting;
 
-            mob(int damage = 10, int type = 0, bool canShoot = false, float shootCooldown = 0.0f, float shootRate = 1.0f,
-                float speed = 1) :
+            mob(int damage = 10, int type = 0, bool canShoot = true, float shootCooldown = 0.0f,
+                float shootRate = 1.0f, float speed = 1, bool isShooting = false) :
                 damage(damage), type(type), canShoot(canShoot), shootCooldown(shootCooldown), shootRate(shootRate),
-                speed(speed) {};
-            REFLECT(damage, shootCooldown, shootRate, type, canShoot, isShooting, speed)
+                speed(speed), isShooting(isShooting) {};
+            REFLECT(damage, type, canShoot, shootCooldown, shootRate, speed, isShooting)
     };
 } // namespace component

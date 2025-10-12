@@ -59,7 +59,6 @@ void client::network::UDPClient::async_read()
             ::network::UDPSentInfo info;
             info.serializedData = std::string(buffer->begin(), buffer->begin() + bytesRead);
             
-            std::cout << "Data received: " << info.serializedData << std::endl;
             this->notify(info);
             this->async_read();
         });

@@ -24,6 +24,7 @@
 #include <vector>
 #include <istream>
 
+#include "components/PlayerInput.hpp"
 #include "flux/core/Serialization.hpp"
 #include "utils/logger.hpp"
 
@@ -57,6 +58,8 @@ namespace flux
             std::optional<std::function<void()>> hookAfterLogic;
             std::optional<std::function<void()>> hookBeforeRender;
             std::optional<std::function<void()>> hookAfterRender;
+            std::optional<std::function<void(ECS&)>> hookPlayerInput;
+            std::optional<std::function<void(ECS&)>> hookBeforeUpdate;
             std::optional<std::function<void(ECS&)>> hooksNetwork;
     };
 
@@ -432,6 +435,8 @@ namespace flux
                     accumulator += frameTime.count();
 
                     while (accumulator > LOGIC_STEP) {
+                        if (hooks && hooks->hookBeforeUpdate)
+                            hooks->hookBeforeUpdate.value()(*this);
                         if (hooks && hooks->hookBeforeLogic)
                             hooks->hookBeforeLogic.value()();
                         for (const auto& [handler, view] : this->systemsLogicList)
@@ -449,6 +454,8 @@ namespace flux
                         hooks->hookAfterRender.value()();
                     if (hooks && hooks->hooksNetwork)
                         hooks->hooksNetwork.value()(*this);
+                    if (hooks && hooks->hookPlayerInput)
+                        hooks->hookPlayerInput.value()(*this);
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(100));
                 }
@@ -559,6 +566,6 @@ namespace flux
 
         T component;
         component.reflect([&](auto&&... fields) { ((in >> fields), ...); });
-        // ecs.AddOrReplace<T>(entity, component);
+        ecs.AddOrReplace<T>(entity, component);
     }
 } // namespace flux

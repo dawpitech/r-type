@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "Player.hpp"
+#include "components/PlayerInput.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "network/TCP/TCPInfo.hpp"
@@ -25,6 +26,7 @@ namespace game
 
             void createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork& network);
             void storeInfo(const network::ClientTCPReceivedInfo &info);
+            void storeInput(const network::UDPReceivedInfo &info);
 
         private:
             std::mutex _lock;

@@ -5,7 +5,10 @@
 ** Simulation.cpp
 */
 
+#include <cstring>
+#include <iostream>
 #include <memory>
+#include "components/NetworkIdentification.hpp"
 #ifdef IS_CLIENT
 #include "network/datatype.hpp"
 #include "network/TCPClient.hpp"
@@ -13,6 +16,7 @@
 #endif
 
 #include "components/Animation.hpp"
+#include "components/background.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -21,7 +25,6 @@
 #include "components/Projectile.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
-#include "components/background.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
@@ -62,7 +65,8 @@ void Simulation::runServerSimulation(std::optional<flux::runtimeHooks> hooks = s
     this->runSimulation(std::move(hooks), false);
 }
 
-void Simulation::_registerComponent() {
+void Simulation::_registerComponent()
+{
     this->_ecs.registerComponentType<component::animation>("Animation");
     this->_ecs.registerComponentType<component::collider>("Collider");
     this->_ecs.registerComponentType<component::Health>("Health");
@@ -74,6 +78,7 @@ void Simulation::_registerComponent() {
     this->_ecs.registerComponentType<component::Transform>("Transform");
     this->_ecs.registerComponentType<component::Velocity>("Velocity");
     this->_ecs.registerComponentType<component::background>("Background");
+    this->_ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
     this->_ecs.Register<component::animation>();
     this->_ecs.Register<component::collider>();
     this->_ecs.Register<component::Health>();
@@ -85,11 +90,16 @@ void Simulation::_registerComponent() {
     this->_ecs.Register<component::Transform>();
     this->_ecs.Register<component::Velocity>();
     this->_ecs.Register<component::background>();
+    this->_ecs.Register<component::NetworkIdentification>();
 }
 
-void Simulation::_createEntities() {
+void Simulation::_createEntities()
+{
     flux::Entity background = this->_ecs.newEntity();
     const flux::Entity playerEntity = this->_ecs.newEntity();
+    const flux::Entity player2Entity = this->_ecs.newEntity();
+    const flux::Entity player3Entity = this->_ecs.newEntity();
+    const flux::Entity player4Entity = this->_ecs.newEntity();
     const flux::Entity mobEntity = this->_ecs.newEntity();
     const render::SpriteData& playerSprite = render::SDLManager::load("./assets/player.gif");
     const render::SpriteData& mobSprite = render::SDLManager::load("./assets/mob1.gif");
@@ -108,22 +118,57 @@ void Simulation::_createEntities() {
     this->_ecs.Add<component::collider>(
         playerEntity,
         component::collider(component::CollisionLayer::PLAYER,
-                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE,
-                            {0, 0, playerSprite.frameSize.x, playerSprite.frameSize.y}));
-    this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 1.3f, 0.3));
+                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
+                            playerSprite.frameSize.x, playerSprite.frameSize.y));
+    this->_ecs.Add<component::sprite>(player2Entity, component::sprite(component::sprite(playerSprite.texture, {0, 0, 255, 255})));
+    this->_ecs.Add<component::Player>(player2Entity);
+    this->_ecs.Add<component::animation>(player2Entity, component::animation(playerSprite.spriteMap, true));
+    this->_ecs.Add<component::PlayerInput>(player2Entity);
+    this->_ecs.Add<component::Transform>(player2Entity, component::Transform(0, 0, 0, 1, 1));
+    this->_ecs.Add<component::Velocity>(player2Entity, component::Velocity());
+    this->_ecs.Add<component::Health>(player2Entity);
+    this->_ecs.Add<component::collider>(
+        player2Entity,
+        component::collider(component::CollisionLayer::PLAYER,
+                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
+                            playerSprite.frameSize.x, playerSprite.frameSize.y));
+    this->_ecs.Add<component::sprite>(player3Entity, component::sprite(component::sprite(playerSprite.texture, {255, 255, 0, 255})));
+    this->_ecs.Add<component::Player>(player3Entity);
+    this->_ecs.Add<component::animation>(player3Entity, component::animation(playerSprite.spriteMap, true));
+    this->_ecs.Add<component::PlayerInput>(player3Entity);
+    this->_ecs.Add<component::Transform>(player3Entity, component::Transform(0, 0, 0, 1, 1));
+    this->_ecs.Add<component::Velocity>(player3Entity, component::Velocity());
+    this->_ecs.Add<component::Health>(player3Entity);
+    this->_ecs.Add<component::collider>(
+        player3Entity,
+        component::collider(component::CollisionLayer::PLAYER,
+                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
+                            playerSprite.frameSize.x, playerSprite.frameSize.y));
+    this->_ecs.Add<component::sprite>(player4Entity, component::sprite(component::sprite(playerSprite.texture, {0, 0, 0, 255})));
+    this->_ecs.Add<component::Player>(player4Entity);
+    this->_ecs.Add<component::animation>(player4Entity, component::animation(playerSprite.spriteMap, true));
+    this->_ecs.Add<component::PlayerInput>(player4Entity);
+    this->_ecs.Add<component::Transform>(player4Entity, component::Transform(0, 0, 0, 1, 1));
+    this->_ecs.Add<component::Velocity>(player4Entity, component::Velocity());
+    this->_ecs.Add<component::Health>(player4Entity);
+    this->_ecs.Add<component::collider>(
+        player4Entity,
+        component::collider(component::CollisionLayer::PLAYER,
+                            component::CollisionLayer::MOB | component::CollisionLayer::MOB_PROJECTILE, 0, 0,
+                            playerSprite.frameSize.x, playerSprite.frameSize.y));
+    this->_ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 2.0f));
     this->_ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity, component::animation(mobSprite.spriteMap, true));
-    this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2000, 150, 0, 1, 1));
+    this->_ecs.Add<component::Transform>(mobEntity, component::Transform(2500, 150, 0, 1, 1));
     this->_ecs.Add<component::Velocity>(mobEntity);
     this->_ecs.Add<component::collider>(
         mobEntity,
         component::collider(component::CollisionLayer::MOB,
-                                  component::CollisionLayer::PLAYER |
-                                      component::CollisionLayer::PLAYER_PROJECTILE,
-                                  render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
-    this->_ecs.Add<component::Health>(mobEntity, component::Health(100));
+                            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE, 0, 0,
+                            mobSprite.frameSize.x, mobSprite.frameSize.y));
+    this->_ecs.Add<component::Health>(mobEntity, component::Health(40));
     const flux::Entity mobEntity2 = this->_ecs.newEntity();
-    this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.5f, 0.5));
+    this->_ecs.Add<component::mob>(mobEntity2, component::mob(10, 0, true, 0.0f, 1.0f));
     this->_ecs.Add<component::sprite>(mobEntity2, component::sprite(mobSprite.texture));
     this->_ecs.Add<component::animation>(mobEntity2, component::animation(mobSprite.spriteMap, true));
     this->_ecs.Add<component::Transform>(mobEntity2, component::Transform(1900, 300, 0, 1, 1));
@@ -131,8 +176,9 @@ void Simulation::_createEntities() {
     this->_ecs.Add<component::collider>(
         mobEntity2,
         component::collider(component::CollisionLayer::MOB,
-                            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE,
-                            render::Rect{0, 0, mobSprite.frameSize.x, mobSprite.frameSize.y}));
+                            component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE, 0, 0,
+                            mobSprite.frameSize.x, mobSprite.frameSize.y));
+    this->_ecs.Add<component::Health>(mobEntity2);
 }
 
 void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, bool hasGUI)
@@ -143,8 +189,10 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, bool has
     this->_ecs.registerSystem(InputSystem, InputSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(MovementSystem, MovementSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(MobSystem, MobSystemView(this->_ecs), flux::systemType::LOGIC);
+    #ifndef IS_CLIENT
     this->_ecs.registerSystem(MobShootSystem, MobShootSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(ShootSystem, ShootSystemView(this->_ecs), flux::systemType::LOGIC);
+    #endif
     this->_ecs.registerSystem(ProjectileSystem, ProjectileSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(CollisionSystem, CollisionSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(DamageSystem, DamageSystemView(this->_ecs), flux::systemType::LOGIC);
@@ -163,7 +211,8 @@ void Simulation::runSimulation(std::optional<flux::runtimeHooks> hooks, bool has
         this->_ecs.handExecution(hooks);
 }
 
-void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort, std::optional<flux::runtimeHooks> &hooks)
+void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
+                               std::optional<flux::runtimeHooks>& hooks)
 {
 #ifdef IS_CLIENT
     utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIp, serverPort));
@@ -171,19 +220,60 @@ void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
     this->_networkTCPClient =
         std::make_unique<client::network::TCPClient>(serverIp, serverPort, this->_networkUDPClient->getLocalPort());
 
-    this->_networkTCPClient->attach<network::ClientTCPSentInfo>(
-        [this](const network::ClientTCPSentInfo& info)
+    this->_networkTCPClient->attach<network::ClientTCPSentInfo>([this](const network::ClientTCPSentInfo& info)
+                                                                { this->gameInfo = info; });
+    this->_networkUDPClient->attach<network::UDPSentInfo>(
+        [this](const network::UDPSentInfo& info)
         {
-            this->gameInfo = info;
-        });
-    this->_networkUDPClient->attach<network::UDPSentInfo>([this](const network::UDPSentInfo& info) {
-            std::cout << "Data received through udp are :" << info.serializedData << std::endl;
             this->_ecs.unserializeAllComponents(info.serializedData);
-    });
-    hooks->hooksNetwork = [this](flux::ECS &ecs) {
-        this->_networkUDPClient->connect();
-    };
+        });
+    hooks->hooksNetwork = [this](flux::ECS& ecs) { this->_networkUDPClient->connect(); };
 
+    this->_lastInputSend = std::chrono::steady_clock::now();
+
+    hooks->hookPlayerInput = [this](flux::ECS& ecs)
+    {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
+
+        if (elapsed.count() < 50) {
+            return;
+        }
+
+        std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
+        ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
+        ecs.getEntities<component::PlayerInput>(ecs, componentStore);
+
+        for (const auto& [entity, components] : componentStore) {
+            const component::NetworkIdentification* netId = nullptr;
+            const component::PlayerInput* playerInput = nullptr;
+
+            for (const auto& component : components) {
+                if (component.type() == typeid(component::NetworkIdentification)) {
+                    netId = std::any_cast<component::NetworkIdentification>(&component);
+                }
+                if (component.type() == typeid(component::PlayerInput)) {
+                    playerInput = std::any_cast<component::PlayerInput>(&component);
+                }
+            }
+
+            if (netId && playerInput) {
+                if (std::strcmp(netId->uuid, this->gameInfo.userID) == 0) {
+                    network::UDPReceivedInfo data;
+                    std::strcpy(data.uuid, this->gameInfo.userID);
+                    data.game = *playerInput;
+
+                    static component::PlayerInput lastSentInput;
+                    if (lastSentInput != data.game) {
+                        this->_networkUDPClient->async_write(data);
+                        lastSentInput = data.game;
+                        this->_lastInputSend = now;
+                    }
+                    continue;
+                }
+            }
+        }
+    };
     try {
         this->_networkTCPClient->connect();
         utils::Logger::debug("Network setup completed");

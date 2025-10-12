@@ -28,6 +28,7 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
         SDL_FRect destRect = {transform.pos.x, transform.pos.y, sprite.srcRect.w * transform.scale.x,
                               sprite.srcRect.h * transform.scale.y};
+        render::SDLManager::applyColor(sprite.texture, sprite.tint);
         render::SDLManager::renderTexture(sprite.texture, sprite.srcRect, destRect);
     };
 }
