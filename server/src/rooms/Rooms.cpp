@@ -169,11 +169,14 @@ void Room::Room::run()
         for (auto& it : this->_players) {
             std::ostringstream localData;
             localData << serializedData.str();
-            if (it.get().getEntity() != game::BASE_ENTITY) {
-                auto& existingId = ecs.GetComponent<component::NetworkIdentification>(it.get().getEntity());
-                localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
-                                      ecs, it.get().getEntity(), existingId)
-                               << std::endl;
+            auto entity = it.get().getEntity();
+            if (entity != game::BASE_ENTITY) {
+                if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
+                    auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+                    localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
+                                     ecs, it.get().getEntity(), existingId)
+                              << std::endl;
+                }
             }
             try {
                 it.get().sendData(localData.str());
