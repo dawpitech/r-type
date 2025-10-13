@@ -56,7 +56,7 @@ int main(int argc, char **argv)
         };
 
         Simulation simulation;
-        simulation.runSimulationWithNetwork(hooks, true, ip, port);
+        simulation.runClientSimulation(hooks, ip, port);
     }
     catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;
@@ -68,6 +68,9 @@ int main(int argc, char **argv)
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unexpected Error" << std::endl;
     }
     return EXIT_SUCCESS;
 }

@@ -5,12 +5,10 @@
 // mob shoot system
 //
 
-#include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/Projectile.hpp"
-#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
@@ -54,8 +52,6 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
             ecs.Add<component::Projectile>(projectile,
                                            component::Projectile(component::ProjectileType::MOB, PROJECTILE_SPEED));
-            ecs.Add<component::sprite>(projectile, proj.texture);
-            ecs.Add<component::animation>(projectile, component::animation(proj.spriteMap, true));
             ecs.Add<component::Transform>(
                 projectile,
                 component::Transform(mobTransform.pos.x,
@@ -64,7 +60,7 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
             ecs.Add<component::collider>(projectile,
                                          component::collider(component::MOB_PROJECTILE, component::PLAYER,
-                                                             {0, 0, proj.frameSize.x, proj.frameSize.y}));
+                                                             0, 0, proj.frameSize.x, proj.frameSize.y));
             ecs.Add<component::Health>(projectile);
 
             mob.shootCooldown = mob.shootRate;

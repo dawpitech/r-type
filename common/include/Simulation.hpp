@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include "flux/core/flux.hpp"
@@ -21,12 +22,18 @@ class Simulation
 {
     public:
         void runSimulation(std::optional<flux::runtimeHooks> hooks = std::nullopt, bool hasGUI = false);
-        void runSimulationWithNetwork(std::optional<flux::runtimeHooks> hooks, bool hasGUI, const std::string& serverIP,
-                                      uint16_t serverPort);
+        void runClientSimulation(std::optional<flux::runtimeHooks> hooks, const std::string& serverIP, uint16_t serverPort);
+        void runServerSimulation(std::optional<flux::runtimeHooks> hooks);
+        flux::ECS &getEcs() {return this->_ecs;}
 
     private:
-        void _setupNetwork(const std::string& serverIp, uint16_t serverPort);
+        flux::ECS _ecs;
+        void _createEntities();
+        void _registerComponent();
+        void _setupNetwork(const std::string& serverIp, uint16_t serverPort, std::optional<flux::runtimeHooks> &hooks);
 #ifdef IS_CLIENT
+        std::chrono::steady_clock::time_point _lastInputSend;
+        std::unique_ptr<client::network::TCPClient> _networkClient;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient;
         std::unique_ptr<client::network::UDPClient> _networkUDPClient;
         network::ClientTCPSentInfo gameInfo;

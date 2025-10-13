@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "flux/core/Serialization.hpp"
 #include "spriteHandler.hpp"
 #include "utils/error.hpp"
 #include "utils/eventManager.hpp"
@@ -34,9 +35,10 @@ namespace render
             float srcY;
             float srcw;
             float srch;
+            REFLECT(srcX, srcY, srcw, srch)
     };
 
-    inline std::ostream& operator<<(std::ostream& stream, const Rect& rect)
+    inline std::ostream& operator<<(std::ostream& stream, const render::Rect& rect)
     {
         stream << rect.srcX << " " << rect.srcY << " " << rect.srcw << " " << rect.srch;
         return stream;
@@ -76,11 +78,19 @@ namespace render
 
             static int getWindowHeight() { return instance()._windowHeight; }
 
+            static void applyColor(SDL_Texture* texture, SDL_Color tint)
+            {
+                SDL_SetTextureColorMod(texture, tint.r, tint.g, tint.b);
+                SDL_SetTextureAlphaMod(texture, tint.a);
+                SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+            }
+
             static std::vector<utils::EventManager>& getKeysEvent() { return instance()._keyEvent; }
 
             static void handleEvent(bool& running)
             {
                 SDL_FlushEvent(SDL_EVENT_KEY_DOWN);
+                SDL_FlushEvent(SDL_EVENT_KEY_UP);
                 const std::map<utils::Keys, SDL_Keycode> code{{utils::Keys::KEY_A, SDLK_A},
                                                               {utils::Keys::KEY_B, SDLK_B},
                                                               {utils::Keys::KEY_C, SDLK_C},
@@ -207,7 +217,6 @@ namespace render
                 }
                 this->_renderer = SDL_CreateRenderer(this->_window, nullptr);
                 if (this->_renderer == nullptr) {
-                    std::cout << SDL_GetError() << std::endl;
                     throw utils::BaseError(SDL_GetError(), "_initSdl");
                 }
             }
