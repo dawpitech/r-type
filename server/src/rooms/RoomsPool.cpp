@@ -9,8 +9,8 @@
 #include <format>
 #include <thread>
 
-#include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
+#include "network/UDP/UDPNetwork.hpp"
 #include "Rooms.hpp"
 #include "utils/logger.hpp"
 
@@ -28,6 +28,9 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
             auto cpt = 0;
             for (auto& room : this->_rooms) {
                 if (!room->_isRoomFull()) {
+                    while (!room->isRoomReady()) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    }
                     utils::Logger::debug(std::format("Player added to room {}", cpt));
                     room->addPlayer(playerOpt.value());
                     break;
@@ -37,9 +40,8 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
         });
     this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>([this](network::ClientTCPReceivedInfo info)
                                                                     { this->_playerManager.storeInfo(info); });
-    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info) {
-        this->_playerManager.storeInput(info);
-    });
+    this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>([this](network::UDPReceivedInfo info)
+                                                              { this->_playerManager.storeInput(info); });
 
     for (uint16_t i = 0; i < nbRooms; i += 1) {
         this->_rooms.push_back(std::make_unique<Room>(i));

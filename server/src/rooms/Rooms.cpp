@@ -40,6 +40,7 @@ void Room::Room::run()
     auto lastUpdate = std::chrono::steady_clock::now();
     hooks.hookBeforeUpdate = [this, &lastUpdate](flux::ECS& ecs)
     {
+        this->setRoomReady(true);
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate);
 
