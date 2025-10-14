@@ -8,8 +8,8 @@
 #pragma once
 
 #include <cstdint>
+
 #include "flux/core/Serialization.hpp"
-#include "sdlManager.hpp"
 
 constexpr uint8_t NONE_BIT = 0;
 constexpr uint8_t PLAYER_BIT = 1 << 0;

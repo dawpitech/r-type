@@ -5,12 +5,10 @@
 // mob System
 //
 
-#include <iostream>
 #include "components/Mob.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
-#include "sdlManager.hpp"
 
 flux::View MobSystemView(const flux::ECS& ecs)
 {
@@ -19,6 +17,8 @@ flux::View MobSystemView(const flux::ECS& ecs)
 
 void MobSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    return;
+    /*
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
         const auto& tranform = ecs.GetComponent<component::Transform>(entity);
@@ -29,4 +29,5 @@ void MobSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         if (tranform.pos.x > 0 && tranform.pos.x < static_cast<float>(render::SDLManager::getWindowWidth()))
             mob.isShooting = true;
     }
+    */
 }

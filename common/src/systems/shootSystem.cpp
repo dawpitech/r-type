@@ -5,17 +5,15 @@
 // shootSystem
 //
 
-#include "components/Animation.hpp"
+//#include "components/Animation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
-#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
-#include "sdlManager.hpp"
 
 constexpr float SCALE_X = 0.5;
 constexpr float SCALE_Y = 0.5;
@@ -29,6 +27,8 @@ flux::View ShootSystemView(const flux::ECS& ecs)
 
 void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    return;
+    /*
     using clock = std::chrono::steady_clock;
     static auto prev = clock::now();
 
@@ -63,4 +63,5 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             playerCpn.shootCooldown = 0.2;
         }
     }
+    */
 }

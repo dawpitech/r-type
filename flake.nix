@@ -12,6 +12,7 @@
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
+            valgrind
             libcxx
             gnumake
             cmake
