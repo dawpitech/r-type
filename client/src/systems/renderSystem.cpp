@@ -14,15 +14,19 @@
 #include "components/Transform.hpp"
 #include "flux/core/flux.hpp"
 
+#include <components/Animation.hpp>
+
 flux::View RenderSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::sprite, component::Transform>();
+    return ecs.GenerateViewFromComponents<component::Sprite, component::Transform>();
 }
 
 void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
     for (const flux::Entity entity : entities) {
-        const auto& sprite = ecs.GetComponent<component::sprite>(entity);
+        if (ecs.HasComponent<component::Animation>(entity))
+            continue;
+        const auto& sprite = ecs.GetComponent<component::Sprite>(entity);
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
         const auto& texture = TextureStore::getInstance().getTexture(sprite.assetPath, sprite.startX, sprite.startY, sprite.width, sprite.height);

@@ -13,7 +13,7 @@
 
 namespace component
 {
-    struct sprite {
+    struct Sprite {
         std::string assetPath;
         int startX;
         int startY;
@@ -21,10 +21,10 @@ namespace component
         int height;
         REFLECT()
 
-        sprite() = default;
-        sprite(const std::string& assetPath)
+        Sprite() = default;
+        Sprite(const std::string& assetPath)
             : assetPath(assetPath), startX(0), startY(0), width(-1), height(-1) {}
-        sprite(const std::string& assetPath, int startX, int startY, int width, int height)
+        Sprite(const std::string& assetPath, int startX, int startY, int width, int height)
             : assetPath(assetPath), startX(startX), startY(startY), width(width), height(height) {}
     };
 } // namespace component

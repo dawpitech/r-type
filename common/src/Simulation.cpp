@@ -5,19 +5,19 @@
 ** Simulation.cpp
 */
 
-#include "components/NetworkIdentification.hpp"
+#include "Simulation.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/NetworkIdentification.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
-#include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
-#include "Simulation.hpp"
+#include "flux/core/flux.hpp"
 
 void Simulation::setInitialSimState(flux::ECS& ecs)
 {
@@ -33,7 +33,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Player>("Player");
     ecs.registerComponentType<component::PlayerInput>("PlayerInput");
     ecs.registerComponentType<component::Projectile>("Projectile");
-    ecs.registerComponentType<component::sprite>("Sprite");
+    ecs.registerComponentType<component::Sprite>("Sprite");
     ecs.registerComponentType<component::Transform>("Transform");
     ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
@@ -43,7 +43,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Player>();
     ecs.Register<component::PlayerInput>();
     ecs.Register<component::Projectile>();
-    ecs.Register<component::sprite>();
+    ecs.Register<component::Sprite>();
     ecs.Register<component::Transform>();
     ecs.Register<component::Velocity>();
     ecs.Register<component::NetworkIdentification>();
@@ -57,7 +57,7 @@ void Simulation::_createEntities(flux::ECS& ecs)
     //_createMob(ecs, utils::Vector2(1900, 300));
 
     const flux::Entity background = ecs.newEntity();
-    ecs.Add<component::sprite>(background, component::sprite("./assets/starfield2.jpg"));
+    ecs.Add<component::Sprite>(background, component::Sprite("./assets/starfield2.jpg"));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
 }
 
@@ -85,7 +85,7 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     }
 
     const flux::Entity playerEntity = ecs.newEntity();
-    ecs.Add<component::sprite>(playerEntity, component::sprite("./assets/player.gif", startX, startY, width, height));
+    ecs.Add<component::Sprite>(playerEntity, component::Sprite("./assets/player.png", startX, startY, width, height));
     ecs.Add<component::Player>(playerEntity);
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::NetworkIdentification>(playerEntity);
