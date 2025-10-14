@@ -5,18 +5,13 @@
 ** Simulation.cpp
 */
 
-#include <cstring>
-#include <iostream>
-#include <memory>
-#include "components/NetworkIdentification.hpp"
 #ifdef IS_CLIENT
 #include "network/datatype.hpp"
 #include "network/TCPClient.hpp"
 #include "network/UDPClient.hpp"
 #endif
 
-//#include "components/Animation.hpp"
-#include "components/Background.hpp"
+#include "components/NetworkIdentification.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -30,25 +25,6 @@
 #include "flux/core/Serialization.hpp"
 #include "Simulation.hpp"
 
-#include <utility>
-#include "utils/error.hpp"
-#include "utils/logger.hpp"
-
-#include "systems/animationSystem.hpp"
-#include "systems/backgroundSystem.hpp"
-#include "systems/collisionSystem.hpp"
-#include "systems/damageSystem.hpp"
-#include "systems/healthSystem.hpp"
-#include "systems/inputSystem.hpp"
-#include "systems/mobShootSystem.hpp"
-#include "systems/mobSystem.hpp"
-#include "systems/movementSystem.hpp"
-#include "systems/projectileSystem.hpp"
-#include "systems/renderSystem.hpp"
-#include "systems/shootSystem.hpp"
-
-#include "raylib-cpp.hpp"
-
 void Simulation::setInitialSimState(flux::ECS& ecs)
 {
     _registerComponent(ecs);
@@ -57,7 +33,6 @@ void Simulation::setInitialSimState(flux::ECS& ecs)
 
 void Simulation::_registerComponent(flux::ECS& ecs)
 {
-    //ecs.registerComponentType<component::animation>("Animation");
     ecs.registerComponentType<component::collider>("Collider");
     ecs.registerComponentType<component::Health>("Health");
     ecs.registerComponentType<component::mob>("Mob");
@@ -67,9 +42,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::sprite>("Sprite");
     ecs.registerComponentType<component::Transform>("Transform");
     ecs.registerComponentType<component::Velocity>("Velocity");
-    //ecs.registerComponentType<component::background>("Background");
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
-    //ecs.Register<component::animation>();
     ecs.Register<component::collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::mob>();
@@ -79,7 +52,6 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::sprite>();
     ecs.Register<component::Transform>();
     ecs.Register<component::Velocity>();
-    //ecs.Register<component::background>();
     ecs.Register<component::NetworkIdentification>();
 }
 
@@ -91,7 +63,6 @@ void Simulation::_createEntities(flux::ECS& ecs)
     //_createMob(ecs, utils::Vector2(1900, 300));
 
     const flux::Entity background = ecs.newEntity();
-    ecs.Add<component::background>(background, component::background(backgroundSprite.spriteMap, 100.0f));
     ecs.Add<component::sprite>(background, component::sprite("./assets/starfield2.jpg"));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
 }
@@ -122,7 +93,6 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     const flux::Entity playerEntity = ecs.newEntity();
     ecs.Add<component::sprite>(playerEntity, component::sprite("./assets/player.gif", startX, startY, width, height));
     ecs.Add<component::Player>(playerEntity);
-    //ecs.Add<component::animation>(playerEntity, component::animation(playerSprite.spriteMap, true));
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::NetworkIdentification>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));

@@ -10,19 +10,19 @@
 #include <format>
 #include <iostream>
 
-#include "systems/inputSystem.hpp"
-#include "systems/movementSystem.hpp"
-#include "systems/mobSystem.hpp"
-#include "systems/mobShootSystem.hpp"
-#include "systems/shootSystem.hpp"
-#include "systems/projectileSystem.hpp"
+#include "flux/core/flux.hpp"
+#include "raylib-cpp.hpp"
 #include "systems/collisionSystem.hpp"
 #include "systems/damageSystem.hpp"
 #include "systems/healthSystem.hpp"
 #include "systems/inputDetectorSystem.hpp"
+#include "systems/inputSystem.hpp"
+#include "systems/mobShootSystem.hpp"
+#include "systems/mobSystem.hpp"
+#include "systems/movementSystem.hpp"
+#include "systems/projectileSystem.hpp"
 #include "systems/renderSystem.hpp"
-#include "flux/core/flux.hpp"
-#include "raylib-cpp.hpp"
+#include "systems/shootSystem.hpp"
 
 #include "Simulation.hpp"
 #include "parseArgs.hpp"
@@ -67,19 +67,21 @@ int main(int argc, char **argv)
         auto ip = variables["ip"].as<std::string>();
         std::uint16_t port = variables["port"].as<uint16_t>();
 
+        flux::ECS ecs;
         raylib::Window window(800, 450, "R-Type");
+        auto& masterRunVar = ecs.getMasterRunState();
 
         flux::runtimeHooks hooks = {
-            .hookBeforeRender = [&window] {
+            .hookBeforeRender = [&window, &masterRunVar] {
                 window.ClearBackground();
                 BeginDrawing();
+                if (window.ShouldClose())
+                    masterRunVar = false;
             },
             .hookAfterRender = [] {
                 EndDrawing();
             },
         };
-
-        flux::ECS ecs;
 
         Simulation::setInitialSimState(ecs);
 
@@ -93,7 +95,6 @@ int main(int argc, char **argv)
         //ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
-        //ecs.registerSystem(BackgroundSystem, BackgroundSystemView(ecs), flux::systemType::RENDER);
         //ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
 
