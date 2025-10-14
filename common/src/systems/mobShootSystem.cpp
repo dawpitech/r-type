@@ -20,7 +20,7 @@ constexpr float PROJECTILE_SPEED = 5.0f;
 
 flux::View MobShootSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::mob, component::Transform>();
+    return ecs.GenerateViewFromComponents<component::Mob, component::Transform>();
 }
 
 void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)

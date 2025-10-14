@@ -5,12 +5,6 @@
 ** Simulation.cpp
 */
 
-#ifdef IS_CLIENT
-#include "network/datatype.hpp"
-#include "network/TCPClient.hpp"
-#include "network/UDPClient.hpp"
-#endif
-
 #include "components/NetworkIdentification.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
@@ -33,9 +27,9 @@ void Simulation::setInitialSimState(flux::ECS& ecs)
 
 void Simulation::_registerComponent(flux::ECS& ecs)
 {
-    ecs.registerComponentType<component::collider>("Collider");
+    ecs.registerComponentType<component::Collider>("Collider");
     ecs.registerComponentType<component::Health>("Health");
-    ecs.registerComponentType<component::mob>("Mob");
+    ecs.registerComponentType<component::Mob>("Mob");
     ecs.registerComponentType<component::Player>("Player");
     ecs.registerComponentType<component::PlayerInput>("PlayerInput");
     ecs.registerComponentType<component::Projectile>("Projectile");
@@ -43,9 +37,9 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Transform>("Transform");
     ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
-    ecs.Register<component::collider>();
+    ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
-    ecs.Register<component::mob>();
+    ecs.Register<component::Mob>();
     ecs.Register<component::Player>();
     ecs.Register<component::PlayerInput>();
     ecs.Register<component::Projectile>();
@@ -126,77 +120,3 @@ void Simulation::_createMob(flux::ECS& ecs, const utils::Vector2<int>& pos)
     ecs.Add<component::Health>(mobEntity, component::Health(40));
     */
 }
-
-/*
-void Simulation::_setupNetwork(const std::string& serverIp, uint16_t serverPort,
-                               std::optional<flux::runtimeHooks>& hooks)
-{
-    utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIp, serverPort));
-    this->_networkUDPClient = std::make_unique<client::network::UDPClient>(serverIp, serverPort);
-    this->_networkTCPClient =
-        std::make_unique<client::network::TCPClient>(serverIp, serverPort, this->_networkUDPClient->getLocalPort());
-
-    this->_networkTCPClient->attach<network::ClientTCPSentInfo>([this](const network::ClientTCPSentInfo& info)
-                                                                { this->gameInfo = info; });
-    this->_networkUDPClient->attach<network::UDPSentInfo>(
-        [this](const network::UDPSentInfo& info)
-        {
-            this->_ecs.unserializeAllComponents(info.serializedData);
-        });
-    hooks->hooksNetwork = [this](flux::ECS& ecs) { this->_networkUDPClient->connect(); };
-
-    this->_lastInputSend = std::chrono::steady_clock::now();
-
-    hooks->hookPlayerInput = [this](flux::ECS& ecs)
-    {
-        auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
-
-        if (elapsed.count() < 50) {
-            return;
-        }
-
-        std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
-        ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
-        ecs.getEntities<component::PlayerInput>(ecs, componentStore);
-
-        for (const auto& [entity, components] : componentStore) {
-            const component::NetworkIdentification* netId = nullptr;
-            const component::PlayerInput* playerInput = nullptr;
-
-            for (const auto& component : components) {
-                if (component.type() == typeid(component::NetworkIdentification)) {
-                    netId = std::any_cast<component::NetworkIdentification>(&component);
-                }
-                if (component.type() == typeid(component::PlayerInput)) {
-                    playerInput = std::any_cast<component::PlayerInput>(&component);
-                }
-            }
-
-            if (netId && playerInput) {
-                if (std::strcmp(netId->uuid, this->gameInfo.userID) == 0) {
-                    network::UDPReceivedInfo data;
-                    std::strcpy(data.uuid, this->gameInfo.userID);
-                    data.game = *playerInput;
-
-                    static component::PlayerInput lastSentInput;
-                    if (lastSentInput != data.game) {
-                        this->_networkUDPClient->async_write(data);
-                        lastSentInput = data.game;
-                        this->_lastInputSend = now;
-                    }
-                    continue;
-                }
-            }
-        }
-    };
-    try {
-        this->_networkTCPClient->connect();
-        utils::Logger::debug("Network setup completed");
-    }
-    catch (const client::network::NetworkError& e) {
-        utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
-        throw utils::BaseError("Failed to connect to server", "_setupNetwork");
-    }
-}
-*/

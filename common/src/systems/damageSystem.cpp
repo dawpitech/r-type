@@ -11,14 +11,14 @@
 
 flux::View DamageSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::collider, component::Health>();
+    return ecs.GenerateViewFromComponents<component::Collider, component::Health>();
 }
 
 void DamageSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
-        auto& collider = ecs.GetComponent<component::collider>(entity);
+        auto& collider = ecs.GetComponent<component::Collider>(entity);
 
         if (!collider.hasCollide)
             continue;

@@ -101,9 +101,10 @@ void Room::Room::run()
         uint8_t playerIndex = 0;
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
-        ecs.getEntities<component::collider>(ecs, componentStore);
+        // @Valiance what the heck that does ?
+        ecs.getEntities<component::Collider>(ecs, componentStore);
         ecs.getEntities<component::Health>(ecs, componentStore);
-        ecs.getEntities<component::mob>(ecs, componentStore);
+        ecs.getEntities<component::Mob>(ecs, componentStore);
         ecs.getEntities<component::Player>(ecs, componentStore);
         ecs.getEntities<component::PlayerInput>(ecs, componentStore);
         ecs.getEntities<component::Projectile>(ecs, componentStore);
@@ -114,9 +115,9 @@ void Room::Room::run()
         std::ostringstream serializedData;
         for (const auto& [entity, components] : componentStore) {
             for (const auto& component : components) {
-                if (component.type() == typeid(component::collider)) {
-                    auto& comp = std::any_cast<const component::collider&>(component);
-                    serializedData << flux::SerializerHandler<component::collider>::serialize(ecs, entity, comp)
+                if (component.type() == typeid(component::Collider)) {
+                    auto& comp = std::any_cast<const component::Collider&>(component);
+                    serializedData << flux::SerializerHandler<component::Collider>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
@@ -126,9 +127,9 @@ void Room::Room::run()
                                    << std::endl;
                     continue;
                 }
-                if (component.type() == typeid(component::mob)) {
-                    auto& comp = std::any_cast<const component::mob&>(component);
-                    serializedData << flux::SerializerHandler<component::mob>::serialize(ecs, entity, comp)
+                if (component.type() == typeid(component::Mob)) {
+                    auto& comp = std::any_cast<const component::Mob&>(component);
+                    serializedData << flux::SerializerHandler<component::Mob>::serialize(ecs, entity, comp)
                                    << std::endl;
                     continue;
                 }
@@ -201,7 +202,9 @@ void Room::Room::run()
         }
     };
 
-    this->_simulation.runServerSimulation(hooks);
+    Simulation::setInitialSimState(this->_ecs);
+
+    this->_ecs.handExecution(hooks);
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
@@ -234,13 +237,12 @@ bool Room::Room::_isRoomFull()
 
 void Room::Room::_assignPlayerToEntity(game::Player& player)
 {
-    auto& ecs = this->_simulation.getEcs();
-    auto playerView = ecs.GenerateViewFromComponents<component::Player>();
-    auto allPlayerEntities = ecs.QueryViewNotExclusive(playerView);
+    const auto playerView = this->_ecs.GenerateViewFromComponents<component::Player>();
+    const auto allPlayerEntities = this->_ecs.QueryViewNotExclusive(playerView);
 
     for (auto entity : allPlayerEntities) {
-        if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
-            auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+        if (this->_ecs.HasComponent<component::NetworkIdentification>(entity)) {
+            auto& existingId = this->_ecs.GetComponent<component::NetworkIdentification>(entity);
             if (std::strcmp(existingId.uuid, player.getId().c_str()) == 0) {
                 return;
             }
@@ -248,10 +250,10 @@ void Room::Room::_assignPlayerToEntity(game::Player& player)
     }
 
     for (auto entity : allPlayerEntities) {
-        if (!ecs.HasComponent<component::NetworkIdentification>(entity)) {
+        if (!this->_ecs.HasComponent<component::NetworkIdentification>(entity)) {
             component::NetworkIdentification id{};
             std::strcpy(id.uuid, player.getId().c_str());
-            ecs.AddOrReplace(entity, id);
+            this->_ecs.AddOrReplace(entity, id);
             player.assignEntity(entity);
             utils::Logger::debug(std::format("Assigned uuid {} to entity {}", player.getId(), player.getEntity()));
             return;

@@ -13,7 +13,7 @@
 
 flux::View CollisionSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::collider, component::Transform>();
+    return ecs.GenerateViewFromComponents<component::Collider, component::Transform>();
 }
 /*
 static bool checkRectCollision(render::Rect firstRect, component::Transform firstTransform, render::Rect secondRect,

@@ -33,7 +33,6 @@ namespace Room {
        private:
         std::mutex _roomMutex;
         flux::ECS _ecs;
-        Simulation _simulation;
         std::vector<std::reference_wrapper<game::Player>> _players;
         std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;

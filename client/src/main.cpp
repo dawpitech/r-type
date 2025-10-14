@@ -24,6 +24,8 @@
 #include "systems/renderSystem.hpp"
 #include "systems/shootSystem.hpp"
 
+#include "network/TCPClient.hpp"
+#include "network/UDPClient.hpp"
 #include "Simulation.hpp"
 #include "parseArgs.hpp"
 #include "utils/error.hpp"
@@ -64,8 +66,8 @@ int main(int argc, char **argv)
         msg = std::format("Port: {}", variables["port"].as<uint16_t>());
         utils::Logger::debug(msg);
 
-        auto ip = variables["ip"].as<std::string>();
-        std::uint16_t port = variables["port"].as<uint16_t>();
+        const auto serverIP = variables["ip"].as<std::string>();
+        const auto serverPort = variables["port"].as<uint16_t>();
 
         flux::ECS ecs;
         raylib::Window window(800, 450, "R-Type");
@@ -98,6 +100,74 @@ int main(int argc, char **argv)
         //ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
         ecs.registerSystem(RenderSystem, RenderSystemView(ecs), flux::systemType::RENDER);
 
+        utils::Logger::debug(std::format("Setting up network connection to {}:{}", serverIP, serverPort));
+
+        std::chrono::steady_clock::time_point _lastInputSend;
+        std::unique_ptr<client::network::TCPClient> _networkClient;
+        std::unique_ptr<client::network::TCPClient> _networkTCPClient;
+        std::unique_ptr<client::network::UDPClient> _networkUDPClient;
+        network::ClientTCPSentInfo gameInfo;
+        
+        _networkUDPClient = std::make_unique<client::network::UDPClient>(serverIP, serverPort);
+        _networkTCPClient = std::make_unique<client::network::TCPClient>(serverIP, serverPort, _networkUDPClient->getLocalPort());
+
+        _networkTCPClient->attach<network::ClientTCPSentInfo>([&gameInfo](const network::ClientTCPSentInfo& info){ gameInfo = info; });
+        _networkUDPClient->attach<network::UDPSentInfo>([&ecs](const network::UDPSentInfo& info){ecs.unserializeAllComponents(info.serializedData);});
+        hooks.hooksNetwork = [&_networkUDPClient](flux::ECS&) { _networkUDPClient->connect(); };
+
+        _lastInputSend = std::chrono::steady_clock::now();
+
+        hooks.hookPlayerInput = [&_lastInputSend, &gameInfo, &_networkUDPClient](flux::ECS& ecs)
+        {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - _lastInputSend);
+
+            if (elapsed.count() < 50) {
+                return;
+            }
+
+            std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
+            ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
+            ecs.getEntities<component::PlayerInput>(ecs, componentStore);
+
+            for (const auto& [entity, components] : componentStore) {
+                const component::NetworkIdentification* netId = nullptr;
+                const component::PlayerInput* playerInput = nullptr;
+
+                for (const auto& component : components) {
+                    if (component.type() == typeid(component::NetworkIdentification)) {
+                        netId = std::any_cast<component::NetworkIdentification>(&component);
+                    }
+                    if (component.type() == typeid(component::PlayerInput)) {
+                        playerInput = std::any_cast<component::PlayerInput>(&component);
+                    }
+                }
+
+                if (netId && playerInput) {
+                    if (std::strcmp(netId->uuid, gameInfo.userID) == 0) {
+                        network::UDPReceivedInfo data;
+                        std::strcpy(data.uuid, gameInfo.userID);
+                        data.game = *playerInput;
+
+                        static component::PlayerInput lastSentInput;
+                        if (lastSentInput != data.game) {
+                            _networkUDPClient->async_write(data);
+                            lastSentInput = data.game;
+                            _lastInputSend = now;
+                        }
+                    }
+                }
+            }
+        };
+        try {
+            _networkTCPClient->connect();
+            utils::Logger::debug("Network setup completed");
+        }
+        catch (const client::network::NetworkError& e) {
+            utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
+            throw utils::BaseError("Failed to connect to server", "_setupNetwork");
+        }
+        
         ecs.handExecution(hooks);
     }
     catch (const utils::BaseError& e) {

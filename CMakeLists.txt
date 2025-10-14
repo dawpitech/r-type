@@ -34,4 +34,4 @@ endif()
 add_subdirectory(lib/flux)
 
 add_subdirectory(client)
-#add_subdirectory(server)
+add_subdirectory(server)

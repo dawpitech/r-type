@@ -12,7 +12,7 @@
 
 flux::View MobSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::mob, component::Transform, component::Velocity>();
+    return ecs.GenerateViewFromComponents<component::Mob, component::Transform, component::Velocity>();
 }
 
 void MobSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
