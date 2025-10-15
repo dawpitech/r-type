@@ -8,14 +8,17 @@
 #pragma once
 
 #include "network/datatype.hpp"
+#include <cstring>
 
-namespace component
-{
-    struct NetworkIdentification
-    {
-            char uuid[network::BUFFERSIZE];
+namespace component {
+    struct NetworkIdentification {
+        char uuid[network::BUFFERSIZE];
 
-            REFLECT(uuid)
+        NetworkIdentification()
+        {
+            std::memset(this->uuid, '\0', network::BUFFERSIZE);
+        }
+        REFLECT(uuid)
     };
 
-} // namespace component
+}  // namespace component

@@ -19,7 +19,7 @@ namespace component
         int startY;
         int width;
         int height;
-        REFLECT()
+        REFLECT(assetPath, startX, startY, width, height)
 
         Sprite() = default;
         Sprite(const std::string& assetPath)
