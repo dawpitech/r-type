@@ -7,9 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
-#include "network/datatype.hpp"
 #include "vector2.hpp"
 #include "flux/core/flux.hpp"
 
@@ -28,6 +25,7 @@ class Simulation
 
         static void _createEntities(flux::ECS& ecs);
         static void _registerComponent(flux::ECS& ecs);
+        static void _registerSystems(flux::ECS& ecs);
         static void _createPlayer(flux::ECS& ecs, PLAYER_TYPE type);
         static void _createMob(flux::ECS& ecs, const utils::Vector2<int>& pos);
 };

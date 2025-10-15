@@ -28,8 +28,9 @@ void InputHandlerSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entitie
         if (playerInput.move_down)
             playerVelocity.y += 0.1;
 
-        if (playerInput.move_right)
+        if (playerInput.move_right){
             playerVelocity.x += 0.1;
+        }
 
         if (playerInput.move_left)
             playerVelocity.x -= 0.1;

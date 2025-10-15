@@ -35,6 +35,7 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
 
 void Room::Room::run()
 {
+    Simulation::setInitialSimState(this->_ecs);
     flux::runtimeHooks hooks;
 
     auto lastUpdate = std::chrono::steady_clock::now();
@@ -43,7 +44,7 @@ void Room::Room::run()
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastUpdate);
 
-        if (elapsed.count() < 50) {
+        if (elapsed.count() < 16) {
             return;
         }
         lastUpdate = now;
@@ -55,7 +56,6 @@ void Room::Room::run()
         for (auto& playerRef : this->_players) {
             auto& player = playerRef.get();
             const auto& uuid = player.getId();
-            bool inputApplied = false;
 
             for (auto entity : entities) {
                 try {
@@ -73,7 +73,6 @@ void Room::Room::run()
                         auto inputComp = player.getInput();
                         ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
 
-                        inputApplied = true;
                         break;
                     }
                 }
@@ -138,19 +137,6 @@ void Room::Room::run()
                     serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
                                    << std::endl;
                 }
-                // if (component.type() == typeid(component::NetworkIdentification)) {
-                //     auto& existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
-                //     serializedData << flux::SerializerHandler<component::NetworkIdentification>::serialize(ecs,
-                //     entity,
-                //                                                                                            existingId)
-                //                    << std::endl;
-                // }
-                // if (component.type() == typeid(component::PlayerInput)) {
-                //     auto& comp = std::any_cast<const component::PlayerInput&>(component);
-                //     serializedData << flux::SerializerHandler<component::PlayerInput>::serialize(ecs, entity, comp)
-                //                    << std::endl;
-                //     continue;
-                // }
                 if (component.type() == typeid(component::Projectile)) {
                     auto& comp = std::any_cast<const component::Projectile&>(component);
                     serializedData << flux::SerializerHandler<component::Projectile>::serialize(ecs, entity, comp)
@@ -186,9 +172,9 @@ void Room::Room::run()
                 }
                 else {
                     if (ecs.HasComponent<component::PlayerInput>(entity)) {
-                        auto& existingId = ecs.GetComponent<component::PlayerInput>(entity);
+                        auto& input = ecs.GetComponent<component::PlayerInput>(entity);
                         localData << flux::SerializerHandler<component::PlayerInput>::serialize(
-                                         ecs, it.get().getEntity(), existingId)
+                                         ecs, it.get().getEntity(), input)
                                   << std::endl;
                     }
                 }
@@ -197,12 +183,11 @@ void Room::Room::run()
                 it.get().sendData(localData.str());
             }
             catch (const boost::system::system_error& e) {
-                utils::Logger::debug(std::format("Failed to send data to player: {}", e.what()));
+                utils::Logger::debug(std::format("Failed to send game data to player: {}", e.what()));
             }
         }
     };
 
-    Simulation::setInitialSimState(this->_ecs);
 
     this->_ecs.handExecution(hooks);
 }

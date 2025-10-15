@@ -18,10 +18,13 @@
 #include "components/Velocity.hpp"
 #include "flux/core/Serialization.hpp"
 #include "flux/core/flux.hpp"
+#include "systems/inputSystem.hpp"
+#include "systems/movementSystem.hpp"
 
 void Simulation::setInitialSimState(flux::ECS& ecs)
 {
     _registerComponent(ecs);
+    _registerSystems(ecs);
     _createEntities(ecs);
 }
 
@@ -49,9 +52,28 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::NetworkIdentification>();
 }
 
+void Simulation::_registerSystems(flux::ECS& ecs)
+{
+        ecs.registerSystem(InputHandlerSystem, InputHandlerSystemView(ecs),
+            flux::systemType::LOGIC);
+        ecs.registerSystem(
+            MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+        //ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
+}
+
 void Simulation::_createEntities(flux::ECS& ecs)
 {
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_ONE);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
 
     //_createMob(ecs, utils::Vector2(255, 150));
     //_createMob(ecs, utils::Vector2(1900, 300));
@@ -88,7 +110,6 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     ecs.Add<component::Sprite>(playerEntity, component::Sprite("./assets/player.png", startX, startY, width, height));
     ecs.Add<component::Player>(playerEntity);
     ecs.Add<component::PlayerInput>(playerEntity);
-    ecs.Add<component::NetworkIdentification>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
     ecs.Add<component::Velocity>(playerEntity, component::Velocity());
     ecs.Add<component::Health>(playerEntity);

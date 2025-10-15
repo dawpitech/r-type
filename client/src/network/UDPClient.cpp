@@ -7,6 +7,7 @@
 
 #include "UDPClient.hpp"
 #include <memory>
+#include "network/Network.hpp"
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
@@ -14,6 +15,8 @@ client::network::UDPClient::UDPClient(const std::string& serverIp, uint16_t serv
     _serverEndpoint(boost::asio::ip::make_address(serverIp), serverPort), client::network::Network(serverIp, serverPort)
 {
     this->_socket = std::make_unique<udp::socket>(this->_ioContext, udp::endpoint(udp::v4(), 0));
+    if (this->_socket == nullptr)
+        throw NetworkError("Unable to create socket", "udp client");
     this->async_read();
 }
 
