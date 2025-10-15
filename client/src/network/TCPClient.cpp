@@ -108,7 +108,6 @@ void client::network::TCPClient::_readHandler(
         return;
     }
 
-    std::cout << std::format("Id: {}\nPortUdp: {}", this->_info.userID, this->_info.portUDP) << std::endl;
     this->notify(this->_info);
 
     utils::Logger::debug(std::format("Client UUID: {}", this->_info.userID));
