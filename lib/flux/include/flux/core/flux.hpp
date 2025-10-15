@@ -456,8 +456,6 @@ namespace flux
                         hooks->hooksNetwork.value()(*this);
                     if (hooks && hooks->hookPlayerInput)
                         hooks->hookPlayerInput.value()(*this);
-
-                    std::this_thread::sleep_for(std::chrono::nanoseconds(100));
                 }
             }
 

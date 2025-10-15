@@ -8,6 +8,7 @@
 #pragma once
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdint>
 #include <ctime>
 #include <mutex>
@@ -28,15 +29,22 @@ namespace Room {
         void clear(std::uint8_t nbPlayers);
 
         bool addPlayer(game::Player &player);
-        bool _isRoomFull();
+
+        void setRoomReady();
+
+        bool isRoomFull();
+        void waitRoomReady();
 
        private:
         std::mutex _roomMutex;
+        std::mutex _readyMutex;
+        std::condition_variable _readyCondition;
         flux::ECS _ecs;
         std::vector<std::reference_wrapper<game::Player>> _players;
         std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
+        std::atomic<bool> _isReady = false;
 
         void _assignPlayerToEntity(game::Player& player);
     };

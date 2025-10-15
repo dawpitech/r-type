@@ -13,6 +13,7 @@
 #include <thread>
 #include <unordered_map>
 
+#include <condition_variable>
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -36,6 +37,8 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers) :
 void Room::Room::run()
 {
     Simulation::setInitialSimState(this->_ecs);
+    this->setRoomReady();
+    std::cout << "Room ready" << std::endl;
     flux::runtimeHooks hooks;
 
     auto lastUpdate = std::chrono::steady_clock::now();
@@ -201,7 +204,7 @@ void Room::Room::clear(const std::uint8_t nbPlayers)
 
 bool Room::Room::addPlayer(game::Player& player)
 {
-    if (this->_isRoomFull()) {
+    if (this->isRoomFull()) {
         auto log = std::format("Too many player ! Can't add user in room {}", this->_roomNumber);
         utils::Logger::debug(log);
         return false;
@@ -214,10 +217,23 @@ bool Room::Room::addPlayer(game::Player& player)
     return true;
 }
 
-bool Room::Room::_isRoomFull()
+bool Room::Room::isRoomFull()
 {
     std::lock_guard<std::mutex> lock(this->_roomMutex);
     return this->_players.size() > this->_nbPlayerMax;
+}
+
+void Room::Room::setRoomReady() {
+    this->_isReady.store(true);
+    this->_readyCondition.notify_all();
+}
+
+void Room::Room::waitRoomReady()
+{
+    std::unique_lock<std::mutex> lock(this->_readyMutex);
+    if (!this->_isReady.load()) {
+        this->_readyCondition.wait(lock);
+    }
 }
 
 void Room::Room::_assignPlayerToEntity(game::Player& player)

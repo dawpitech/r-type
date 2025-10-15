@@ -6,6 +6,8 @@
 //
 
 #include "RoomsPool.hpp"
+#include <chrono>
+#include <condition_variable>
 #include <format>
 #include <thread>
 
@@ -27,7 +29,8 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms) :
             }
             auto cpt = 0;
             for (auto& room : this->_rooms) {
-                if (!room->_isRoomFull()) {
+                if (!room->isRoomFull()) {
+                    room->waitRoomReady();
                     utils::Logger::debug(std::format("Player added to room {}", cpt));
                     room->addPlayer(playerOpt.value());
                     break;
