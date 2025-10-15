@@ -29,7 +29,7 @@ namespace game
             void storeInput(const network::UDPReceivedInfo &info);
 
         private:
-            std::mutex _lock;
+            std::mutex _playerLock;
             std::vector<std::unique_ptr<Player>> _players;
     };
 } // namespace game

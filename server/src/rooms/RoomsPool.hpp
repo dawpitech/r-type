@@ -25,7 +25,7 @@ namespace Room {
         void run();
         
        private:
-        std::uint8_t _nbRooms;
+        std::uint8_t _nbRooms = 0;
         bool _isRunning = true;
 
         network::TCPNetwork _connectionNetwork;

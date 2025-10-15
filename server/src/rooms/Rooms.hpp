@@ -18,7 +18,7 @@
 #include "player/Player.hpp"
 
 namespace Room {
-    constexpr uint8_t BASEROOMPLAYER = 3;
+    constexpr uint8_t BASEROOMPLAYER = 4;
 
     class Room {
        public:
@@ -44,7 +44,7 @@ namespace Room {
         std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
-        std::atomic<bool> _isReady = false;
+        bool _isReady = false;
 
         void _assignPlayerToEntity(game::Player& player);
     };

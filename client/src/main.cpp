@@ -114,12 +114,13 @@ int main(int argc, char **argv)
             serverIP, serverPort, _networkUDPClient->getLocalPort());
 
         network::ClientTCPSentInfo gameInfo;
+        std::chrono::steady_clock::time_point _lastInputSend;
+
         if constexpr (true) {
             utils::Logger::debug(
                 std::format("Setting up network connection to {}:{}", serverIP,
                     serverPort));
 
-            std::chrono::steady_clock::time_point _lastInputSend;
 
             _networkTCPClient->attach<network::ClientTCPSentInfo>(
                 [&gameInfo](const network::ClientTCPSentInfo &info) {
