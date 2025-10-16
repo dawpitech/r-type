@@ -26,6 +26,11 @@ client::network::TCPClient::~TCPClient()
     }
 }
 
+void client::network::TCPClient::run()
+{
+    this->_ioContext.poll_one();
+}
+
 void client::network::TCPClient::connect()
 {
     if (this->_connected) {
@@ -61,6 +66,7 @@ void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo
         return;
     }
 
+    utils::Logger::debug("Client sent connection info");
     boost::asio::write(this->_socket, boost::asio::buffer(&data, sizeof(data)));
 }
 
