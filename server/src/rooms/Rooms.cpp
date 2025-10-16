@@ -36,6 +36,12 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers)
 
 void Room::Room::_initHooks(flux::runtimeHooks &hooks)
 {
+    this->_initUpdateHook(hooks);
+    this->_initNetworkHook(hooks);
+}
+
+void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
+{
     hooks.hookBeforeUpdate = [this](flux::ECS &ecs) {
         std::lock_guard<std::mutex> lock(this->_roomMutex);
         auto view =
@@ -64,7 +70,10 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
             }
         }
     };
+}
 
+void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
+{
     hooks.hooksNetwork = [this](flux::ECS &ecs) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_networkClock);
@@ -107,9 +116,9 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
             auto entity = it.get().getEntity();
             if (entity != game::BASE_ENTITY) {
                 if (ecs.HasComponent<component::NetworkIdentification>(entity)) {
-                    auto &existingId = ecs.GetComponent<component::NetworkIdentification>(entity);
+                    auto &component = ecs.GetComponent<component::NetworkIdentification>(entity);
                     localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
-                                     ecs, it.get().getEntity(), existingId)
+                                     ecs, it.get().getEntity(), component)
                               << std::endl;
                 } else if (ecs.HasComponent<component::PlayerInput>(entity)) {
                     auto &input = ecs.GetComponent<component::PlayerInput>(entity);

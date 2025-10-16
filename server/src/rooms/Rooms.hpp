@@ -49,6 +49,8 @@ namespace Room {
 
         void _assignPlayerToEntity(game::Player &player);
         void _initHooks(flux::runtimeHooks &hooks);
+        void _initUpdateHook(flux::runtimeHooks &hooks);
+        void _initNetworkHook(flux::runtimeHooks &hooks);
 
         template <typename T>
         void _getSerializedComponent(

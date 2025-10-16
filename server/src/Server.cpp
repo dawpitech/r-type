@@ -5,18 +5,17 @@
 // Threadpool for the rooms
 //
 
-#include "RoomsPool.hpp"
 #include <chrono>
-#include <condition_variable>
 #include <format>
 #include <thread>
 
-#include "Rooms.hpp"
+#include "Server.hpp"
+#include "rooms/Rooms.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
-Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms)
+Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms)
     : _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port)
 {
     this->_connectionNetwork.attach<network::ConnectionInfo>(
@@ -49,8 +48,8 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms)
         });
 
     for (uint16_t i = 0; i < nbRooms; i += 1) {
-        this->_rooms.push_back(std::make_unique<Room>(i));
-        Room *roomPtr = this->_rooms.back().get();
+        this->_rooms.push_back(std::make_unique<Room::Room>(i));
+        Room::Room *roomPtr = this->_rooms.back().get();
         this->_threads.emplace_back([roomPtr] {
             if (roomPtr)
                 roomPtr->run();
@@ -58,9 +57,9 @@ Room::RoomsPool::RoomsPool(std::uint16_t port, std::uint16_t nbRooms)
     }
 }
 
-Room::RoomsPool::~RoomsPool() {}
+Server::Server::~Server() {}
 
-void Room::RoomsPool::run()
+void Server::Server::run()
 {
     while (this->_isRunning) {
         this->_connectionNetwork.connect();
