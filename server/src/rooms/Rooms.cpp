@@ -47,25 +47,19 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
             const auto &uuid = player.getId();
 
             for (auto entity : entities) {
-                try {
-                    auto &idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
-
-                    if (!ecs.HasComponent<component::Health>(entity)) {
-                        continue;
-                    }
-                    auto health = ecs.GetComponent<component::Health>(entity);
-                    if (health.healthPoint == 0) {
-                        continue;
-                    }
-
-                    if (uuid == idComp.uuid) {
-                        auto inputComp = player.getInput();
-                        ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
-
-                        break;
-                    }
-                } catch (const flux::ECS::FluxException &e) {
+                if (!ecs.HasComponent<component::NetworkIdentification>(entity) &&
+                    !ecs.HasComponent<component::Health>(entity))
                     continue;
+                auto &idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
+                auto health = ecs.GetComponent<component::Health>(entity);
+
+                if (health.healthPoint == 0)
+                    continue;
+
+                if (uuid == idComp.uuid) {
+                    auto inputComp = player.getInput();
+                    ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
+                    break;
                 }
             }
         }
@@ -81,7 +75,6 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
 
         this->_networkClock = now;
 
-        uint8_t playerIndex = 0;
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
 
         ecs.getEntities<component::Collider>(ecs, componentStore);
@@ -97,52 +90,13 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
         std::ostringstream serializedData;
         for (const auto &[entity, components] : componentStore) {
             for (const auto &component : components) {
-                if (component.type() == typeid(component::Collider)) {
-                    auto &comp = std::any_cast<const component::Collider &>(component);
-                    serializedData << flux::SerializerHandler<component::Collider>::serialize(
-                                          ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
-                if (component.type() == typeid(component::Health)) {
-                    auto &comp = std::any_cast<const component::Health &>(component);
-                    serializedData << flux::SerializerHandler<component::Health>::serialize(ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
-                if (component.type() == typeid(component::Mob)) {
-                    auto &comp = std::any_cast<const component::Mob &>(component);
-                    serializedData << flux::SerializerHandler<component::Mob>::serialize(ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
-                if (component.type() == typeid(component::Player)) {
-                    auto &comp = std::any_cast<const component::Player &>(component);
-                    serializedData << flux::SerializerHandler<component::Player>::serialize(ecs, entity, comp)
-                                   << std::endl;
-                }
-                if (component.type() == typeid(component::Projectile)) {
-                    auto &comp = std::any_cast<const component::Projectile &>(component);
-                    serializedData << flux::SerializerHandler<component::Projectile>::serialize(
-                                          ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
-                if (component.type() == typeid(component::Transform)) {
-                    auto &comp = std::any_cast<const component::Transform &>(component);
-                    serializedData << flux::SerializerHandler<component::Transform>::serialize(
-                                          ecs, entity, comp)
-                                   << std::endl;
-                    ;
-                    continue;
-                }
-                if (component.type() == typeid(component::Velocity)) {
-                    auto &comp = std::any_cast<const component::Velocity &>(component);
-                    serializedData << flux::SerializerHandler<component::Velocity>::serialize(
-                                          ecs, entity, comp)
-                                   << std::endl;
-                    continue;
-                }
+                this->_getSerializedComponent<component::Collider>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Health>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Mob>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Player>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Projectile>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Transform>(entity, component, serializedData);
+                this->_getSerializedComponent<component::Velocity>(entity, component, serializedData);
             }
         };
         std::lock_guard<std::mutex> lock(this->_roomMutex);
@@ -157,13 +111,11 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
                     localData << flux::SerializerHandler<component::NetworkIdentification>::serialize(
                                      ecs, it.get().getEntity(), existingId)
                               << std::endl;
-                } else {
-                    if (ecs.HasComponent<component::PlayerInput>(entity)) {
-                        auto &input = ecs.GetComponent<component::PlayerInput>(entity);
-                        localData << flux::SerializerHandler<component::PlayerInput>::serialize(
-                                         ecs, it.get().getEntity(), input)
-                                  << std::endl;
-                    }
+                } else if (ecs.HasComponent<component::PlayerInput>(entity)) {
+                    auto &input = ecs.GetComponent<component::PlayerInput>(entity);
+                    localData << flux::SerializerHandler<component::PlayerInput>::serialize(
+                                     ecs, it.get().getEntity(), input)
+                              << std::endl;
                 }
             }
             try {
