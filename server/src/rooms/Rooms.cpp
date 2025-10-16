@@ -30,6 +30,8 @@
 #include "utils/logger.hpp"
 #include <condition_variable>
 
+using std::uint8_t;
+
 Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers)
     : _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
 {}
@@ -130,7 +132,8 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
             try {
                 it.get().sendData(localData.str());
             } catch (const boost::system::system_error &e) {
-                utils::Logger::debug(std::format("Failed to send game data to player: {}", e.what()));
+                utils::Logger::debug(
+                    std::format("Failed to send game data to player {}:\n\t{}", it.get().getId(), e.what()));
             }
         }
     };
@@ -142,11 +145,18 @@ void Room::Room::run()
         std::lock_guard<std::mutex> lock(this->_roomMutex);
         Simulation::setInitialSimState(this->_ecs);
     }
-    this->setRoomReady();
+    this->_setRoomReady();
+    this->_waitRoomFull();
 
     flux::runtimeHooks hooks;
     this->_initHooks(hooks);
     this->_ecs.handExecution(hooks);
+}
+
+void Room::Room::_waitRoomFull()
+{
+    std::unique_lock<std::mutex> lock(this->_roomMutex);
+    this->_fullCondition.wait(lock, [this] { return this->_players.size() >= BASEROOMPLAYER; });
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
@@ -166,9 +176,16 @@ bool Room::Room::addPlayer(game::Player &player)
     }
 
     this->_players.push_back(player);
+    player.assignRoom(this->_roomNumber);
 
     this->_assignPlayerToEntity(player);
     return true;
+}
+
+void Room::Room::notifyRoomFull()
+{
+    if (this->_players.size() >= BASEROOMPLAYER)
+        this->_fullCondition.notify_all();
 }
 
 bool Room::Room::isRoomFull()
@@ -177,7 +194,7 @@ bool Room::Room::isRoomFull()
     return this->_players.size() >= this->_nbPlayerMax;
 }
 
-void Room::Room::setRoomReady()
+void Room::Room::_setRoomReady()
 {
     std::lock_guard<std::mutex> lock(this->_readyMutex);
     this->_isReady = true;

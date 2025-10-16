@@ -55,3 +55,14 @@ void game::PlayersManager::storeInput(const network::UDPReceivedInfo& info)
     }
     utils::Logger::debug(std::format("No player with uuid: {}", info.uuid));
 }
+
+std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id)
+{
+    for (auto& it : this->_players) {
+        if (it->getId() == id) {
+            return it->getRoom();
+        }
+    }
+    utils::Logger::debug(std::format("No player with uuid: {}", id));
+    return std::nullopt;
+}

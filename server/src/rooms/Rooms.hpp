@@ -31,15 +31,16 @@ namespace Room {
 
         bool addPlayer(game::Player &player);
 
-        void setRoomReady();
 
         bool isRoomFull();
+        void notifyRoomFull();
         void waitRoomReady();
 
        private:
         std::mutex _roomMutex;
         std::mutex _readyMutex;
         std::condition_variable _readyCondition;
+        std::condition_variable _fullCondition;
         flux::ECS _ecs;
         std::vector<std::reference_wrapper<game::Player>> _players;
         std::chrono::steady_clock::time_point _networkClock;
@@ -47,6 +48,8 @@ namespace Room {
         std::size_t _roomNumber;
         bool _isReady = false;
 
+        void _setRoomReady();
+        void _waitRoomFull();
         void _assignPlayerToEntity(game::Player &player);
         void _initHooks(flux::runtimeHooks &hooks);
         void _initUpdateHook(flux::runtimeHooks &hooks);
