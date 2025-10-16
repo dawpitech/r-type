@@ -47,5 +47,6 @@ namespace Room {
         bool _isReady = false;
 
         void _assignPlayerToEntity(game::Player& player);
+        void _initHooks(flux::runtimeHooks &hooks);
     };
 }  // namespace Room
