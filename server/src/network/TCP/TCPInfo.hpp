@@ -60,8 +60,6 @@ namespace network
 
             [[nodiscard]] tcp::socket& getSocket() { return this->_socket; };
 
-            void addData(ServerNetwork& network, const ClientTCPReceivedInfo& data) { network.notify(data); }
-
         private:
             tcp::socket _socket;
             ClientTCPReceivedInfo _data;

@@ -14,7 +14,7 @@ network::ServerNetwork::ServerNetwork(const uint16_t port) : _port(port) {}
 
 network::ServerNetwork::~ServerNetwork() {}
 
-void network::ServerNetwork::connect() { int hasRun = this->_ioContext.poll_one(); }
+void network::ServerNetwork::connect() { this->_ioContext.poll_one(); }
 
 void network::ServerNetwork::notify(const NetworkData& data)
 {
