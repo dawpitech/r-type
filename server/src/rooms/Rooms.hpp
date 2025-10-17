@@ -55,6 +55,8 @@ namespace Room {
         void _initUpdateHook(flux::runtimeHooks &hooks);
         void _initNetworkHook(flux::runtimeHooks &hooks);
 
+        void _serializeComponent(const unsigned entity, const std::any &component, std::ostringstream &out);
+
         template <typename T>
         void _getSerializedComponent(
             flux::Entity entity, const std::any &component, std::ostream &serializedData)

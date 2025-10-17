@@ -80,7 +80,7 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_networkClock);
 
-        if (elapsed.count() < 50) {
+        if (elapsed.count() < 16) {
             return;
         }
 
@@ -101,13 +101,7 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
         std::ostringstream serializedData;
         for (const auto &[entity, components] : componentStore) {
             for (const auto &component : components) {
-                this->_getSerializedComponent<component::Collider>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Health>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Mob>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Player>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Projectile>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Transform>(entity, component, serializedData);
-                this->_getSerializedComponent<component::Velocity>(entity, component, serializedData);
+                this->_serializeComponent(entity, component, serializedData);
             }
         };
         std::lock_guard<std::mutex> lock(this->_roomMutex);
@@ -137,6 +131,18 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
             }
         }
     };
+}
+
+void Room::Room::_serializeComponent(
+    const unsigned entity, const std::any &component, std::ostringstream &out)
+{
+    this->_getSerializedComponent<component::Collider>(entity, component, out);
+    this->_getSerializedComponent<component::Health>(entity, component, out);
+    this->_getSerializedComponent<component::Mob>(entity, component, out);
+    this->_getSerializedComponent<component::Player>(entity, component, out);
+    this->_getSerializedComponent<component::Projectile>(entity, component, out);
+    this->_getSerializedComponent<component::Transform>(entity, component, out);
+    this->_getSerializedComponent<component::Velocity>(entity, component, out);
 }
 
 void Room::Room::run()
