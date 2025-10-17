@@ -98,6 +98,11 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
         ecs.getEntities<component::Velocity>(ecs, componentStore);
         ecs.getEntities<component::NetworkIdentification>(ecs, componentStore);
 
+        this->_snapshots.push_back(componentStore);
+        if (this->_snapshots.size() > NB_SNAPSHOTS){
+            this->_snapshots.pop_front();
+        }
+
         std::ostringstream serializedData;
         for (const auto &[entity, components] : componentStore) {
             for (const auto &component : components) {

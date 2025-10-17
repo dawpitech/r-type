@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <ctime>
+#include <deque>
 #include <mutex>
 
 #include "Simulation.hpp"
@@ -20,6 +21,7 @@
 
 namespace Room {
     constexpr uint8_t BASEROOMPLAYER = 4;
+    constexpr uint8_t NB_SNAPSHOTS = 10;
 
     class Room {
        public:
@@ -43,6 +45,7 @@ namespace Room {
         std::condition_variable _fullCondition;
         flux::ECS _ecs;
         std::vector<std::reference_wrapper<game::Player>> _players;
+        std::deque<std::unordered_map<flux::Entity, std::vector<std::any>>> _snapshots;
         std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
