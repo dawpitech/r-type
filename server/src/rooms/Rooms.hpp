@@ -13,8 +13,8 @@
 #include <ctime>
 #include <deque>
 #include <mutex>
+#include <ostream>
 
-#include "Simulation.hpp"
 #include "flux/core/Serialization.hpp"
 #include "flux/core/flux.hpp"
 #include "player/Player.hpp"
@@ -59,6 +59,8 @@ namespace Room {
         void _initNetworkHook(flux::runtimeHooks &hooks);
 
         void _serializeComponent(const unsigned entity, const std::any &component, std::ostringstream &out);
+        void _getSnapshot(std::unordered_map<flux::Entity, std::vector<std::any>> &store);
+        void _sendSnapshotToPlayer(std::ostringstream &serializedData);
 
         template <typename T>
         void _getSerializedComponent(
