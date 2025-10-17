@@ -6,13 +6,14 @@
 */
 
 #include "UDPClient.hpp"
-#include <memory>
 #include "network/Network.hpp"
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
+#include <memory>
 
-client::network::UDPClient::UDPClient(const std::string& serverIp, uint16_t serverPort) :
-    _serverEndpoint(boost::asio::ip::make_address(serverIp), serverPort), client::network::Network(serverIp, serverPort)
+client::network::UDPClient::UDPClient(const std::string &serverIp, uint16_t serverPort)
+    : _serverEndpoint(boost::asio::ip::make_address(serverIp), serverPort),
+      client::network::Network(serverIp, serverPort)
 {
     this->_socket = std::make_unique<udp::socket>(this->_ioContext, udp::endpoint(udp::v4(), 0));
     if (this->_socket == nullptr)
@@ -20,14 +21,12 @@ client::network::UDPClient::UDPClient(const std::string& serverIp, uint16_t serv
     this->async_read();
 }
 
-void client::network::UDPClient::async_write(const ::network::UDPReceivedInfo& data)
+void client::network::UDPClient::async_write(const ::network::UDPReceivedInfo &data)
 {
     auto dataPtr = std::make_shared<::network::UDPReceivedInfo>(data);
 
-    this->_socket->async_send_to(
-        boost::asio::buffer(dataPtr.get(), sizeof(::network::UDPReceivedInfo)), _serverEndpoint,
-        [dataPtr](const boost::system::error_code& error, std::size_t bytesSent)
-        {
+    this->_socket->async_send_to(boost::asio::buffer(dataPtr.get(), sizeof(::network::UDPReceivedInfo)),
+        _serverEndpoint, [dataPtr](const boost::system::error_code &error, std::size_t bytesSent) {
             if (error) {
                 utils::Logger::debug(std::format("Error in UDP write: {}", error.message()));
                 return;
@@ -35,7 +34,7 @@ void client::network::UDPClient::async_write(const ::network::UDPReceivedInfo& d
 
             if (bytesSent != sizeof(::network::UDPReceivedInfo)) {
                 utils::Logger::debug(std::format("Error in UDP write size\nexpected: {}\nbut sent: {}",
-                                                 sizeof(::network::UDPReceivedInfo), bytesSent));
+                    sizeof(::network::UDPReceivedInfo), bytesSent));
                 return;
             }
 
@@ -48,23 +47,25 @@ void client::network::UDPClient::async_read()
     auto buffer = std::make_shared<std::vector<char>>(8192);
     auto remoteEndpoint = std::make_shared<udp::endpoint>();
 
-    this->_socket->async_receive_from(
-        boost::asio::buffer(*buffer),
-        *remoteEndpoint,
-        [this, buffer, endpoint = remoteEndpoint](const boost::system::error_code& error, size_t bytesRead)
-        {
+    this->_socket->async_receive_from(boost::asio::buffer(*buffer), *remoteEndpoint,
+        [this, buffer, endpoint = remoteEndpoint](const boost::system::error_code &error, size_t bytesRead) {
             if (error) {
                 utils::Logger::debug(std::format("Error in UDP read: {}", error.message()));
                 this->async_read();
                 return;
             }
-            
+
             ::network::UDPSentInfo info;
-            info.serializedData = std::string(buffer->begin(), buffer->begin() + bytesRead);
-            
+            auto decompressedData =
+                this->_decompressString(std::string(buffer->begin(), buffer->begin() + bytesRead));
+            info.serializedData = decompressedData;
+
             this->notify(info);
             this->async_read();
         });
 }
 
-void client::network::UDPClient::connect() { this->_ioContext.poll_one(); }
+void client::network::UDPClient::connect()
+{
+    this->_ioContext.poll_one();
+}

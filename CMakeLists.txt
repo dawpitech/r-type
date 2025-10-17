@@ -21,6 +21,7 @@ CPMGetPackage(sol2)
 CPMGetPackage(boost)
 CPMGetPackage(raylib)
 CPMGetPackage(raylib-cpp)
+CPMGetPackage(zlib)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
