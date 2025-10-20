@@ -14,6 +14,7 @@
 #include <mutex>
 
 #include "Simulation.hpp"
+#include "flux/core/Serialization.hpp"
 #include "flux/core/flux.hpp"
 #include "player/Player.hpp"
 
@@ -46,6 +47,19 @@ namespace Room {
         std::size_t _roomNumber;
         bool _isReady = false;
 
-        void _assignPlayerToEntity(game::Player& player);
+        void _assignPlayerToEntity(game::Player &player);
+        void _initHooks(flux::runtimeHooks &hooks);
+        void _initUpdateHook(flux::runtimeHooks &hooks);
+        void _initNetworkHook(flux::runtimeHooks &hooks);
+
+        template <typename T>
+        void _getSerializedComponent(
+            flux::Entity entity, const std::any &component, std::ostream &serializedData)
+        {
+            if (!(component.type() == typeid(T)))
+                return;
+            const auto &comp = std::any_cast<const T &>(component);
+            serializedData << flux::SerializerHandler<T>::serialize(this->_ecs, entity, comp) << std::endl;
+        }
     };
 }  // namespace Room

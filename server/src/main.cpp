@@ -7,12 +7,13 @@
 
 #include <cstdlib>
 #include <exception>
+#include <format>
 #include <iostream>
 #include <boost/program_options/errors.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include "parseArgs.hpp"
-#include "rooms/RoomsPool.hpp"
+#include "Server.hpp"
+#include "parser/parseArgs.hpp"
 #include "utils/logger.hpp"
 
 static void checkVariables(const po::variables_map& variables)
@@ -48,7 +49,7 @@ int main(int argc, char** argv)
 
         std::uint16_t port = variables["port"].as<uint16_t>();
         std::uint16_t rooms = variables["rooms"].as<uint16_t>();
-        Room::RoomsPool roomsPool(port, rooms);
+        Server::Server roomsPool(port, rooms);
         roomsPool.run();
     }
     catch (const utils::BaseError& e)
