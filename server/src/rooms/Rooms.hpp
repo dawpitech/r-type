@@ -31,7 +31,6 @@ namespace Room {
 
         bool addPlayer(game::Player &player);
 
-
         bool isRoomFull();
         void notifyRoomFull();
         void waitRoomReady();
