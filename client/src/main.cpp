@@ -130,7 +130,8 @@ int main(int argc, char **argv)
                 [&ecs](const network::UDPSentInfo &info) {
                     ecs.unserializeAllComponents(info.serializedData);
                 });
-            hooks.hooksNetwork = [&_networkUDPClient](flux::ECS &) {
+            hooks.hooksNetwork = [&_networkUDPClient, &_networkTCPClient](flux::ECS &) {
+                _networkTCPClient->run();
                 _networkUDPClient->connect();
             };
 

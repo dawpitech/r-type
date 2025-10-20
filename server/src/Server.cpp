@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <format>
+#include <optional>
 #include <thread>
 
 #include "Server.hpp"
@@ -41,6 +42,14 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms)
     this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>(
         [this](network::ClientTCPReceivedInfo info) {
             this->_playerManager.storeInfo(info);
+            auto roomNb = this->_playerManager.getPlayerRoom(info.uuid);
+            if (roomNb == std::nullopt || roomNb > this->_rooms.size()) {
+                utils::Logger::debug("Trying to add player to wrong room");
+                return;
+            }
+            if (this->_rooms[roomNb.value()]->isRoomFull()) {
+                this->_rooms[roomNb.value()]->notifyRoomFull();
+            }
         });
     this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>(
         [this](network::UDPReceivedInfo info) {

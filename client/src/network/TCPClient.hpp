@@ -25,6 +25,9 @@ namespace client::network
             explicit TCPClient(const std::string& serverIp, uint16_t serverPort, uint16_t selfUdpPort);
             ~TCPClient();
 
+            void run();
+        
+            void waitConnection();
             void connect() override;
             void disconnect() override;
 
