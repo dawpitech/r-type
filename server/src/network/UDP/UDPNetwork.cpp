@@ -10,6 +10,9 @@
 #include <boost/system/detail/error_code.hpp>
 #include <memory>
 
+#include <vector>
+#include <stdexcept>
+#include <zlib.h>
 #include "UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
@@ -23,7 +26,8 @@ network::UDPNetwork::UDPNetwork(std::uint16_t port) : ServerNetwork(port), _endp
 void network::UDPNetwork::sendData(std::string &ip, uint16_t port, const std::string &data)
 {
     udp::endpoint remoteEndpoint(boost::asio::ip::make_address(ip), port);
-    this->_socket->send_to(boost::asio::buffer(data), remoteEndpoint);
+    auto compressedData = this->_compressString(data);
+    this->_socket->send_to(boost::asio::buffer(compressedData), remoteEndpoint);
 }
 
 void network::UDPNetwork::async_read()

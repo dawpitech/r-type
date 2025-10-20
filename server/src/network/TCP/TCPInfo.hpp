@@ -52,12 +52,6 @@ namespace network
                         }
 
                         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data.get());
-                        for (size_t i = 0; i < bytesRead && i < 20; ++i) {
-                            std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i])
-                                      << " ";
-                        }
-                        std::cout << std::dec << std::endl;
-                        std::cout << "UUID string: '" << data->uuid << "'" << std::endl;
 
                         network.notify(*data);
                         this->async_read(network);
@@ -65,8 +59,6 @@ namespace network
             }
 
             [[nodiscard]] tcp::socket& getSocket() { return this->_socket; };
-
-            void addData(ServerNetwork& network, const ClientTCPReceivedInfo& data) { network.notify(data); }
 
         private:
             tcp::socket _socket;

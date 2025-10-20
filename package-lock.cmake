@@ -18,21 +18,24 @@ CPMDeclarePackage(boost
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
-# sdl3
-CPMDeclarePackage(sdl3
-        URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.20/SDL3-3.2.20.tar.gz
+# raylib
+CPMDeclarePackage(raylib
+        GIT_TAG 5.5
+        GITHUB_REPOSITORY raysan5/raylib
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
-# sdl3_ttf
-CPMDeclarePackage(sdl3_ttf
-        URL https://github.com/libsdl-org/SDL_ttf/releases/download/release-3.2.2/SDL3_ttf-3.2.2.tar.gz
+# raylib-cpp
+CPMDeclarePackage(raylib-cpp
+        VERSION 5.5.0
+        GITHUB_REPOSITORY RobLoach/raylib-cpp
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
-# sdl3_image
-CPMDeclarePackage(sdl3_image
-        URL https://github.com/libsdl-org/SDL_image/releases/download/release-3.2.4/SDL3_image-3.2.4.tar.gz
+
+# zlib
+CPMDeclarePackage(zlib
+        URL https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )

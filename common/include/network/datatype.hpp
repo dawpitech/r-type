@@ -51,7 +51,7 @@ namespace network
             uint16_t score;
 
             ClientTCPSentInfo() : portUDP(0), score(0) {
-                std::memset(this->userID, 0, BUFFERSIZE);
+                std::memset(this->userID, '\0', BUFFERSIZE);
             }
 
             explicit ClientTCPSentInfo(const std::string& id, uint16_t port, uint16_t score) : portUDP(port), score(score)

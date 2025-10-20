@@ -12,6 +12,7 @@
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
+            valgrind
             libcxx
             gnumake
             cmake
@@ -44,6 +45,8 @@
             wayland
             wayland-protocols
             freetype
+
+            xorg.libXi
           ];
         };
 

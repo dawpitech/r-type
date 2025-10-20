@@ -17,7 +17,7 @@
 
 std::optional<std::reference_wrapper<game::Player>> game::PlayersManager::getPlayer(const std::string &id)
 {
-    std::lock_guard<std::mutex> lock(this->_lock);
+    std::lock_guard<std::mutex> lock(this->_playerLock);
     for (auto &it: this->_players) {
         if (id == it->getId()) {
             return *it;
@@ -28,6 +28,8 @@ std::optional<std::reference_wrapper<game::Player>> game::PlayersManager::getPla
 
 void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork &network)
 {
+    
+    std::lock_guard<std::mutex> lock(this->_playerLock);
     utils::Logger::debug(std::format("New player added with uuid: {}", info.uuid));
     this->_players.emplace_back(std::make_unique<Player>(info, network));
 }
@@ -52,4 +54,15 @@ void game::PlayersManager::storeInput(const network::UDPReceivedInfo& info)
         }
     }
     utils::Logger::debug(std::format("No player with uuid: {}", info.uuid));
+}
+
+std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id)
+{
+    for (auto& it : this->_players) {
+        if (it->getId() == id) {
+            return it->getRoom();
+        }
+    }
+    utils::Logger::debug(std::format("No player with uuid: {}", id));
+    return std::nullopt;
 }

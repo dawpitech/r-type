@@ -25,23 +25,23 @@ namespace client::network
             explicit TCPClient(const std::string& serverIp, uint16_t serverPort, uint16_t selfUdpPort);
             ~TCPClient();
 
+            void run();
+        
+            void waitConnection();
             void connect() override;
             void disconnect() override;
 
             void sendData(const ::network::ClientTCPReceivedInfo& data);
             bool isConnected() const;
-            uint16_t getPortUDP() const;
 
         private:
             tcp::socket _socket;
             bool _connected;
-            std::string _uuid;
-            uint16_t _portUDP;
             uint16_t _selfUDPPort;
-            uint16_t _score = 0;
+            ::network::ClientTCPSentInfo _info;
 
             void _connectHandler(const boost::system::error_code& error);
             void _setupRead();
-            void _readHandler(const boost::system::error_code& error, size_t bytesRead, std::unique_ptr<::network::ClientTCPSentInfo>&& data);
+            void _readHandler(const boost::system::error_code& error, size_t bytesRead);
     };
 } // namespace client::network

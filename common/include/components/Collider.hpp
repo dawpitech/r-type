@@ -8,8 +8,8 @@
 #pragma once
 
 #include <cstdint>
+
 #include "flux/core/Serialization.hpp"
-#include "sdlManager.hpp"
 
 constexpr uint8_t NONE_BIT = 0;
 constexpr uint8_t PLAYER_BIT = 1 << 0;
@@ -28,7 +28,7 @@ namespace component
         MOB_PROJECTILE = MOB_PROJECTILE_BIT
     };
 
-    struct collider
+    struct Collider
     {
             int layer;
             int mask;
@@ -36,7 +36,7 @@ namespace component
             bool isActive;
             bool hasCollide;
 
-            explicit collider(int layer = 0, int mask = 0, float srcX = 0, float srcY = 0, float srch = 0,
+            explicit Collider(int layer = 0, int mask = 0, float srcX = 0, float srcY = 0, float srch = 0,
                               float srcw = 0, bool isActive = true, bool hasCollide = false) :
                 layer(layer), mask(mask), srcX(srcX), srcY(srcY), srch(srch), srcw(srcw), isActive(isActive),
                 hasCollide(hasCollide)

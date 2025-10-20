@@ -12,7 +12,6 @@
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
-#include "sdlManager.hpp"
 
 constexpr float SCALE_X = 0.5;
 constexpr float SCALE_Y = 0.5;
@@ -21,11 +20,13 @@ constexpr float PROJECTILE_SPEED = 5.0f;
 
 flux::View MobShootSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::mob, component::Transform>();
+    return ecs.GenerateViewFromComponents<component::Mob, component::Transform>();
 }
 
 void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    return;
+    /*
     using clock = std::chrono::steady_clock;
     static auto prev = clock::now();
 
@@ -67,4 +68,5 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             mob.isShooting = false;
         }
     }
+    */
 }

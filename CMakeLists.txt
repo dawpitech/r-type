@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(R-Type
-        VERSION 1.0.0
+        VERSION 1.1.0
         DESCRIPTION "Touhou but with aliens"
         LANGUAGES CXX
 )
@@ -19,9 +19,9 @@ CPMUsePackageLock(package-lock.cmake)
 CPMGetPackage(lua)
 CPMGetPackage(sol2)
 CPMGetPackage(boost)
-CPMGetPackage(sdl3)
-CPMGetPackage(sdl3_ttf)
-CPMGetPackage(sdl3_image)
+CPMGetPackage(raylib)
+CPMGetPackage(raylib-cpp)
+CPMGetPackage(zlib)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

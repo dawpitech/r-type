@@ -6,16 +6,16 @@
 //
 
 #include <vector>
+
 #include "components/Collider.hpp"
 #include "components/Transform.hpp"
 #include "flux/core/flux.hpp"
-#include "sdlManager.hpp"
 
 flux::View CollisionSystemView(const flux::ECS& ecs)
 {
-    return ecs.GenerateViewFromComponents<component::collider, component::Transform>();
+    return ecs.GenerateViewFromComponents<component::Collider, component::Transform>();
 }
-
+/*
 static bool checkRectCollision(render::Rect firstRect, component::Transform firstTransform, render::Rect secondRect,
                                component::Transform secondTransform)
 {
@@ -37,9 +37,12 @@ static void handleCollision(component::collider& collider, component::collider& 
     collider.hasCollide = true;
     colliderOther.hasCollide = true;
 }
+*/
 
 void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    return;
+    /*
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         auto& collider = ecs.GetComponent<component::collider>(entities[i]);
         auto& transform = ecs.GetComponent<component::Transform>(entities[i]);
@@ -65,4 +68,5 @@ void CollisionSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
                 handleCollision(collider, colliderOther);
         }
     }
+    */
 }

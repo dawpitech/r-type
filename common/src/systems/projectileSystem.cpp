@@ -5,7 +5,7 @@
 // projectile System
 //
 
-#include "components/Animation.hpp"
+//#include "components/Animation.hpp"
 #include "components/Projectile.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
@@ -19,6 +19,8 @@ flux::View ProjectileSystemView(const flux::ECS& ecs)
 
 void ProjectileSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
+    return;
+    /*
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
         auto& velocity = ecs.GetComponent<component::Velocity>(entity);
@@ -44,4 +46,5 @@ void ProjectileSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             }
         }
     }
+    */
 }

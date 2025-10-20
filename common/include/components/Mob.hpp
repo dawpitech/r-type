@@ -10,7 +10,7 @@
 #include "flux/core/Serialization.hpp"
 namespace component
 {
-    struct mob
+    struct Mob
     {
             int damage;
             int type;
@@ -20,7 +20,7 @@ namespace component
             float speed;
             bool isShooting;
 
-            mob(int damage = 10, int type = 0, bool canShoot = true, float shootCooldown = 0.0f,
+            Mob(int damage = 10, int type = 0, bool canShoot = true, float shootCooldown = 0.0f,
                 float shootRate = 1.0f, float speed = 1, bool isShooting = false) :
                 damage(damage), type(type), canShoot(canShoot), shootCooldown(shootCooldown), shootRate(shootRate),
                 speed(speed), isShooting(isShooting) {};

@@ -14,18 +14,18 @@
 #include "network/UDP/UDPNetwork.hpp"
 #include "rooms/Rooms.hpp"
 
-namespace Room {
+namespace Server {
     constexpr uint16_t BASENBROOMS = 10;
 
-    class RoomsPool final {
+    class Server final {
        public:
-        explicit RoomsPool(std::uint16_t port, std::uint16_t nbRooms = BASENBROOMS);
-        ~RoomsPool();
+        explicit Server(std::uint16_t port, std::uint16_t nbRooms = BASENBROOMS);
+        ~Server();
 
         void run();
         
        private:
-        std::uint8_t _nbRooms;
+        std::uint8_t _nbRooms = 0;
         bool _isRunning = true;
 
         network::TCPNetwork _connectionNetwork;
@@ -33,6 +33,6 @@ namespace Room {
 
         game::PlayersManager _playerManager;
         std::vector<std::thread> _threads;
-        std::vector<std::unique_ptr<Room>> _rooms;
+        std::vector<std::unique_ptr<Room::Room>> _rooms;
     };
 }  // namespace Room
