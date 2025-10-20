@@ -32,3 +32,10 @@ CPMDeclarePackage(raylib-cpp
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
+
+# zlib
+CPMDeclarePackage(zlib
+        URL https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)

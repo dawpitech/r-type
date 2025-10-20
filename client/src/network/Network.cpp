@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <typeinfo>
 
+#include <zlib.h>
 #include "Network.hpp"
 #include "network/datatype.hpp"
 
@@ -69,6 +70,47 @@ void client::network::Network::notify(const ::network::NetworkData& data)
             }
         },
         data);
+}
+
+std::string client::network::Network::_compressString(const std::string &str)
+{
+    auto destLen = compressBound(str.length());
+    std::string compressedData(destLen, '\0');
+
+    int res = compress2(reinterpret_cast<Bytef *>(compressedData.data()), &destLen,
+        reinterpret_cast<const Bytef *>(str.c_str()), str.length(), Z_BEST_COMPRESSION);
+
+    if (res != Z_OK)
+        throw NetworkError("Unable to compress data", "Server");
+    compressedData.resize(destLen);
+    return compressedData;
+}
+
+std::string client::network::Network::_decompressString(const std::string &compressedStr)
+{
+    auto bufferSize = compressedStr.length() * 2;
+    std::string decompressedData;
+    int res = Z_BUF_ERROR;
+    auto destLen = bufferSize;
+
+    while (res == Z_BUF_ERROR) {
+        decompressedData.resize(bufferSize);
+        destLen = bufferSize;
+
+        res = uncompress(
+            reinterpret_cast<Bytef*>(decompressedData.data()),
+            &destLen,
+            reinterpret_cast<const Bytef*>(compressedStr.c_str()),
+            compressedStr.length()
+        );
+        if (res == Z_BUF_ERROR)
+            bufferSize *= 2;
+    }
+
+    if (res != Z_OK)
+        throw NetworkError("Unable to decompress data", "Server");
+    decompressedData.resize(destLen);
+    return decompressedData;
 }
 
 template void client::network::Network::attach<::network::ClientTCPSentInfo>(
