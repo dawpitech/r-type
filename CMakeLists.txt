@@ -22,6 +22,7 @@ CPMGetPackage(boost)
 CPMGetPackage(raylib)
 CPMGetPackage(raylib-cpp)
 CPMGetPackage(zlib)
+CPMGetPackage(ldtk_loader)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

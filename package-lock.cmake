@@ -39,3 +39,11 @@ CPMDeclarePackage(zlib
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
+
+# LDtkLoader
+CPMDeclarePackage(ldtk_loader
+        NAME LDtkLoader
+        URL https://github.com/Madour/LDtkLoader/archive/refs/tags/1.5.3.1.tar.gz
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)
