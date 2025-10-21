@@ -8,6 +8,7 @@
 #pragma once
 
 #include "flux/core/Serialization.hpp"
+#include <chrono>
 
 namespace component
 {
