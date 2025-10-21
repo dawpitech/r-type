@@ -100,7 +100,7 @@ int main(int argc, char **argv)
         ecs.Add<component::Velocity>(projectileEntity);
         ecs.Add<component::Sprite>(projectileEntity,
             component::Sprite(
-                "assets/player_shoot_spritesheet.png", 96, 0, 32, 32));
+                "assets/player_shoot_spritesheet.png", 96, 0, 32, 32, 1));
         ecs.Add<component::Animation>(projectileEntity,
             component::Animation(
                 4, 200, "assets/player_shoot_spritesheet.png", true, 32, 32));
