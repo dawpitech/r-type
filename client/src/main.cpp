@@ -14,10 +14,9 @@
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
 
+#include <LuaContext.hpp>
 #include <components/Sprite.hpp>
-#include <components/Transform.hpp>
-#include <components/Velocity.hpp>
-#include <systems/animationSystem.hpp>
+
 #include "Client.hpp"
 
 static void checkVariables(const po::variables_map &variables)
