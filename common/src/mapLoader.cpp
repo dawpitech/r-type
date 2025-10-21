@@ -53,7 +53,7 @@ void map::MapLoader::_getMapTiles() {
     flux::Entity newTile = this->_ecs.newEntity();
     this->_ecs.AddOrReplace<component::Sprite>(
         newTile, component::Sprite(groundLayer.getTileset().path, srcRect.x,
-                                   srcRect.y, srcRect.w, srcRect.h));
+                                   srcRect.y, srcRect.w, srcRect.h, 1));
     this->_ecs.AddOrReplace<component::Transform>(
         newTile, component::Transform(destRect.x, destRect.y, 0, 1.0f, 1.0f));
   }
