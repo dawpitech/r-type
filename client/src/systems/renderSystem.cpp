@@ -16,9 +16,9 @@
 
 #include <components/Animation.hpp>
 
-flux::View RenderSystemView(const flux::ECS& ecs)
-{
-    return ecs.GenerateViewFromComponents<component::Sprite, component::Transform>();
+flux::View RenderSystemView(const flux::ECS &ecs) {
+  return ecs
+      .GenerateViewFromComponents<component::Sprite, component::Transform>();
 }
 
 void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
@@ -42,10 +42,9 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         const auto& sprite = ecs.GetComponent<component::Sprite>(entity);
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
-        const auto& texture = TextureStore::getInstance().getTexture(sprite.assetPath, sprite.startX, sprite.startY, sprite.width, sprite.height);
-        texture.Draw(
-            static_cast<int>(transform.pos.x),
-            static_cast<int>(transform.pos.y)
-        );
-    }
+    const auto &texture = TextureStore::getInstance().getTexture(
+        sprite.assetPath, sprite.srcX, sprite.srcY, sprite.srcW, sprite.srcW);
+    texture.Draw(static_cast<int>(transform.pos.x),
+                 static_cast<int>(transform.pos.y));
+  }
 }

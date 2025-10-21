@@ -27,7 +27,6 @@ flux::View ShootSystemView(const flux::ECS& ecs)
 
 void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    return;
     /*
     using clock = std::chrono::steady_clock;
     static auto prev = clock::now();

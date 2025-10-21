@@ -18,6 +18,7 @@
 #include "components/Velocity.hpp"
 #include "flux/core/Serialization.hpp"
 #include "flux/core/flux.hpp"
+#include "mapLoader.hpp"
 #include "systems/inputSystem.hpp"
 #include "systems/movementSystem.hpp"
 
@@ -74,10 +75,11 @@ void Simulation::_createEntities(flux::ECS& ecs)
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
+    map::MapLoader map(ecs);
+    map.initializeGame();
 
     //_createMob(ecs, utils::Vector2(255, 150));
     //_createMob(ecs, utils::Vector2(1900, 300));
-
     const flux::Entity background = ecs.newEntity();
     ecs.Add<component::Sprite>(background, component::Sprite("./assets/starfield2.jpg", 0));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
