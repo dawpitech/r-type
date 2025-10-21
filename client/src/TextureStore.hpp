@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <raylib-cpp.hpp>
+
+#include <unordered_map>
 #include <functional>
 #include <tuple>
 
 #include <memory>
-#include <raylib-cpp.hpp>
-#include <unordered_map>
 
 class TextureStore {
     public:

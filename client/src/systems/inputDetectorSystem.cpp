@@ -8,6 +8,7 @@
 #include "inputDetectorSystem.hpp"
 
 #include <raylib-cpp.hpp>
+
 #include <components/NetworkIdentification.hpp>
 
 flux::View InputDetectorSystemView(const flux::ECS& ecs)

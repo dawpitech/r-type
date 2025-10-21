@@ -14,3 +14,19 @@ target_include_directories(r-type PRIVATE
 set_target_properties(flux
         PROPERTIES PREFIX "${CMAKE_SOURCE_DIR}/"
 )
+
+if(WIN32)
+    target_compile_definitions(r-type PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
+
+    set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+    set(BUILD_DIR ${CMAKE_BINARY_DIR})
+    set(CLIENT_DIR "${BUILD_DIR}/client/${CMAKE_BUILD_TYPE}")
+
+    set(TARGET_DIR "${PROJECT_DIR}")
+
+    add_custom_command(TARGET r-type POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CLIENT_DIR}/r-type.exe
+        ${TARGET_DIR}/r-type.exe
+    )
+endif()
