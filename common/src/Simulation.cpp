@@ -21,6 +21,8 @@
 #include "mapLoader.hpp"
 #include "systems/inputSystem.hpp"
 #include "systems/movementSystem.hpp"
+#include "systems/shootSystem.hpp"
+#include "systems/projectileSystem.hpp"
 
 void Simulation::setInitialSimState(flux::ECS& ecs)
 {
@@ -61,8 +63,8 @@ void Simulation::_registerSystems(flux::ECS& ecs)
             MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs), flux::systemType::LOGIC);
-        //ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
-        //ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
+        ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
+        ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
         //ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);

@@ -43,7 +43,7 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
     const auto &texture = TextureStore::getInstance().getTexture(
-        sprite.assetPath, sprite.srcX, sprite.srcY, sprite.srcW, sprite.srcW);
+        sprite.assetPath, sprite.srcX, sprite.srcY, sprite.srcW, sprite.srcH);
     texture.Draw(static_cast<int>(transform.pos.x),
                  static_cast<int>(transform.pos.y));
   }

@@ -5,15 +5,15 @@
 // shootSystem
 //
 
-//#include "components/Animation.hpp"
-#include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
+#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
+#include <iostream>
 
 constexpr float SCALE_X = 0.5;
 constexpr float SCALE_Y = 0.5;
@@ -27,7 +27,6 @@ flux::View ShootSystemView(const flux::ECS& ecs)
 
 void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    /*
     using clock = std::chrono::steady_clock;
     static auto prev = clock::now();
 
@@ -39,28 +38,26 @@ void ShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
-        auto& input = ecs.GetComponent<component::PlayerInput>(entity);
-        auto& playerCpn = ecs.GetComponent<component::Player>(entity);
+        auto input = ecs.GetComponent<component::PlayerInput>(entity);
+        auto playerCpn = ecs.GetComponent<component::Player>(entity);
         
         playerCpn.shootCooldown -= static_cast<float>(deltaTime);
         if (playerCpn.shootCooldown <= 0.0f && input.shoot) {
+            std::cout << "Shoot Shoot\n";
             auto& playerTransform = ecs.GetComponent<component::Transform>(entity);
             flux::Entity projectile = ecs.newEntity();
-            render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
-            render::SpriteData player = render::SDLManager::load("./assets/player.gif");
-            ecs.Add<component::Projectile>(projectile, component::Projectile(component::ProjectileType::PLAYER, PROJECTILE_SPEED));
-            ecs.Add<component::Transform>(
-                projectile,
-                component::Transform(playerTransform.pos.x + (player.frameSize.x * playerTransform.scale.x),
-                                     playerTransform.pos.y + (player.frameSize.y * playerTransform.scale.y) / 2, ROTATION, SCALE_X,
-                                     SCALE_Y));
-            ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
-            ecs.Add<component::collider>(projectile,
-                                         component::collider(component::PLAYER_PROJECTILE, component::MOB,
-                                                             0, 0, proj.frameSize.x, proj.frameSize.y));
+        ecs.Add<component::Transform>(
+            projectile, component::Transform(playerTransform.pos.x, playerTransform.pos.y, 0, 1, 1));
+        ecs.Add<component::Velocity>(projectile);
+        ecs.Add<component::Projectile>(projectile, component::Projectile(0));
+        // ecs.Add<component::Animation>(projectileEntity,
+        //     component::Animation(
+        //         4, 200, "assets/player_shoot_spritesheet.png", true, 32, 32));
+
             ecs.Add<component::Health>(projectile);
             playerCpn.shootCooldown = 0.2;
         }
+        ecs.AddOrReplace<component::PlayerInput>(entity, input);
+        ecs.AddOrReplace<component::Player>(entity, playerCpn);
     }
-    */
 }
