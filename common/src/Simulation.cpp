@@ -79,7 +79,7 @@ void Simulation::_createEntities(flux::ECS& ecs)
     //_createMob(ecs, utils::Vector2(1900, 300));
 
     const flux::Entity background = ecs.newEntity();
-    ecs.Add<component::Sprite>(background, component::Sprite("./assets/starfield2.jpg"));
+    ecs.Add<component::Sprite>(background, component::Sprite("./assets/starfield2.jpg", 0));
     ecs.Add<component::Transform>(background, component::Transform(0, 0, 0, 1, 1));
 }
 
@@ -107,7 +107,7 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     }
 
     const flux::Entity playerEntity = ecs.newEntity();
-    ecs.Add<component::Sprite>(playerEntity, component::Sprite("./assets/player.png", startX, startY, width, height));
+    ecs.Add<component::Sprite>(playerEntity, component::Sprite("./assets/player.png", startX, startY, width, height, 1));
     ecs.Add<component::Player>(playerEntity);
     ecs.Add<component::PlayerInput>(playerEntity);
     ecs.Add<component::Transform>(playerEntity, component::Transform(0, 0, 0, 1, 1));
