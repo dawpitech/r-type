@@ -69,12 +69,21 @@ std::string network::ServerNetwork::_decompressString(const std::string &compres
         decompressedData.resize(bufferSize);
         destLen = bufferSize;
 
+#ifndef _WIN32
         res = uncompress(
             reinterpret_cast<Bytef*>(decompressedData.data()),
             &destLen,
             reinterpret_cast<const Bytef*>(compressedStr.c_str()),
             compressedStr.length()
         );
+#else
+        res = uncompress(
+            reinterpret_cast<Bytef*>(decompressedData.data()),
+            reinterpret_cast<unsigned long*>(&destLen),
+            reinterpret_cast<const Bytef*>(compressedStr.c_str()),
+            compressedStr.length()
+        );
+#endif
         if (res == Z_BUF_ERROR)
             bufferSize *= 2;
     }

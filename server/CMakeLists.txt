@@ -14,3 +14,26 @@ target_include_directories(r-type_server PRIVATE
 set_target_properties(flux
     PROPERTIES PREFIX "${CMAKE_SOURCE_DIR}/"
 )
+
+if(WIN32)
+    target_compile_definitions(r-type_server PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
+
+    set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+    set(BUILD_DIR ${CMAKE_BINARY_DIR})
+    set(ZLIB_DLL_DIR "${BUILD_DIR}/_deps/zlib-build/${CMAKE_BUILD_TYPE}")
+    set(SERVER_DIR "${BUILD_DIR}/server/${CMAKE_BUILD_TYPE}")
+
+    set(TARGET_DIR "${PROJECT_DIR}")
+
+    add_custom_command(TARGET r-type_server POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${ZLIB_DLL_DIR}/zlib.dll
+        ${TARGET_DIR}/zlib.dll
+    )
+
+    add_custom_command(TARGET r-type_server POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${SERVER_DIR}/r-type_server.exe
+        ${TARGET_DIR}/r-type_server.exe
+    )
+endif()

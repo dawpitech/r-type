@@ -61,13 +61,14 @@ See [LICENSE](LICENSE) for details.
 
 ### Recommended: Using the Justfile
 
-If you have [`just`](https://github.com/casey/just) installed, simply run:
+Note: this step only works on Linux, for Windows please use the instructions in "Manual Build on Windows".
+If you have [`just`](https://github.com/casey/just) installed, simply run :
 
 ```bash
 just release
 ```
 
-### Manual Build (CMake)
+### Manual Build on Linux (CMake)
 
 If you do not wish to use `just`, you can build manually:
 
@@ -86,8 +87,28 @@ If you do not wish to use `just`, you can build manually:
    ```bash
    cmake --build build -j$(nproc)
    ```
+   
+### Manual Build on Windows (CMake & Visual Studio)
 
-**Note:** You may need to install system dependencies such as X11-dev or wayland-devel.
+1. Download and install [CMake for Windows](https://cmake.org/download/)
+
+2. Download [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/fr/) and install the C++ toolchain from the installer.
+
+3. Clone the repository:
+   ```bash
+   git clone https://github.com/dawpitech/r-type.git
+   cd r-type
+   ```
+
+4. Create the build directory and run CMake:
+   ```bash
+   cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+   ```
+
+5. Build the project:
+   ```bash
+   cmake --build build --config Release -j%NUMBER_OF_PROCESSORS%
+   ```
 
 ## Dev guidelines
 

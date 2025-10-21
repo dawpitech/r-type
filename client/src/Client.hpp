@@ -18,7 +18,11 @@ namespace client {
 
     constexpr unsigned WINDOW_BASE_WIDTH = 800;
     constexpr unsigned WINDOW_BASE_HEIGHT = 450;
+#ifndef _WIN32
     constexpr std::string WINDOW_BASE_NAME = "R-Type";
+#else
+    const std::string WINDOW_BASE_NAME = "R-Type";
+#endif
     constexpr unsigned INPUT_SEND_DELAY = 20;
 
     class Client {
