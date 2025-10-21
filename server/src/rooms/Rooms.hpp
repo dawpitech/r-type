@@ -11,15 +11,17 @@
 #include <condition_variable>
 #include <cstdint>
 #include <ctime>
+#include <deque>
 #include <mutex>
+#include <ostream>
 
-#include "Simulation.hpp"
 #include "flux/core/Serialization.hpp"
 #include "flux/core/flux.hpp"
 #include "player/Player.hpp"
 
 namespace Room {
     constexpr uint8_t BASEROOMPLAYER = 4;
+    constexpr uint8_t NB_SNAPSHOTS = 10;
 
     class Room {
        public:
@@ -42,6 +44,7 @@ namespace Room {
         std::condition_variable _fullCondition;
         flux::ECS _ecs;
         std::vector<std::reference_wrapper<game::Player>> _players;
+        std::deque<std::unordered_map<flux::Entity, std::vector<std::any>>> _snapshots;
         std::chrono::steady_clock::time_point _networkClock;
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
@@ -55,6 +58,8 @@ namespace Room {
         void _initNetworkHook(flux::runtimeHooks &hooks);
 
         void _serializeComponent(const unsigned entity, const std::any &component, std::ostringstream &out);
+        void _getSnapshot(std::unordered_map<flux::Entity, std::vector<std::any>> &store);
+        void _sendSnapshotToPlayer(std::ostringstream &serializedData);
 
         template <typename T>
         void _getSerializedComponent(

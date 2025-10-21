@@ -62,6 +62,7 @@ namespace network
 
     struct UDPReceivedInfo final
     {
+            unsigned inputIndex = 0;
             char uuid[BUFFERSIZE] = "";
             component::PlayerInput game;
     };
