@@ -24,6 +24,19 @@ CPMGetPackage(raylib-cpp)
 CPMGetPackage(zlib)
 CPMGetPackage(ldtk_loader)
 
+set(FMOD_SDK_DIR ${CMAKE_SOURCE_DIR}/lib/fmod/fmodLinux)
+set(FMOD_CORE_INC_DIR ${FMOD_SDK_DIR}/api/core/inc)
+set(FMOD_CORE_LIB_DIR ${FMOD_SDK_DIR}/api/core/lib/x86_64)
+
+add_library(fmod_engine INTERFACE)
+target_include_directories(fmod_engine INTERFACE ${FMOD_CORE_INC_DIR})
+target_link_directories(fmod_engine INTERFACE ${FMOD_CORE_LIB_DIR})
+
+target_link_libraries(fmod_engine INTERFACE
+    optimized fmod
+    debug     fmodL
+)
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
