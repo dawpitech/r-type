@@ -21,9 +21,9 @@ void ProjectileSystem(flux::ECS &ecs,
                       const std::vector<flux::Entity> &entities) {
   for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
     const flux::Entity &entity = entities[i];
-    auto &velocity = ecs.GetComponent<component::Velocity>(entity);
-    auto &transform = ecs.GetComponent<component::Transform>(entity);
-    const auto &proj = ecs.GetComponent<component::Projectile>(entity);
+    auto velocity = ecs.GetComponent<component::Velocity>(entity);
+    auto transform = ecs.GetComponent<component::Transform>(entity);
+    auto proj = ecs.GetComponent<component::Projectile>(entity);
     if (!ecs.HasComponents<component::Sprite>(entity)) {
       ecs.Add<component::Sprite>(
           entity, component::Sprite("assets/player_shoot_spritesheet.png", 96,
@@ -39,7 +39,9 @@ void ProjectileSystem(flux::ECS &ecs,
       velocity.x = (-proj.speed);
       if (transform.pos.x <= 0) {
         ecs.DeleteEntity(entity);
+        continue;
       }
     }
+    ecs.AddOrReplace<component::Velocity>(entity, velocity);
   }
 }

@@ -20,7 +20,7 @@ void InputHandlerSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entitie
 {
     for (const flux::Entity entity : entities) {
         const auto& playerInput = ecs.GetComponent<component::PlayerInput>(entity);
-        auto& playerVelocity = ecs.GetComponent<component::Velocity>(entity);
+        auto playerVelocity = ecs.GetComponent<component::Velocity>(entity);
 
         if (playerInput.move_up)
             playerVelocity.y -= 0.1;
@@ -34,5 +34,7 @@ void InputHandlerSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entitie
 
         if (playerInput.move_left)
             playerVelocity.x -= 0.1;
+
+        ecs.AddOrReplace<component::Velocity>(entity, playerVelocity);
     }
 }
