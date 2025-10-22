@@ -84,8 +84,6 @@ void Simulation::_createEntities(flux::ECS &ecs) {
   map::MapLoader map(ecs);
   map.initializeGame();
 
-  //_createMob(ecs, utils::Vector2(255, 150));
-  //_createMob(ecs, utils::Vector2(1900, 300));
   const flux::Entity background = ecs.newEntity();
   ecs.Add<component::Sprite>(background,
                              component::Sprite("./assets/starfield2.jpg", 0));
@@ -129,26 +127,4 @@ void Simulation::_createPlayer(flux::ECS &ecs, PLAYER_TYPE type) {
       playerEntity, component::Collider(component::CollisionLayer::PLAYER,
                                         component::CollisionLayer::WALL, 0, 0,
                                         width, height));
-}
-
-void Simulation::_createMob(flux::ECS &ecs, const utils::Vector2<int> &pos) {
-  /*
-  const flux::Entity mobEntity = ecs.newEntity();
-  const render::SpriteData& mobSprite =
-  render::SDLManager::load("./assets/mob1.gif");
-
-  ecs.Add<component::mob>(mobEntity, component::mob(10, 0, true, 0.0f, 2.0f));
-  ecs.Add<component::sprite>(mobEntity, component::sprite(mobSprite.texture));
-  ecs.Add<component::animation>(mobEntity,
-  component::animation(mobSprite.spriteMap, true));
-  ecs.Add<component::Transform>(mobEntity,
-  component::Transform(static_cast<float>(pos.x), static_cast<float>(pos.y), 0,
-  1, 1)); ecs.Add<component::Velocity>(mobEntity); ecs.Add<component::collider>(
-      mobEntity,
-      component::collider(component::CollisionLayer::MOB,
-                          component::CollisionLayer::PLAYER |
-  component::CollisionLayer::PLAYER_PROJECTILE, 0, 0, mobSprite.frameSize.x,
-  mobSprite.frameSize.y)); ecs.Add<component::Health>(mobEntity,
-  component::Health(40));
-  */
 }
