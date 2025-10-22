@@ -30,6 +30,7 @@ namespace client {
     class Client {
        public:
         Client(const std::string &ip, uint16_t port);
+        ~Client();
 
         void run();
 

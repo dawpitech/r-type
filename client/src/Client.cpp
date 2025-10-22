@@ -29,6 +29,12 @@ client::Client::Client(const std::string &ip, uint16_t port) : _ip(ip), _port(po
     Simulation::setInitialSimState(this->_ecs);
     this->_registerBase();
     this->_initHooks();
+    this->voiceChat.startAudioCapture();
+}
+
+client::Client::~Client()
+{
+    this->voiceChat.stopAudioCapture();
 }
 
 void client::Client::_registerBase()
@@ -135,5 +141,10 @@ void client::Client::run()
         utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }
+    std::thread audioThread([this] {
+        while (true) {
+            this->voiceChat.playSound();
+        }
+    });
     this->_ecs.handExecution(this->_hooks);
 }

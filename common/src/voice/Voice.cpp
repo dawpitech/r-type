@@ -54,10 +54,39 @@ voice::VoiceChat::~VoiceChat() {}
 
 void voice::VoiceChat::startAudioCapture()
 {
-    this->_system->recordStart(this->_deviceIndex, this->_soundBuffer, true);
+    if (this->_system == nullptr || this->_soundBuffer == nullptr) {
+        utils::Logger::debug("Unable to acces system and/or soundBuffer for voice chat");
+        return;
+    }
+
+    auto result = this->_system->recordStart(this->_deviceIndex, this->_soundBuffer, true);
+    if (result != FMOD_OK) {
+        utils::Logger::debug("Unable to record for voice chat");
+        return;
+    }
 }
 
 void voice::VoiceChat::stopAudioCapture()
 {
+    if (this->_system == nullptr) {
+        utils::Logger::debug("Unable to acces system to stop audio for voice chat");
+        return;
+    }
+
     this->_system->recordStop(this->_deviceIndex);
+}
+
+void voice::VoiceChat::playSound()
+{
+    unsigned int recordPos = 0;
+    auto result = this->_system->getRecordPosition(this->_deviceIndex, &recordPos);
+    if (result != FMOD_OK) {
+        utils::Logger::debug("Unable to get record pos for voice chat");
+        return;
+    }
+
+    result = this->_system->playSound(this->_soundBuffer, 0, false, &this->_channel);
+    if (result != FMOD_OK) {
+        utils::Logger::debug("Unable to get record pos for voice chat");
+    }
 }
