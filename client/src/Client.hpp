@@ -6,6 +6,7 @@
 //
 
 #include "flux/core/flux.hpp"
+#include "voice/Voice.hpp"
 #include "network/TCPClient.hpp"
 #include "network/UDPClient.hpp"
 #include "network/datatype.hpp"
@@ -35,6 +36,7 @@ namespace client {
        private:
         flux::ECS _ecs;
         flux::runtimeHooks _hooks;
+        voice::VoiceChat voiceChat;
 
         std::string _ip;
         unsigned _port = 0;

@@ -13,10 +13,16 @@ namespace voice {
         VoiceChat();
         ~VoiceChat();
 
-        void captureAudio();
+        void startAudioCapture();
+        void stopAudioCapture();
         void compressAudio();
         void decompressAudio();
         void sendAudio();
+
        private:
+        FMOD::System *_system = nullptr;
+        FMOD::Sound *_soundBuffer = nullptr;
+        FMOD_CREATESOUNDEXINFO _soundInfo = {0};
+        int _deviceIndex = 0;
     };
 }  // namespace voice
