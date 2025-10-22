@@ -8,11 +8,13 @@
 #include "mapLoader.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
+#include "components/Mob.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
+#include "flux/core/Serialization.hpp"
 #include "vector4.hpp"
 #include <LDtkLoader/Entity.hpp>
 #include <cstdlib>
@@ -32,7 +34,10 @@ map::MapLoader::MapLoader(flux::ECS &ecs)
   }
 }
 
-void map::MapLoader::initializeGame() { this->_getMapTiles(); }
+void map::MapLoader::initializeGame() {
+  this->_getMapTiles();
+  this->_getMobs();
+}
 
 void map::MapLoader::_getMapTiles() {
   const auto &wall = this->_level->get().getLayer("Wall");
@@ -58,5 +63,31 @@ void map::MapLoader::_getMapTiles() {
         newTile, component::Collider(component::CollisionLayer::WALL,
                                      component::CollisionLayer::PLAYER, pos.x,
                                      pos.y, rect.width, rect.height));
+  }
+}
+
+void map::MapLoader::_getMobs() {
+  for (const ldtk::Entity &mob :
+       this->_level->get().getLayer("Entities").getEntitiesByName("Mob")) {
+    flux::Entity mobEntity = this->_ecs.newEntity();
+    const auto &rect = mob.getTextureRect();
+
+    const auto &pos = mob.getPosition();
+    const auto &size = mob.getSize();
+    this->_ecs.Add<component::Mob>(mobEntity, component::Mob());
+    this->_ecs.Add<component::Sprite>(
+        mobEntity, component::Sprite(mob.getTexturePath(), rect.x, rect.y,
+                                     rect.width, rect.height, 1));
+    this->_ecs.Add<component::Transform>(
+        mobEntity, component::Transform(static_cast<float>(pos.x),
+                                        static_cast<float>(pos.y), 0, 1, 1));
+    this->_ecs.Add<component::Velocity>(mobEntity);
+    this->_ecs.Add<component::Collider>(
+        mobEntity,
+        component::Collider(component::CollisionLayer::MOB,
+                            component::CollisionLayer::PLAYER |
+                                component::CollisionLayer::PLAYER_PROJECTILE,
+                            pos.x, pos.y, rect.width, rect.height));
+    this->_ecs.Add<component::Health>(mobEntity, component::Health(mob.getField<int>("Health").value()));
   }
 }

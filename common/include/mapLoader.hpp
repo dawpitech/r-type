@@ -26,6 +26,7 @@ namespace map
         private:
             void _getMapTiles();
             void _getCollider();
+            void _getMobs();
 
             ldtk::Project _project;
             std::string _ldtkFile;
