@@ -49,6 +49,7 @@ namespace client {
         std::chrono::steady_clock::time_point _lastInputSend;
         component::PlayerInput _lastSentInput;
 
+        static void _setupLuaEngine();
         void _initHooks();
         void _initNetworkableHooks();
         void _registerBase();

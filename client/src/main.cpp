@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <format>
 #include <iostream>
+#include <filesystem>
 
 #include "parseArgs.hpp"
 #include "utils/error.hpp"
