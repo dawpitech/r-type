@@ -16,6 +16,7 @@ constexpr uint8_t PLAYER_BIT = 1 << 0;
 constexpr uint8_t MOB_BIT = 1 << 1;
 constexpr uint8_t PLAYER_PROJECTILE_BIT = 1 << 2;
 constexpr uint8_t MOB_PROJECTILE_BIT = 1 << 3;
+constexpr uint8_t WALL_BIT = 1 << 4;
 
 namespace component
 {
@@ -25,7 +26,8 @@ namespace component
         PLAYER = PLAYER_BIT,
         MOB = MOB_BIT,
         PLAYER_PROJECTILE = PLAYER_PROJECTILE_BIT,
-        MOB_PROJECTILE = MOB_PROJECTILE_BIT
+        MOB_PROJECTILE = MOB_PROJECTILE_BIT,
+        WALL = WALL_BIT
     };
 
     struct Collider

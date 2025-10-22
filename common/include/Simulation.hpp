@@ -27,5 +27,4 @@ class Simulation
         static void _registerComponent(flux::ECS& ecs);
         static void _registerSystems(flux::ECS& ecs);
         static void _createPlayer(flux::ECS& ecs, PLAYER_TYPE type);
-        static void _createMob(flux::ECS& ecs, const utils::Vector2<int>& pos);
 };

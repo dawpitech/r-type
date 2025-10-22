@@ -20,11 +20,11 @@ namespace component
 
     struct Projectile
     {
-        ProjectileType type;
+        int type;
         float speed;
 
         Projectile() = default;
-        Projectile(ProjectileType type, float speed = 5.0f): type(type), speed(speed) {}
-        REFLECT(speed)
+        Projectile(int type, float speed = 5.0f): type(type), speed(speed) {}
+        REFLECT(type,speed)
     };
 } // namespace component

@@ -16,6 +16,7 @@ _build type extra='':
     cmake --build {{ OUTDIR }} -j {{ num_cpus() }}
     cp {{ OUTDIR }}/client/r-type .
     cp {{ OUTDIR }}/server/r-type_server .
+    cp {{ OUTDIR }}/compile_commands.json .
 
 clean:
     rm -rf {{ OUTDIR }}
