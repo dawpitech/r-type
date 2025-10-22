@@ -24,6 +24,7 @@ namespace client {
     const std::string WINDOW_BASE_NAME = "R-Type";
 #endif
     constexpr unsigned INPUT_SEND_DELAY = 20;
+    constexpr uint8_t NB_REDUNDANCY = 10;
 
     class Client {
        public:
