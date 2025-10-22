@@ -32,14 +32,12 @@ map::MapLoader::MapLoader(flux::ECS &ecs)
   }
 }
 
-void map::MapLoader::initializeGame() {
-  this->_getMapTiles();
-}
+void map::MapLoader::initializeGame() { this->_getMapTiles(); }
 
 void map::MapLoader::_getMapTiles() {
-  const auto &groundLayer = this->_level->get().getLayer("Wall");
+  const auto &wall = this->_level->get().getLayer("Wall");
 
-  for (const auto &tile : groundLayer.allTiles()) {
+  for (const auto &tile : wall.allTiles()) {
     const auto &rect = tile.getTextureRect();
     const auto &pos = tile.getWorldPosition();
 
@@ -52,9 +50,13 @@ void map::MapLoader::_getMapTiles() {
         static_cast<float>(rect.width), static_cast<float>(rect.height));
     flux::Entity newTile = this->_ecs.newEntity();
     this->_ecs.AddOrReplace<component::Sprite>(
-        newTile, component::Sprite(groundLayer.getTileset().path, srcRect.x,
-                                   srcRect.y, srcRect.w, srcRect.h, 1));
+        newTile, component::Sprite(wall.getTileset().path, srcRect.x, srcRect.y,
+                                   srcRect.w, srcRect.h, 1));
     this->_ecs.AddOrReplace<component::Transform>(
         newTile, component::Transform(destRect.x, destRect.y, 0, 1.0f, 1.0f));
+    this->_ecs.AddOrReplace<component::Collider>(
+        newTile, component::Collider(component::CollisionLayer::WALL,
+                                     component::CollisionLayer::PLAYER, pos.x,
+                                     pos.y, rect.width, rect.height));
   }
 }
