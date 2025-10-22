@@ -115,8 +115,9 @@ void client::Client::_sendPlayerInput(
                     data.inputIndex = this->_inputIndex;
                     this->_inputIndex += 1;
                     this->_inputs.push(data.game);
-                    // std::cout << data.game.shoot << std::endl;
-                    this->_networkUDPClient->async_write(data);
+                    for (size_t i = 0; i < NB_REDUNDANCY; i += 1) {
+                        this->_networkUDPClient->async_write(data);
+                    }
                     this->_lastSentInput = data.game;
                     this->_lastInputSend = now;
                 }
