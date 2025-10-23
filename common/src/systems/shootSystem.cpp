@@ -43,7 +43,7 @@ void ShootSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities) {
 
     playerCpn.shootCooldown -= static_cast<float>(deltaTime);
     if (playerCpn.shootCooldown <= 0.0f && input.shoot) {
-      auto &playerTransform = ecs.GetComponent<component::Transform>(entity);
+      auto playerTransform = ecs.GetComponent<component::Transform>(entity);
       flux::Entity projectile = ecs.newEntity();
       ecs.Add<component::Transform>(
           projectile, component::Transform(playerTransform.pos.x,
