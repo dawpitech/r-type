@@ -46,6 +46,7 @@ namespace client {
         std::unique_ptr<raylib::Window> _window = nullptr;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient = nullptr;
         std::unique_ptr<client::network::UDPClient> _networkUDPClient = nullptr;
+        std::unique_ptr<client::network::UDPClient> _voiceUDPClient = nullptr;
 
         std::queue<component::PlayerInput> _inputs;
         ::network::ClientTCPSentInfo _gameInfo;

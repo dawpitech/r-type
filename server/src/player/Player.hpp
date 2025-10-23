@@ -21,8 +21,9 @@ namespace game {
 
     class Player {
        public:
-        explicit Player(const network::ConnectionInfo &info, network::UDPNetwork &network)
-            : _id(info.uuid), _ip(info.ip), _network(network)
+        explicit Player(const network::ConnectionInfo &info, network::UDPNetwork &network,
+            network::UDPNetwork &voiceNetwork)
+            : _id(info.uuid), _ip(info.ip), _network(network), _voiceNetwork(voiceNetwork)
         {}
 
         ~Player() = default;
@@ -31,8 +32,10 @@ namespace game {
 
         void storeInfo(const network::ClientTCPReceivedInfo &info)
         {
-            utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));
+            utils::Logger::debug(std::format(
+                "Player {} on port {} and voice on port {}", this->_id, info.portUDP, info.portVoiceChat));
             this->_udpPort = info.portUDP;
+            this->_voicePort = info.portVoiceChat;
         }
 
         void storeInput(component::PlayerInput input)
@@ -54,17 +57,26 @@ namespace game {
             this->_network.sendData(this->_ip, this->_udpPort, string);
         }
 
+        void sendVoice(const std::string &string)
+        {
+            this->_voiceNetwork.sendData(this->_ip, this->_voicePort, string);
+        }
+
         component::PlayerInput getInput() { return this->_lastInput; };
 
         unsigned getInputIndex() { return this->_inputIndex; }
 
+        std::string soundBuffer;
+
        private:
         network::UDPNetwork &_network;
+        network::UDPNetwork &_voiceNetwork;
         component::PlayerInput _lastInput;
         std::string _id;
         unsigned _entity = BASE_ENTITY;
         uint16_t _score = 0;
         uint16_t _udpPort = 0;
+        uint16_t _voicePort = 0;
         uint8_t _room = 0;
         unsigned _inputIndex = 0;
         std::string _ip;

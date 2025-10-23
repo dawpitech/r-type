@@ -41,6 +41,10 @@ namespace network {
                 this->_udpReceivedCallback = std::move(callback);
                 return;
             }
+            if constexpr (std::is_same_v<T, UDPVoiceInfo>) {
+                this->_udpVoiceCallback = std::move(callback);
+                return;
+            }
         }
 
         void notify(const NetworkData &data);
@@ -52,6 +56,7 @@ namespace network {
         std::function<void(const ClientTCPReceivedInfo &)> _tcpReceivedCallback;
         std::function<void(const UDPReceivedInfo &)> _udpReceivedCallback;
         std::function<void(const ConnectionInfo &)> _connectionCallback;
+        std::function<void(const UDPVoiceInfo &)> _udpVoiceCallback;
 
         std::string _compressString(const std::string &string);
         std::string _decompressString(const std::string &string);

@@ -26,12 +26,12 @@ std::optional<std::reference_wrapper<game::Player>> game::PlayersManager::getPla
     return std::nullopt;
 }
 
-void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork &network)
+void game::PlayersManager::createNewPlayer(const network::ConnectionInfo& info, network::UDPNetwork &network, network::UDPNetwork &voiceNetwork)
 {
     
     std::lock_guard<std::mutex> lock(this->_playerLock);
     utils::Logger::debug(std::format("New player added with uuid: {}", info.uuid));
-    this->_players.emplace_back(std::make_unique<Player>(info, network));
+    this->_players.emplace_back(std::make_unique<Player>(info, network, voiceNetwork));
 }
 
 void game::PlayersManager::storeInfo(const network::ClientTCPReceivedInfo& info)
@@ -67,4 +67,23 @@ std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id
     }
     utils::Logger::debug(std::format("No player with uuid: {}", id));
     return std::nullopt;
+}
+
+void game::PlayersManager::dispatchSound(const network::UDPVoiceInfo &info)
+{
+    auto room = -1;
+    for (auto &it: this->_players) {
+        if (it->getId() == info.userID) {
+            auto room = it->getRoom();
+            return;
+        }
+    }
+
+    if (room == -1)
+        return;
+    for (auto &it: this->_players) {
+        if (it->getRoom() == room && it->getId() != info.userID) {
+            it->sendVoice(info.soundBuffer);
+        }
+    }
 }

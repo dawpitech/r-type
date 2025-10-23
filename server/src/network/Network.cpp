@@ -40,6 +40,11 @@ void network::ServerNetwork::notify(const NetworkData &data)
                     this->_connectionCallback(arg);
                 return;
             }
+            if constexpr (std::is_same_v<T, UDPVoiceInfo>) {
+                if (this->_udpVoiceCallback)
+                    this->_udpVoiceCallback(arg);
+                return;
+            }
         },
         data);
 }

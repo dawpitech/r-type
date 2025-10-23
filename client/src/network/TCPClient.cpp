@@ -5,16 +5,18 @@
 ** TCPClient.cpp
 */
 
+#include <boost/system/error_code.hpp>
 #include <cstdint>
 #include <functional>
-#include <boost/system/error_code.hpp>
 
 #include "network/TCPClient.hpp"
 #include "network/datatype.hpp"
 #include "utils/logger.hpp"
 
-client::network::TCPClient::TCPClient(const std::string& serverIp, uint16_t serverPort, uint16_t selfUDPPort) :
-    Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false), _selfUDPPort(selfUDPPort)
+client::network::TCPClient::TCPClient(
+    const std::string &serverIp, uint16_t serverPort, uint16_t selfUDPPort, uint16_t selfVoicePort)
+    : Network(serverIp, serverPort), _socket(this->_ioContext), _connected(false), _selfUDPPort(selfUDPPort),
+      _selfVoicePort(selfVoicePort)
 {
     utils::Logger::debug(std::format("TCP Client created for {}:{}", serverIp, serverPort));
 }
@@ -41,9 +43,10 @@ void client::network::TCPClient::connect()
     utils::Logger::debug(std::format("Attempting to connect to {}:{}", this->_serverIp, this->_serverPort));
     tcp::resolver resolver(this->_ioContext);
     auto endpoints = resolver.resolve(this->_serverIp, std::to_string(this->_serverPort));
-    
-    boost::asio::async_connect(this->_socket, endpoints, std::bind(&TCPClient::_connectHandler, this, std::placeholders::_1));
-    
+
+    boost::asio::async_connect(
+        this->_socket, endpoints, std::bind(&TCPClient::_connectHandler, this, std::placeholders::_1));
+
     this->_ioContext.poll_one();
 }
 
@@ -57,10 +60,9 @@ void client::network::TCPClient::disconnect()
     this->_socket.shutdown(tcp::socket::shutdown_both, ec);
     this->_socket.close(ec);
     this->_connected = false;
-    
 }
 
-void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo& data)
+void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo &data)
 {
     if (!this->_connected) {
         return;
@@ -75,7 +77,7 @@ bool client::network::TCPClient::isConnected() const
     return this->_connected;
 }
 
-void client::network::TCPClient::_connectHandler(const boost::system::error_code& error)
+void client::network::TCPClient::_connectHandler(const boost::system::error_code &error)
 {
     if (error) {
         utils::Logger::debug(std::format("Connection failed: {}", error.message()));
@@ -84,24 +86,18 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
 
     this->_connected = true;
     this->_setupRead();
-
 }
 
 void client::network::TCPClient::_setupRead()
 {
     boost::system::error_code error;
     std::size_t bytesRead = boost::asio::read(
-        this->_socket,
-        boost::asio::buffer(&this->_info, sizeof(::network::ClientTCPSentInfo)),
-        error
-    );
+        this->_socket, boost::asio::buffer(&this->_info, sizeof(::network::ClientTCPSentInfo)), error);
 
     this->_readHandler(error, bytesRead);
 }
 
-void client::network::TCPClient::_readHandler(
-    const boost::system::error_code& error,
-    std::size_t bytesRead)
+void client::network::TCPClient::_readHandler(const boost::system::error_code &error, std::size_t bytesRead)
 {
     if (error) {
         this->_connected = false;
@@ -123,13 +119,15 @@ void client::network::TCPClient::_readHandler(
     std::strncpy(info.uuid, this->_info.userID, sizeof(info.uuid) - 1);
     utils::Logger::debug(std::format("uuid {}", info.uuid));
     info.portUDP = this->_selfUDPPort;
+    info.portVoiceChat = this->_selfVoicePort;
 
     try {
         boost::asio::write(this->_socket, boost::asio::buffer(&info, sizeof(info)));
         utils::Logger::debug(std::format("Sent ClientTCPReceivedInfo via TCP udpPort {}\n", info.portUDP));
-    } catch (const boost::system::system_error& e) {
+    } catch (const boost::system::system_error &e) {
         utils::Logger::debug(std::format("Failed to send ClientTCPSReceivedInfo via TCP: {}", e.what()));
     }
 
-    utils::Logger::debug(std::format("UDP client local port: {}\n", info.portUDP));
+    utils::Logger::debug(std::format("UDP client local port: {}", info.portUDP));
+    utils::Logger::debug(std::format("UDP client voice chat port: {}", info.portVoiceChat));
 }

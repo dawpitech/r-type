@@ -30,6 +30,7 @@ namespace Server {
 
         network::TCPNetwork _connectionNetwork;
         network::UDPNetwork _gameUpdateNetwork;
+        network::UDPNetwork _voiceNetwork;
 
         game::PlayersManager _playerManager;
         std::vector<std::thread> _threads;

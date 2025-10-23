@@ -23,8 +23,9 @@ client::Client::Client(const std::string &ip, uint16_t port) : _ip(ip), _port(po
 {
     this->_window = std::make_unique<raylib::Window>(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, WINDOW_BASE_NAME);
     this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
-    this->_networkTCPClient =
-        std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
+    this->_voiceUDPClient = std::make_unique<client::network::UDPClient>(ip, 0);
+    this->_networkTCPClient = std::make_unique<client::network::TCPClient>(
+        ip, port, this->_networkUDPClient->getLocalPort(), this->_voiceUDPClient->getLocalPort());
 
     Simulation::setInitialSimState(this->_ecs);
     this->_registerBase();
@@ -60,7 +61,11 @@ void client::Client::_initHooks()
                 if (window->ShouldClose())
                     masterRunVar = false;
             },
-        .hookAfterRender = [] { EndDrawing(); },
+        .hookAfterRender =
+            [this] {
+                this->voiceChat.update();
+                EndDrawing();
+            },
     };
     this->_initNetworkableHooks();
 }
@@ -74,6 +79,12 @@ void client::Client::_initNetworkableHooks()
     this->_networkUDPClient->attach<::network::UDPSentInfo>([this](const ::network::UDPSentInfo &info) {
         this->_ecs.unserializeAllComponents(info.serializedData);
     });
+    // this->_voiceUDPClient->attach<::network::UDPVoiceSentInfo>(
+    //     [this](const ::network::UDPVoiceSentInfo &info) {
+    //         if (!info.soundBuffer.empty()) {
+    //             this->voiceChat.receiveSound(info.soundBuffer);
+    //         }
+    //     });
     this->_hooks.hooksNetwork = [this](flux::ECS &) {
         this->_networkTCPClient->run();
         this->_networkUDPClient->connect();
@@ -113,9 +124,16 @@ void client::Client::_sendPlayerInput(
 
         if (netId && playerInput) {
             if (std::strcmp(netId->uuid, this->_gameInfo.userID) == 0) {
+                ::network::UDPVoiceInfo voiceInfo;
                 ::network::UDPReceivedInfo data;
                 std::strcpy(data.uuid, this->_gameInfo.userID);
                 data.game = *playerInput;
+
+                this->voiceChat.setSoundToSend(voiceInfo);
+                voiceInfo.userID = this->_gameInfo.userID;
+                if (!voiceInfo.soundBuffer.empty()) {
+                    //send voiceInfo
+                }
 
                 if (this->_lastSentInput != data.game) {
                     data.inputIndex = this->_inputIndex;
@@ -141,10 +159,6 @@ void client::Client::run()
         utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }
-    std::thread audioThread([this] {
-        while (true) {
-            this->voiceChat.playSound();
-        }
-    });
+    this->voiceChat.startAudioCapture();
     this->_ecs.handExecution(this->_hooks);
 }

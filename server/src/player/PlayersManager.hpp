@@ -22,9 +22,11 @@ namespace game {
 
         std::optional<std::reference_wrapper<Player>> getPlayer(const std::string &id);
 
-        void createNewPlayer(const network::ConnectionInfo &info, network::UDPNetwork &network);
+        void createNewPlayer(const network::ConnectionInfo &info, network::UDPNetwork &network,
+            network::UDPNetwork &voiceNetwork);
         void storeInfo(const network::ClientTCPReceivedInfo &info);
         void storeInput(const network::UDPReceivedInfo &info);
+        void dispatchSound(const network::UDPVoiceInfo &info);
 
         std::optional<uint8_t> getPlayerRoom(const std::string &id);
 
