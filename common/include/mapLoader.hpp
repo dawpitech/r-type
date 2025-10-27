@@ -22,11 +22,15 @@ namespace map
             explicit MapLoader(flux::ECS& ecs);
 
             void initializeGame();
+            void loadMenu();
+            void loadGame();
 
         private:
             void _getMapTiles();
             void _getCollider();
             void _getMobs();
+            void _getBackground();
+            void _getIdol();
 
             ldtk::Project _project;
             std::string _ldtkFile;

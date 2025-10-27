@@ -13,7 +13,7 @@
 class Simulation
 {
     public:
-        static void setInitialSimState(flux::ECS& ecs);
+        static void setInitialSimState(flux::ECS& ecs, std::string level);
 
     private:
         enum class PLAYER_TYPE {
@@ -23,7 +23,7 @@ class Simulation
             PLAYER_FOUR,
         };
 
-        static void _createEntities(flux::ECS& ecs);
+        static void _createEntities(flux::ECS& ecs, std::string level);
         static void _registerComponent(flux::ECS& ecs);
         static void _registerSystems(flux::ECS& ecs);
         static void _createPlayer(flux::ECS& ecs, PLAYER_TYPE type);
