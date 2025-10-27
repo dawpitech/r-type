@@ -9,6 +9,7 @@
 #include "network/TCPClient.hpp"
 #include "network/UDPClient.hpp"
 #include "network/datatype.hpp"
+#include <Camera2D.hpp>
 #include <Window.hpp>
 #include <chrono>
 #include <memory>
@@ -41,6 +42,7 @@ namespace client {
         unsigned _inputIndex = 0;
 
         std::unique_ptr<raylib::Window> _window = nullptr;
+        std::unique_ptr<raylib::Camera2D> _camera = nullptr;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient = nullptr;
         std::unique_ptr<client::network::UDPClient> _networkUDPClient = nullptr;
 

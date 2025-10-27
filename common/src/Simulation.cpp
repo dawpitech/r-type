@@ -7,6 +7,7 @@
 
 #include "Simulation.hpp"
 #include <string>
+#include "components/Camera.hpp"
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -20,6 +21,7 @@
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
 #include "mapLoader.hpp"
+#include "systems/cameraSystem.hpp"
 #include "systems/collisionSystem.hpp"
 #include "systems/damageSystem.hpp"
 #include "systems/healthSystem.hpp"
@@ -48,6 +50,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Transform>("Transform");
     ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
+    ecs.registerComponentType<component::Camera>("Camera");
     ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::Mob>();
@@ -58,6 +61,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Transform>();
     ecs.Register<component::Velocity>();
     ecs.Register<component::NetworkIdentification>();
+    ecs.Register<component::Camera>();
 }
 
 void Simulation::_registerSystems(flux::ECS& ecs)
@@ -72,6 +76,7 @@ void Simulation::_registerSystems(flux::ECS& ecs)
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(AnimationSystem,
     // AnimationSystemView(ecs), flux::systemType::RENDER);
 }
@@ -87,6 +92,7 @@ void Simulation::_createEntities(flux::ECS& ecs, std::string level)
         map.loadMenu();
     if (level == "Level_0")
         map.loadGame();
+    _createCamera(ecs);
 }
 
 void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
@@ -123,4 +129,12 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     ecs.Add<component::Collider>(
         playerEntity,
         component::Collider(component::CollisionLayer::PLAYER, component::CollisionLayer::WALL, 0, 0, width, height));
+}
+
+void Simulation::_createCamera(flux::ECS& ecs)
+{
+    flux::Entity camera = ecs.newEntity();
+    ecs.Add<component::Camera>(camera, component::Camera(0, 0, 800 / 2, 450 / 2));
+    ecs.Add<component::Transform>(camera, component::Transform(800 / 2, 450 / 2, 0, 1, 1));
+    ecs.Add<component::Velocity>(camera, component::Velocity());
 }

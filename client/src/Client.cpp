@@ -6,11 +6,16 @@
 //
 
 #include "Client.hpp"
+#include <Camera2D.hpp>
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <memory>
+#include <raylib.h>
 #include <unordered_map>
 #include <Window.hpp>
+#include <vector>
+#include "CameraRaylib.hpp"
 #include "components/Animation.hpp"
 #include "components/NetworkIdentification.hpp"
 #include "flux/core/Serialization.hpp"
@@ -19,10 +24,12 @@
 #include "systems/animationSystem.hpp"
 #include "systems/inputDetectorSystem.hpp"
 #include "systems/renderSystem.hpp"
+#include "systems/setCamera.hpp"
 
 client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
 {
     this->_window = std::make_unique<raylib::Window>(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, WINDOW_BASE_NAME);
+    this->_camera = std::make_unique<raylib::Camera2D>();
     this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
     this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
 
@@ -38,6 +45,7 @@ void client::Client::_registerBase()
     this->_ecs.registerSystem(InputDetectorSystem, InputDetectorSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
+    this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::LOGIC);
 }
 
 void client::Client::_initHooks()
@@ -51,10 +59,11 @@ void client::Client::_initHooks()
         {
             window->ClearBackground();
             BeginDrawing();
+            BeginMode2D(CameraRaylib::getCamera());
             if (window->ShouldClose())
                 masterRunVar = false;
         },
-        .hookAfterRender = [] { EndDrawing(); },
+        .hookAfterRender = [] { EndMode2D(); EndDrawing(); },
     };
     this->_initNetworkableHooks();
 }
