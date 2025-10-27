@@ -540,6 +540,20 @@ namespace flux
                     it->second.unserialize(*this, entity, in);
                 }
             }
+
+            void reset()
+            {
+                this->componentTypeRegistry.clear();
+                this->componentMaskGroups.clear();
+                this->componentMaskOffsetStore.clear();
+                this->componentsStore.clear();
+                this->entitiesComponentMask.clear();
+                this->nextComponentMaskOffsetBit = 0;
+                this->nextEntityID = 0;
+                this->systemsLogicList.clear();
+                this->systemsRenderList.clear();
+                this->_running = true;
+            }
     };
 
     template <typename T>
