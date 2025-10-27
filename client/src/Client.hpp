@@ -49,6 +49,8 @@ namespace client {
         std::chrono::steady_clock::time_point _lastInputSend;
         component::PlayerInput _lastSentInput;
 
+        bool _gameLaunch = false;
+
         void _initHooks();
         void _initNetworkableHooks();
         void _registerBase();
