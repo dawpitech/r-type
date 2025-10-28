@@ -30,12 +30,40 @@
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
 
-void Simulation::setInitialSimState(flux::ECS& ecs, std::string level)
+void Simulation::setInitialClientSimState(flux::ECS& ecs, std::string level)
 {
     ecs.reset();
+    map::MapLoader map(ecs);
     _registerComponent(ecs);
-    _registerSystems(ecs);
-    _createEntities(ecs, level);
+    if (level == "Menu") {
+        map.loadMenu();
+        _registerMenuSystems(ecs);
+    }
+    if (level == "Level_0") {
+        map.loadGame();
+        _createPlayer(ecs, PLAYER_TYPE::PLAYER_ONE);
+        _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
+        _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
+        _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
+        _registerGameSystems(ecs);
+    }
+    _createCamera(ecs);
+}
+
+void Simulation::setInitialServerSimState(flux::ECS& ecs, std::string level)
+{
+    ecs.reset();
+    map::MapLoader map(ecs);
+    _registerComponent(ecs);
+    if (level == "Level_0") {
+        map.loadGame();
+        _registerGameSystems(ecs);
+    }
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_ONE);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
+    _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
+    _createCamera(ecs);
 }
 
 void Simulation::_registerComponent(flux::ECS& ecs)
@@ -64,7 +92,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Camera>();
 }
 
-void Simulation::_registerSystems(flux::ECS& ecs)
+void Simulation::_registerGameSystems(flux::ECS& ecs)
 {
     ecs.registerSystem(InputHandlerSystem, InputHandlerSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
@@ -81,18 +109,21 @@ void Simulation::_registerSystems(flux::ECS& ecs)
     // AnimationSystemView(ecs), flux::systemType::RENDER);
 }
 
-void Simulation::_createEntities(flux::ECS& ecs, std::string level)
+void Simulation::_registerMenuSystems(flux::ECS& ecs)
 {
-    _createPlayer(ecs, PLAYER_TYPE::PLAYER_ONE);
-    _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
-    _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
-    _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
-    map::MapLoader map(ecs);
-    if (level == "Menu")
-        map.loadMenu();
-    if (level == "Level_0")
-        map.loadGame();
-    _createCamera(ecs);
+    // ecs.registerSystem(InputHandlerSystem, InputHandlerSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs),
+    // flux::systemType::LOGIC);
+    // ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
+    // ecs.registerSystem(AnimationSystem,
+    // AnimationSystemView(ecs), flux::systemType::RENDER);
 }
 
 void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)

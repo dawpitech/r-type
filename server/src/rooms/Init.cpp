@@ -16,6 +16,7 @@
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
+#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/Serialization.hpp"
@@ -95,6 +96,7 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::Projectile>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Transform>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Velocity>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::NetworkIdentification>(this->_ecs, componentStore);
 
     this->_snapshots.push_back(componentStore);
@@ -113,6 +115,7 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Projectile>(entity, component, out);
     this->_getSerializedComponent<component::Transform>(entity, component, out);
     this->_getSerializedComponent<component::Velocity>(entity, component, out);
+    this->_getSerializedComponent<component::Sprite>(entity, component, out);
 }
 
 void Room::Room::_sendSnapshotToPlayer(std::ostringstream &serializedData)

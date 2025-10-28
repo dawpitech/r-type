@@ -33,7 +33,7 @@ client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(po
     this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
     this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
 
-    Simulation::setInitialSimState(this->_ecs, "Menu");
+    Simulation::setInitialClientSimState(this->_ecs, "Menu");
     this->_registerBase();
     this->_initHooks();
 }
@@ -78,7 +78,7 @@ void client::Client::_initNetworkableHooks()
         [this](const ::network::UDPSentInfo& info)
         {
             if (this->_gameLaunch == false) {
-                Simulation::setInitialSimState(this->_ecs, "Level_0");
+                Simulation::setInitialClientSimState(this->_ecs, "Level_0");
                 this->_registerBase();
                 this->_initHooks();
             }
