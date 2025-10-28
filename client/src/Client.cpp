@@ -18,6 +18,7 @@
 #include "CameraRaylib.hpp"
 #include "components/Animation.hpp"
 #include "components/NetworkIdentification.hpp"
+#include "components/music.hpp"
 #include "flux/core/Serialization.hpp"
 #include "network/datatype.hpp"
 #include "Simulation.hpp"
@@ -25,6 +26,7 @@
 #include "systems/inputDetectorSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/setCamera.hpp"
+#include "systems/musicSystem.hpp"
 
 client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
 {
@@ -34,6 +36,10 @@ client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(po
     this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
 
     Simulation::setInitialClientSimState(this->_ecs, "Menu");
+    InitAudioDevice();
+    SetMasterVolume(1.0f);
+    flux::Entity musicEntity = this->_ecs.newEntity();
+    this->_ecs.Add<component::MusicCmp>(musicEntity, component::MusicCmp("./assets/MasterOfPuppets.mp3"));
     this->_registerBase();
     this->_initHooks();
 }
@@ -41,11 +47,13 @@ client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(po
 void client::Client::_registerBase()
 {
     this->_ecs.Register<component::Animation>();
+    this->_ecs.Register<component::MusicCmp>();
 
     this->_ecs.registerSystem(InputDetectorSystem, InputDetectorSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::LOGIC);
+    this->_ecs.registerSystem(MusicSystem, MusicSystemView(this->_ecs), flux::systemType::RENDER);
 }
 
 void client::Client::_initHooks()
