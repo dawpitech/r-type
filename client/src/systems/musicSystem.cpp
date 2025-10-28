@@ -17,15 +17,14 @@ void MusicSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
         auto music = ecs.GetComponent<component::MusicCmp>(entity);
-        // std::cout << "MUSIC !!!\n";
-        SetMusicVolume(music.music, 1.0f);
-        PlayMusicStream(music.music);
+        if (!music.isPlaying) {
+            SetMasterVolume(1.0f);
+            PlayMusicStream(music.music);
+            music.isPlaying = true;
+            ecs.AddOrReplace(entity, music);
+        }
+        std::cout << "Update Music\n";
         UpdateMusicStream(music.music);
-        if (IsMusicStreamPlaying(music.music)) {
-            DrawText("Music is playing", 10, 10, 20, GREEN);
-        }
-        else {
-            DrawText("Music stopped", 10, 10, 20, RED);
-        }
+        std::cout << "MUSIC Updated\n";
     }
 }

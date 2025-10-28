@@ -15,9 +15,10 @@ namespace component
     struct MusicCmp
     {
             std::string musicPath;
+            bool isPlaying;
             Music music;
 
-            MusicCmp(std::string musicPath) : musicPath(musicPath) { this->music = LoadMusicStream(musicPath.c_str()); }
+            MusicCmp(std::string musicPath) : musicPath(musicPath), isPlaying(false) { this->music = LoadMusicStream(musicPath.c_str()); }
     };
 
 } // namespace component

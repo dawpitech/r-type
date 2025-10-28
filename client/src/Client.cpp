@@ -6,7 +6,6 @@
 //
 
 #include "Client.hpp"
-#include <Camera2D.hpp>
 #include <chrono>
 #include <functional>
 #include <iostream>
@@ -35,11 +34,10 @@ client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(po
     this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
     this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
 
-    Simulation::setInitialClientSimState(this->_ecs, "Menu");
     InitAudioDevice();
-    SetMasterVolume(1.0f);
+    Simulation::setInitialClientSimState(this->_ecs, "Menu");
     flux::Entity musicEntity = this->_ecs.newEntity();
-    this->_ecs.Add<component::MusicCmp>(musicEntity, component::MusicCmp("./assets/MasterOfPuppets.mp3"));
+    this->_ecs.Add<component::MusicCmp>(musicEntity, component::MusicCmp("./assets/Assassin.mp3"));
     this->_registerBase();
     this->_initHooks();
 }
@@ -87,6 +85,8 @@ void client::Client::_initNetworkableHooks()
         {
             if (this->_gameLaunch == false) {
                 Simulation::setInitialClientSimState(this->_ecs, "Level_0");
+                flux::Entity musicEntity = this->_ecs.newEntity();
+                this->_ecs.Add<component::MusicCmp>(musicEntity, component::MusicCmp("./assets/Assassin.mp3"));
                 this->_registerBase();
                 this->_initHooks();
             }
