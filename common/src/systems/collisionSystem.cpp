@@ -64,8 +64,8 @@ void CollisionSystem(flux::ECS &ecs,
       utils::Vector4<float> rect{};
       rect.x = collider.srcX;
       rect.y = collider.srcY;
-      rect.h = collider.srch;
-      rect.w = collider.srcw;
+      rect.w = collider.srcW;
+      rect.h = collider.srcH;
       if (checkRectCollision(rect, transform, rect, transformOther)) {
         handleCollision(collider, colliderOther);
         ecs.AddOrReplace<component::Collider>(entities[i], collider);

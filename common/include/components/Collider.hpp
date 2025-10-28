@@ -34,15 +34,15 @@ namespace component
     {
             int layer;
             int mask;
-            float srcX, srcY, srch, srcw;
+            float srcX, srcY, srcW, srcH;
             bool isActive;
             bool hasCollide;
 
-            explicit Collider(int layer = 0, int mask = 0, float srcX = 0, float srcY = 0, float srch = 0,
-                              float srcw = 0, bool isActive = true, bool hasCollide = false) :
-                layer(layer), mask(mask), srcX(srcX), srcY(srcY), srch(srch), srcw(srcw), isActive(isActive),
+            explicit Collider(int layer = 0, int mask = 0, float srcX = 0, float srcY = 0, float srcw = 0,
+                              float srch = 0, bool isActive = true, bool hasCollide = false) :
+                layer(layer), mask(mask), srcX(srcX), srcY(srcY), srcW(srcw), srcH(srch), isActive(isActive),
                 hasCollide(hasCollide)
             {}
-            REFLECT(layer, mask, srcX, srcY, srch, srcw, isActive, hasCollide)
+            REFLECT(layer, mask, srcX, srcY, srcW, srcH, isActive, hasCollide)
     };
 } // namespace component

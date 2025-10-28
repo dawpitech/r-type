@@ -16,9 +16,9 @@ namespace component
     struct Sprite
     {
             std::string assetPath;
-            int zHeight;
             float srcX, srcY, srcW, srcH;
-            REFLECT(assetPath, srcX, srcY, srcW, srcH)
+            int zHeight;
+            REFLECT(assetPath, srcX, srcY, srcW, srcH, zHeight)
 
             Sprite() = default;
             Sprite(std::string assetPath, int zHeight) :
