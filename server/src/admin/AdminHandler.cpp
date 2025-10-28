@@ -23,6 +23,8 @@ void Server::AdminHandler::executeInput(const std::string &input)
 
     if (this->_commandsMap[lowerInput]) {
         this->_commandsMap[lowerInput]();
+        std::cout.flush();
+        std::cin.clear();
         return;
     }
     std::cout << "Command \"" << lowerInput << "\" not found" << std::endl;
@@ -41,6 +43,9 @@ void Server::AdminHandler::_initMap()
     };
     this->_commandsMap["rooms info"] = [this] {
         this->_getRoomsInfo();
+    };
+    this->_commandsMap["room info"] = [this] {
+        this->_getRoomInfo();
     };
     this->_commandsMap["kick player"] = [this] {
         this->_kickPlayer();
