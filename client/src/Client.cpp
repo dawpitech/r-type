@@ -25,6 +25,7 @@
 #include "systems/inputDetectorSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/setCamera.hpp"
+#include "utils/logger.hpp"
 
 client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
 {
@@ -87,7 +88,7 @@ void client::Client::_initNetworkableHooks()
             this->_ecs.unserializeAllComponents(info.serializedData);
         });
     this->_networkTCPClient->attach<::network::ClientReceiveMessage>([this](const ::network::ClientReceiveMessage &msg) {
-        this->_chatLog.emplace_back(std::string(msg.msg));
+        this->_chatLog.emplace_back(std::string(msg.msg), msg.hexcol);
         if (this->_chatLog.size() > 6)
             this->_chatLog.pop_front();
     });
@@ -197,7 +198,8 @@ void client::Client::_renderChat()
     BeginScissorMode(0, WINDOW_BASE_HEIGHT - 120, 400, 120);
     int y = WINDOW_BASE_HEIGHT - 40;
     for (auto it = this->_chatLog.rbegin(); it != this->_chatLog.rend(); ++it) {
-        DrawText(it->c_str(), 10, y, 16, RAYWHITE);
+        raylib::Color col = raylib::Color(it->second);
+        col.DrawText(it->first.c_str(), 10, y, 16);
         y -= 18;
         if (y < WINDOW_BASE_HEIGHT - 120)
             break;

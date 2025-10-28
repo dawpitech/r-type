@@ -55,7 +55,7 @@ namespace client {
 
         bool _chatTyping = false;
         std::string _chatBuffer;
-        std::deque<std::string> _chatLog;
+        std::deque<std::pair<std::string, int>> _chatLog;
 
         void _initHooks();
         void _initNetworkableHooks();

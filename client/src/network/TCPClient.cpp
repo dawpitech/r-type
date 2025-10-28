@@ -6,6 +6,7 @@
 */
 
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <boost/system/error_code.hpp>
 
@@ -112,30 +113,20 @@ void client::network::TCPClient::_setupRead()
                     }
                 );
             } else if (*header == ::network::PacketType::ChatReceive) {
-                auto sender = std::make_shared<std::array<char, ::network::BUFFERSIZE>>();
                 auto chat = std::make_shared<::network::ClientReceiveMessage>();
-                boost::asio::async_read(
-                    this->_socket,
-                    boost::asio::buffer(sender->data(), ::network::BUFFERSIZE),
-                    [this, sender, chat](const boost::system::error_code &err, size_t) {
-                        if (err) {
-                            utils::Logger::debug(std::format("TCP read sender error: {}", err.message()));
-                            return;
-                        }
                         boost::asio::async_read(
                             this->_socket,
                             boost::asio::buffer(chat.get(), sizeof(::network::ClientReceiveMessage)),
-                            [this, sender, chat](const boost::system::error_code &err2, size_t) {
+                            [this, chat](const boost::system::error_code &err2, size_t) {
                                 if (!err2) {
                                     ::network::ClientReceiveMessage merged{};
-                                    std::snprintf(merged.msg, ::network::BUFFERSIZE, "%s: %s", sender->data(), chat->msg);
+                                    std::snprintf(merged.msg, ::network::BUFFERSIZE, "%s", chat->msg);
+				    std:memcpy(&merged.hexcol, &chat->hexcol, sizeof(int));
                                     this->notify(merged);
                                 }
                                 this->_setupRead();
                             }
                         );
-                    }
-                );
             } else {
                 this->_setupRead();
             }

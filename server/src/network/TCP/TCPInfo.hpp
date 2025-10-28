@@ -41,7 +41,7 @@ namespace network
                 }
             }
 
-            void sendChatReceive(const char senderId[::network::BUFFERSIZE], const ::network::ClientReceiveMessage &data)
+            void sendChatReceive(const ::network::ClientReceiveMessage &data)
             {
 		if (!this->_socket.is_open()) return;
                 const ::network::PacketType header = ::network::PacketType::ChatReceive;
@@ -49,11 +49,6 @@ namespace network
                 boost::asio::write(this->_socket, boost::asio::buffer(&header, sizeof(header)), ec);
                 if (ec) {
                     utils::Logger::debug(std::format("TCP sendChatReceive header error: {}", ec.message()));
-                    return;
-                }
-                boost::asio::write(this->_socket, boost::asio::buffer(senderId, ::network::BUFFERSIZE), ec);
-                if (ec) {
-                    utils::Logger::debug(std::format("TCP sendChatReceive sender error: {}", ec.message()));
                     return;
                 }
                 boost::asio::write(this->_socket, boost::asio::buffer(&data, sizeof(data)), ec);

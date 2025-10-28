@@ -5,6 +5,7 @@
 // Function for the tcp connection
 //
 
+#include <Color.hpp>
 #include <functional>
 #include <boost/system/error_code.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -29,7 +30,6 @@ network::TCPNetwork::~TCPNetwork() {}
 void network::TCPNetwork::_setupAcceptNewSocket()
 {
     this->_clients.emplace_back(std::make_unique<ClientTCP>(this->_ioContext));
-    this->_clientUuids.emplace_back("");
     if (this->_clients.back() == nullptr) {
         throw NetworkError("Unable to create new client", "TCP accept");
     }
@@ -54,7 +54,6 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 
     ClientTCPSentInfo dataToSend(info.uuid, this->_port, 0);
     client->sendTCPInfo(dataToSend);
-    this->_clientUuids[this->_clients.size() - 1] = info.uuid;
     utils::Logger::debug(std::format("TCP handshake user {} assigned", info.uuid));
     
     utils::Logger::debug(std::format("New connection accepted from: {}:{}", socketIp, socketPort));
@@ -68,32 +67,31 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
 {
     client.async_read_with_chat(*this, [this](const ::network::ClientSendMessage &msg, boost::asio::ip::tcp::socket &sock) {
-        std::string senderUuid;
+	const std::vector<raylib::Color> colors{raylib::Color::SkyBlue(), raylib::Color::Purple(), raylib::Color::Green(), raylib::Color::Red(), raylib::Color::Blue()};
+	int col = colors[0].ToInt();
         try {
             auto endpoint = sock.remote_endpoint();
             auto ip = endpoint.address().to_string();
             auto port = endpoint.port();
             for (size_t i = 0; i < this->_clients.size(); ++i) {
                 if (&(this->_clients[i]->getSocket()) == &sock) {
-                    senderUuid = this->_clientUuids[i];
+		    col = colors[i % colors.size()].ToInt();
                     break;
                 }
             }
         } catch (...) {}
-        if (!senderUuid.empty())
-            this->_broadcastChat(senderUuid, msg);
+	this->_broadcastChat(col, msg);
     });
 }
 
-void network::TCPNetwork::_broadcastChat(const std::string &senderUuid, const ::network::ClientSendMessage &msg)
+void network::TCPNetwork::_broadcastChat(const int &col, const ::network::ClientSendMessage &msg)
 {
     ::network::ClientReceiveMessage recv{};
     std::memcpy(recv.msg, msg.msg, ::network::BUFFERSIZE);
-    char sender[::network::BUFFERSIZE] = {};
-    std::strncpy(sender, senderUuid.c_str(), ::network::BUFFERSIZE - 1);
+    recv.hexcol = col;
     for (auto &cli : this->_clients) {
         try {
-            cli->sendChatReceive(sender, recv);
+            cli->sendChatReceive(recv);
         } catch (const std::exception &e) {
             utils::Logger::debug(std::format("Error broadcasting chat to client: {}", e.what()));
         }

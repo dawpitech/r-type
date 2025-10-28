@@ -9,6 +9,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/detail/error_code.hpp>
+#include <vector>
 
 #include "network/Network.hpp"
 #include "network/datatype.hpp"
@@ -29,13 +30,12 @@ namespace network
             tcp::endpoint _endpoint;
             ClientTCPReceivedInfo _receivedInfo;
             std::vector<std::unique_ptr<ClientTCP>> _clients;
-            std::vector<std::string> _clientUuids;
 
             void _setupAcceptNewSocket();
             void _acceptHandler(const boost::system::error_code& error);
 
             void _setupReadSocket(ClientTCP& client);
 
-            void _broadcastChat(const std::string &senderUuid, const ::network::ClientSendMessage &msg);
+            void _broadcastChat(const int& col, const ::network::ClientSendMessage &msg);
     };
 } // namespace network

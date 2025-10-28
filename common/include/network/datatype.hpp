@@ -53,6 +53,7 @@ namespace network
     struct ClientReceiveMessage final
     {
             char msg[BUFFERSIZE] = {};
+	    int hexcol = 0;
     };
 
     struct ClientTCPReceivedInfo final
