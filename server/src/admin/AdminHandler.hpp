@@ -30,7 +30,7 @@ namespace Server {
         void _getNbRooms();
         void _getRoomsInfo();
 
-        void _getRoomInfo() {};
+        void _getRoomInfo();
         void _kickPlayer() {};
         void _getRemainingMobs() {};
         void _spawnMob() {};

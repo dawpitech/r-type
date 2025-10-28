@@ -84,9 +84,9 @@ void Server::Server::run()
                 std::string input;
                 std::cout << ">> ";
                 std::getline(std::cin, input);
+                std::cin.clear();
                 admin.executeInput(input);
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                std::cin.clear();
             }
         });
     }
@@ -102,4 +102,11 @@ void Server::Server::displayRoomsInfos()
     for (auto &it: this->_rooms) {
         it->displayInfo();
     }
+}
+
+void Server::Server::displayRoomInfos(uint8_t roomNumber)
+{
+    if (roomNumber >= this->_rooms.size())
+        return;
+    this->_rooms[roomNumber]->displayInfo();
 }
