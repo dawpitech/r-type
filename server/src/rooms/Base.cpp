@@ -5,6 +5,7 @@
 // Logic for each rooms
 //
 
+#include <exception>
 #include <format>
 #include <mutex>
 
@@ -24,24 +25,43 @@ Room::Room::Room(const std::size_t roomNumber, const std::uint8_t nbPlayers)
     : _roomNumber(roomNumber), _nbPlayerMax(nbPlayers)
 {}
 
+Room::Room::~Room()
+{
+    this->stop();
+}
+
 void Room::Room::run()
 {
-    {
-        std::lock_guard<std::mutex> lock(this->_roomMutex);
-        Simulation::setInitialSimState(this->_ecs, "Level_0");
-    }
-    this->_setRoomReady();
-    this->_waitRoomFull();
+    std::thread threadRun([this] {
+        {
+            std::lock_guard<std::mutex> lock(this->_roomMutex);
+            Simulation::setInitialSimState(this->_ecs, "Level_0");
+        }
+        this->_setRoomReady();
+        this->_waitRoomFull();
 
-    flux::runtimeHooks hooks;
-    this->_initHooks(hooks);
-    this->_ecs.handExecution(hooks);
+        if (!this->_isRunning) {
+            return;
+        }
+        flux::runtimeHooks hooks;
+        this->_initHooks(hooks);
+        this->_ecs.handExecution(hooks);
+    });
+    threadRun.join();
+}
+
+void Room::Room::stop()
+{
+    this->_isRunning = false;
+    this->_readyCondition.notify_all();
+    this->_fullCondition.notify_all();
+    this->_ecs.stop();
 }
 
 void Room::Room::_waitRoomFull()
 {
     std::unique_lock<std::mutex> lock(this->_roomMutex);
-    this->_fullCondition.wait(lock, [this] { return this->_players.size() >= BASEROOMPLAYER; });
+    this->_fullCondition.wait(lock, [this] { return !this->_isRunning || this->_players.size() >= BASEROOMPLAYER; });
 }
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
