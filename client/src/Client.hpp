@@ -29,7 +29,7 @@ namespace client {
 
     class Client {
        public:
-        Client(const std::string &ip, uint16_t port);
+        Client(const std::string &ip, uint16_t port, uint16_t voicePort);
         ~Client();
 
         void run();
@@ -41,12 +41,13 @@ namespace client {
 
         std::string _ip;
         unsigned _port = 0;
+        unsigned _voicePort = 0;
         unsigned _inputIndex = 0;
 
         std::unique_ptr<raylib::Window> _window = nullptr;
         std::unique_ptr<client::network::TCPClient> _networkTCPClient = nullptr;
-        std::unique_ptr<client::network::UDPClient> _networkUDPClient = nullptr;
-        std::unique_ptr<client::network::UDPClient> _voiceUDPClient = nullptr;
+        std::unique_ptr<client::network::UDPClient<::network::UDPSentInfo>> _networkUDPClient = nullptr;
+        std::unique_ptr<client::network::UDPClient<::network::UDPVoiceInfo>> _voiceUDPClient = nullptr;
 
         std::queue<component::PlayerInput> _inputs;
         ::network::ClientTCPSentInfo _gameInfo;

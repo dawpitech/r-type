@@ -133,7 +133,7 @@ void voice::VoiceChat::setSoundToSend(network::UDPVoiceInfo &info)
     auto soundToSend = this->_getRecordData();
     if (soundToSend.empty())
         return;
-    info.soundBuffer = soundToSend;
+    info.serializedData = soundToSend;
 }
 
 std::string voice::VoiceChat::_getRecordData()

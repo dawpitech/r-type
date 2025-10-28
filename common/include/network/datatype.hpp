@@ -74,7 +74,7 @@ namespace network {
 
     struct UDPVoiceInfo final {
         std::string userID;
-        std::string soundBuffer;
+        std::string serializedData;
     };
 
 }  // namespace network

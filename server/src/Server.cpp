@@ -19,6 +19,7 @@
 Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms)
     : _nbRooms(nbRooms), _connectionNetwork(port), _gameUpdateNetwork(port), _voiceNetwork(0)
 {
+    utils::Logger::debug(std::format("Voice port: {}", this->_voiceNetwork.getPort()));
     this->_connectionNetwork.attach<network::ConnectionInfo>(
         [this](const network::ConnectionInfo &info) {
             this->_playerManager.createNewPlayer(

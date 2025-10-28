@@ -9,27 +9,32 @@
 
 #include <boost/asio.hpp>
 
-#include "network/datatype.hpp"
 #include "network/Network.hpp"
+#include "network/datatype.hpp"
 
 using boost::asio::ip::udp;
 
-namespace network
-{
-    class UDPNetwork final : public ServerNetwork
-    {
-        public:
-            explicit UDPNetwork(uint16_t port);
-            ~UDPNetwork() = default;
+namespace network {
+    class UDPNetwork final : public ServerNetwork {
+       public:
+        explicit UDPNetwork(uint16_t port);
+        ~UDPNetwork() = default;
 
-            void sendData(std::string &ip, uint16_t port, const std::string &data);
+        void sendData(std::string &ip, uint16_t port, const std::string &data);
 
-        private:
-            udp::endpoint _endpoint;
-            udp::endpoint _remoteEndpoint;
-            std::unique_ptr<udp::socket> _socket = nullptr;
-            UDPReceivedInfo _data;
+        unsigned getPort()
+        {
+            if (this->_socket == nullptr)
+                return 0;
+            return this->_socket->local_endpoint().port();
+        }
 
-            void async_read();
+       private:
+        udp::endpoint _endpoint;
+        udp::endpoint _remoteEndpoint;
+        std::unique_ptr<udp::socket> _socket = nullptr;
+        UDPReceivedInfo _data;
+
+        void async_read();
     };
-} // namespace network
+}  // namespace network

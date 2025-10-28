@@ -19,11 +19,13 @@
 #include <memory>
 #include <unordered_map>
 
-client::Client::Client(const std::string &ip, uint16_t port) : _ip(ip), _port(port)
+client::Client::Client(const std::string &ip, uint16_t port, uint16_t voicePort)
+    : _ip(ip), _port(port), _voicePort(voicePort)
 {
     this->_window = std::make_unique<raylib::Window>(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, WINDOW_BASE_NAME);
-    this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
-    this->_voiceUDPClient = std::make_unique<client::network::UDPClient>(ip, 0);
+    this->_networkUDPClient = std::make_unique<client::network::UDPClient<::network::UDPSentInfo>>(ip, port);
+    this->_voiceUDPClient =
+        std::make_unique<client::network::UDPClient<::network::UDPVoiceInfo>>(ip, voicePort);
     this->_networkTCPClient = std::make_unique<client::network::TCPClient>(
         ip, port, this->_networkUDPClient->getLocalPort(), this->_voiceUDPClient->getLocalPort());
 
@@ -79,15 +81,15 @@ void client::Client::_initNetworkableHooks()
     this->_networkUDPClient->attach<::network::UDPSentInfo>([this](const ::network::UDPSentInfo &info) {
         this->_ecs.unserializeAllComponents(info.serializedData);
     });
-    // this->_voiceUDPClient->attach<::network::UDPVoiceSentInfo>(
-    //     [this](const ::network::UDPVoiceSentInfo &info) {
-    //         if (!info.soundBuffer.empty()) {
-    //             this->voiceChat.receiveSound(info.soundBuffer);
-    //         }
-    //     });
+    this->_voiceUDPClient->attach<::network::UDPVoiceInfo>([this](const ::network::UDPVoiceInfo &info) {
+        std::cout << "Received info: " << info.serializedData << std::endl;
+        this->voiceChat.receiveSound(info.serializedData);
+    });
+
     this->_hooks.hooksNetwork = [this](flux::ECS &) {
         this->_networkTCPClient->run();
         this->_networkUDPClient->connect();
+        this->_voiceUDPClient->connect();
     };
 
     this->_lastInputSend = std::chrono::steady_clock::now();
@@ -130,9 +132,9 @@ void client::Client::_sendPlayerInput(
                 data.game = *playerInput;
 
                 this->voiceChat.setSoundToSend(voiceInfo);
-                voiceInfo.userID = this->_gameInfo.userID;
-                if (!voiceInfo.soundBuffer.empty()) {
-                    //send voiceInfo
+                if (!voiceInfo.serializedData.empty()) {
+                    voiceInfo.userID = this->_gameInfo.userID;
+                    this->_voiceUDPClient->async_write(voiceInfo);
                 }
 
                 if (this->_lastSentInput != data.game) {

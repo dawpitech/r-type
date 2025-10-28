@@ -7,49 +7,41 @@
 
 #pragma once
 
+#include "utils/error.hpp"
 #include <boost/program_options.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include "utils/error.hpp"
 
 namespace po = boost::program_options;
 
-namespace utils
-{
-    class ParsingError final : public BaseError
-    {
-        public:
-            ParsingError(const std::string& msg, const std::string& where) :
-                BaseError(msg, where) {};
+namespace utils {
+    class ParsingError final : public BaseError {
+       public:
+        ParsingError(const std::string &msg, const std::string &where) : BaseError(msg, where) {};
     };
 
-    class Parser
-    {
-        public:
-            explicit Parser(int argc, char** argv) :
-                _desc("Options"), _argc(argc), _argv(argv)
-            {
-                this->_desc.add_options()("help,h", "Display help message")(
-                    "debug,d", "Enable debug mode")(
-                    "port,p", po::value<uint16_t>(),
-                    "Set port to connect to")("ip,i", po::value<std::string>(),
-                                          "Ip of the server");
-            };
-            ~Parser() = default;
+    class Parser {
+       public:
+        explicit Parser(int argc, char **argv) : _desc("Options"), _argc(argc), _argv(argv)
+        {
+            this->_desc.add_options()("help,h", "Display help message")("debug,d", "Enable debug mode")(
+                "port,p", po::value<uint16_t>(), "Set port to connect to")("ip,i", po::value<std::string>(),
+                "Ip of the server")("vocalPort,v", po::value<uint16_t>(), "Set vocal port to connect to");
+        };
 
-            void parseArgs()
-            {
-                po::store(po::parse_command_line(this->_argc, this->_argv,
-                                                 this->_desc),
-                          this->_variables);
-                po::notify(this->_variables);
-            };
+        ~Parser() = default;
 
-            po::variables_map getArgs() { return this->_variables; }
+        void parseArgs()
+        {
+            po::store(po::parse_command_line(this->_argc, this->_argv, this->_desc), this->_variables);
+            po::notify(this->_variables);
+        };
 
-        private:
-            int _argc;
-            char** _argv;
-            po::options_description _desc;
-            po::variables_map _variables;
+        po::variables_map getArgs() { return this->_variables; }
+
+       private:
+        int _argc;
+        char **_argv;
+        po::options_description _desc;
+        po::variables_map _variables;
     };
-} // namespace utils
+}  // namespace utils

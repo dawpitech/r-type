@@ -49,8 +49,9 @@ int main(int argc, char **argv)
 
         const auto serverIP = variables["ip"].as<std::string>();
         const auto serverPort = variables["port"].as<uint16_t>();
+        const auto serverVocalPort = variables["vocalPort"].as<uint16_t>();
 
-        client::Client gameClient(serverIP, serverPort);
+        client::Client gameClient(serverIP, serverPort, serverVocalPort);
 
         gameClient.run();
     } catch (const utils::BaseError &e) {

@@ -83,7 +83,8 @@ void game::PlayersManager::dispatchSound(const network::UDPVoiceInfo &info)
         return;
     for (auto &it: this->_players) {
         if (it->getRoom() == room && it->getId() != info.userID) {
-            it->sendVoice(info.soundBuffer);
+            std::cout << "Send voice from " << info.userID << " to " << it->getId() << std::endl;
+            it->sendVoice(info.serializedData);
         }
     }
 }
