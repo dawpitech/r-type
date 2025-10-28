@@ -9,6 +9,7 @@
 #include <string>
 #include "components/Camera.hpp"
 #include "components/Collider.hpp"
+#include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/NetworkIdentification.hpp"
@@ -29,6 +30,10 @@
 #include "systems/movementSystem.hpp"
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
+#include "systems/fixOnScreenSystems.hpp"
+
+constexpr float MAP_WIDTH = 800;
+constexpr float MAP_HEIGHT = 450;
 
 void Simulation::setInitialClientSimState(flux::ECS& ecs, std::string level)
 {
@@ -79,6 +84,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Velocity>("Velocity");
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
     ecs.registerComponentType<component::Camera>("Camera");
+    ecs.registerComponentType<component::FixOnScreen>("FixOnScreen");
     ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::Mob>();
@@ -90,11 +96,13 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Velocity>();
     ecs.Register<component::NetworkIdentification>();
     ecs.Register<component::Camera>();
+    ecs.Register<component::FixOnScreen>();
 }
 
 void Simulation::_registerGameSystems(flux::ECS& ecs)
 {
     ecs.registerSystem(InputHandlerSystem, InputHandlerSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(FixOnScreenSystem, FixOnScreenSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs),
@@ -128,24 +136,24 @@ void Simulation::_registerMenuSystems(flux::ECS& ecs)
 
 void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
 {
-    constexpr int startX = 0;
-    constexpr int width = 66;
-    constexpr int height = 34;
+    constexpr int startX = 2;
+    constexpr int width = 64;
+    constexpr int height = 29;
     int startY;
 
     switch (type) {
         case PLAYER_TYPE::PLAYER_ONE:
-            startY = 0;
+            startY = 5;
             break;
         case PLAYER_TYPE::PLAYER_TWO:
-            startY = 34;
+            startY = 39;
             break;
         case PLAYER_TYPE::PLAYER_THREE:
-            startY = 68;
+            startY = 73;
             break;
         default:
         case PLAYER_TYPE::PLAYER_FOUR:
-            startY = 102;
+            startY = 107;
             break;
     }
 
@@ -160,12 +168,14 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     ecs.Add<component::Collider>(
         playerEntity,
         component::Collider(component::CollisionLayer::PLAYER, component::CollisionLayer::WALL, 0, 0, width, height));
+    ecs.Add<component::FixOnScreen>(playerEntity, component::FixOnScreen());
 }
 
 void Simulation::_createCamera(flux::ECS& ecs)
 {
     flux::Entity camera = ecs.newEntity();
-    ecs.Add<component::Camera>(camera, component::Camera(0, 0, 800 / 2, 450 / 2));
-    ecs.Add<component::Transform>(camera, component::Transform(800 / 2, 450 / 2, 0, 1, 1));
+    ecs.Add<component::Camera>(camera, component::Camera(MAP_WIDTH / 2, MAP_HEIGHT / 2));
+    ecs.Add<component::Transform>(camera, component::Transform(MAP_WIDTH / 2, MAP_HEIGHT / 2, 0, 1, 1));
     ecs.Add<component::Velocity>(camera, component::Velocity());
+    ecs.Add<component::FixOnScreen>(camera, component::FixOnScreen());
 }

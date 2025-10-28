@@ -9,7 +9,9 @@
 #include <unordered_map>
 
 #include "Rooms.hpp"
+#include "components/Camera.hpp"
 #include "components/Collider.hpp"
+#include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/NetworkIdentification.hpp"
@@ -97,6 +99,8 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::Transform>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Velocity>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::Camera>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::FixOnScreen>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::NetworkIdentification>(this->_ecs, componentStore);
 
     this->_snapshots.push_back(componentStore);
@@ -116,6 +120,8 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Transform>(entity, component, out);
     this->_getSerializedComponent<component::Velocity>(entity, component, out);
     this->_getSerializedComponent<component::Sprite>(entity, component, out);
+    this->_getSerializedComponent<component::Camera>(entity, component, out);
+    this->_getSerializedComponent<component::FixOnScreen>(entity, component, out);
 }
 
 void Room::Room::_sendSnapshotToPlayer(std::ostringstream &serializedData)
