@@ -24,7 +24,8 @@ namespace Server {
 
         void run();
         void stop() {this->_isRunning = false;}
-        std::uint8_t getNbRooms() {return this->_nbRooms;}
+        std::uint8_t getNbRooms() const {return this->_nbRooms;}
+        void displayRoomsInfos();
         
        private:
         std::uint8_t _nbRooms = 0;

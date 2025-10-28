@@ -96,3 +96,10 @@ void Server::Server::run()
         std::this_thread::sleep_for(std::chrono::nanoseconds(10));
     }
 }
+
+void Server::Server::displayRoomsInfos()
+{
+    for (auto &it: this->_rooms) {
+        it->displayInfo();
+    }
+}

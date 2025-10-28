@@ -33,6 +33,7 @@ namespace Room {
         void clear(std::uint8_t nbPlayers);
 
         bool addPlayer(game::Player &player);
+        void displayInfo() const;
 
         bool isRoomFull();
         void notifyRoomFull();

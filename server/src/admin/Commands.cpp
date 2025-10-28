@@ -17,4 +17,5 @@ void Server::AdminHandler::_getNbRooms()
 
 void Server::AdminHandler::_getRoomsInfo()
 {
+    this->_server.displayRoomsInfos();
 }
