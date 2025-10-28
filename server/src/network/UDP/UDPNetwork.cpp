@@ -25,9 +25,16 @@ network::UDPNetwork::UDPNetwork(std::uint16_t port) : ServerNetwork(port), _endp
 
 void network::UDPNetwork::sendData(std::string &ip, uint16_t port, const std::string &data)
 {
+    if (port == 0) {
+        return;
+    }
     udp::endpoint remoteEndpoint(boost::asio::ip::make_address(ip), port);
     auto compressedData = this->_compressString(data);
-    this->_socket->send_to(boost::asio::buffer(compressedData), remoteEndpoint);
+    boost::system::error_code ec;
+    this->_socket->send_to(boost::asio::buffer(compressedData), remoteEndpoint, 0, ec);
+    if (ec) {
+        utils::Logger::debug(std::format("UDP send_to error ({}:{}): {}", ip, port, ec.message()));
+    }
 }
 
 void network::UDPNetwork::async_read()

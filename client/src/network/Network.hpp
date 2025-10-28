@@ -40,6 +40,7 @@ namespace client::network {
         std::function<void(const ::network::UDPReceivedInfo &)> _udpReceivedCallback;
         std::function<void(const ::network::UDPSentInfo &)> _udpSentCallback;
         std::function<void(const ::network::ConnectionInfo &)> _connectionCallback;
+        std::function<void(const ::network::ClientReceiveMessage &)> _chatReceiveCallback;
 
         std::string _compressString(const std::string &string);
         std::string _decompressString(const std::string &string);

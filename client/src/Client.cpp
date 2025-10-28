@@ -25,6 +25,7 @@
 #include "systems/inputDetectorSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/setCamera.hpp"
+#include "utils/logger.hpp"
 
 client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
 {
@@ -55,15 +56,16 @@ void client::Client::_initHooks()
 
     this->_hooks = {
         .hookBeforeRender =
-            [&window, &masterRunVar]
+            [this, &window, &masterRunVar]
         {
             window->ClearBackground();
             BeginDrawing();
             BeginMode2D(CameraRaylib::getCamera());
             if (window->ShouldClose())
                 masterRunVar = false;
+            this->_handleChatInput();
         },
-        .hookAfterRender = [] { EndMode2D(); EndDrawing(); },
+        .hookAfterRender = [this] { EndMode2D(); this->_renderChat(); EndDrawing(); },
     };
     this->_initNetworkableHooks();
 }
@@ -85,6 +87,11 @@ void client::Client::_initNetworkableHooks()
             this->_gameLaunch = true;
             this->_ecs.unserializeAllComponents(info.serializedData);
         });
+    this->_networkTCPClient->attach<::network::ClientReceiveMessage>([this](const ::network::ClientReceiveMessage &msg) {
+        this->_chatLog.emplace_back(std::string(msg.msg), msg.hexcol);
+        if (this->_chatLog.size() > 6)
+            this->_chatLog.pop_front();
+    });
     this->_hooks.hooksNetwork = [this](flux::ECS&)
     {
         this->_networkTCPClient->run();
@@ -98,7 +105,7 @@ void client::Client::_initNetworkableHooks()
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
 
-        if (elapsed.count() < INPUT_SEND_DELAY)
+        if (this->_chatTyping || elapsed.count() < INPUT_SEND_DELAY)
             return;
 
         std::unordered_map<flux::Entity, std::vector<std::any>> componentStore;
@@ -155,4 +162,51 @@ void client::Client::run()
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }
     this->_ecs.handExecution(this->_hooks);
+}
+
+void client::Client::_handleChatInput()
+{
+    if (IsKeyPressed(KEY_ENTER)) {
+        if (!this->_chatTyping) {
+            this->_chatTyping = true;
+            this->_chatBuffer.clear();
+        } else {
+            this->_chatTyping = false;
+            if (!this->_chatBuffer.empty()) {
+                ::network::ClientSendMessage msg{};
+                std::snprintf(msg.msg, ::network::BUFFERSIZE, "%s", this->_chatBuffer.c_str());
+                this->_networkTCPClient->sendChat(msg);
+            }
+        }
+    }
+    if (this->_chatTyping) {
+        int key = GetCharPressed();
+        while (key > 0) {
+            if (key >= 32 && key <= 125) {
+                if (this->_chatBuffer.size() < (::network::BUFFERSIZE - 1))
+                    this->_chatBuffer.push_back(static_cast<char>(key));
+            }
+            key = GetCharPressed();
+        }
+        if (IsKeyPressed(KEY_BACKSPACE) && !this->_chatBuffer.empty())
+            this->_chatBuffer.pop_back();
+    }
+}
+
+void client::Client::_renderChat()
+{
+    BeginScissorMode(0, WINDOW_BASE_HEIGHT - 120, 400, 120);
+    int y = WINDOW_BASE_HEIGHT - 40;
+    for (auto it = this->_chatLog.rbegin(); it != this->_chatLog.rend(); ++it) {
+        raylib::Color col = raylib::Color(it->second);
+        col.DrawText(it->first.c_str(), 10, y, 16);
+        y -= 18;
+        if (y < WINDOW_BASE_HEIGHT - 120)
+            break;
+    }
+    if (this->_chatTyping) {
+        std::string line = "> " + this->_chatBuffer + ((GetTime() - static_cast<int>(GetTime()) < 0.5) ? "_" : "");
+        DrawText(line.c_str(), 10, WINDOW_BASE_HEIGHT - 18, 16, YELLOW);
+    }
+    EndScissorMode();
 }

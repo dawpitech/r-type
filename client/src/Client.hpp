@@ -53,10 +53,17 @@ namespace client {
 
         bool _gameLaunch = false;
 
+        bool _chatTyping = false;
+        std::string _chatBuffer;
+        std::deque<std::pair<std::string, int>> _chatLog;
+
         void _initHooks();
         void _initNetworkableHooks();
         void _registerBase();
         void _sendPlayerInput(const std::unordered_map<flux::Entity, std::vector<std::any>> &componentStore,
             const std::chrono::steady_clock::time_point &now);
+
+        void _handleChatInput();
+        void _renderChat();
     };
 }  // namespace client

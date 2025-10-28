@@ -64,6 +64,9 @@ bool Room::Room::addPlayer(game::Player &player)
     player.assignRoom(this->_roomNumber);
 
     this->_assignPlayerToEntity(player);
+    if (this->_players.size() >= this->_nbPlayerMax) {
+        this->_fullCondition.notify_all();
+    }
     return true;
 }
 

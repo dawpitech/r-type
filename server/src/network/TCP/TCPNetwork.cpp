@@ -5,6 +5,7 @@
 // Function for the tcp connection
 //
 
+#include <Color.hpp>
 #include <functional>
 #include <boost/system/error_code.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -52,7 +53,8 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
     this->notify(info);
 
     ClientTCPSentInfo dataToSend(info.uuid, this->_port, 0);
-    client->send(dataToSend);
+    client->sendTCPInfo(dataToSend);
+    utils::Logger::debug(std::format("TCP handshake user {} assigned", info.uuid));
     
     utils::Logger::debug(std::format("New connection accepted from: {}:{}", socketIp, socketPort));
     
@@ -62,4 +64,36 @@ void network::TCPNetwork::_acceptHandler(const boost::system::error_code& error)
 }
 
 
-void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client) { client.async_read(*this); }
+void network::TCPNetwork::_setupReadSocket(network::ClientTCP& client)
+{
+    client.async_read_with_chat(*this, [this](const ::network::ClientSendMessage &msg, boost::asio::ip::tcp::socket &sock) {
+	const std::vector<raylib::Color> colors{raylib::Color::SkyBlue(), raylib::Color::Purple(), raylib::Color::Green(), raylib::Color::Red(), raylib::Color::Blue()};
+	int col = colors[0].ToInt();
+        try {
+            auto endpoint = sock.remote_endpoint();
+            auto ip = endpoint.address().to_string();
+            auto port = endpoint.port();
+            for (size_t i = 0; i < this->_clients.size(); ++i) {
+                if (&(this->_clients[i]->getSocket()) == &sock) {
+		    col = colors[i % colors.size()].ToInt();
+                    break;
+                }
+            }
+        } catch (...) {}
+	this->_broadcastChat(col, msg);
+    });
+}
+
+void network::TCPNetwork::_broadcastChat(const int &col, const ::network::ClientSendMessage &msg)
+{
+    ::network::ClientReceiveMessage recv{};
+    std::memcpy(recv.msg, msg.msg, ::network::BUFFERSIZE);
+    recv.hexcol = col;
+    for (auto &cli : this->_clients) {
+        try {
+            cli->sendChatReceive(recv);
+        } catch (const std::exception &e) {
+            utils::Logger::debug(std::format("Error broadcasting chat to client: {}", e.what()));
+        }
+    }
+}
