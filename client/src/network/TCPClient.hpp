@@ -32,6 +32,7 @@ namespace client::network
             void disconnect() override;
 
             void sendData(const ::network::ClientTCPReceivedInfo& data);
+            void sendChat(const ::network::ClientSendMessage &msg);
             bool isConnected() const;
 
         private:

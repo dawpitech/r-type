@@ -39,6 +39,10 @@ void client::network::Network::attach(std::function<void(const T&)> callback)
         this->_udpSentCallback = std::move(callback);
         return;
     }
+    if constexpr (std::is_same_v<T, ::network::ClientReceiveMessage>) {
+        this->_chatReceiveCallback = std::move(callback);
+        return;
+    }
 }
 
 void client::network::Network::notify(const ::network::NetworkData& data)
@@ -65,6 +69,12 @@ void client::network::Network::notify(const ::network::NetworkData& data)
             if constexpr (std::is_same_v<T, ::network::UDPSentInfo>) {
                 if (this->_udpSentCallback) {
                     this->_udpSentCallback(arg);
+                }
+                return;
+            }
+            if constexpr (std::is_same_v<T, ::network::ClientReceiveMessage>) {
+                if (this->_chatReceiveCallback) {
+                    this->_chatReceiveCallback(arg);
                 }
                 return;
             }
@@ -130,3 +140,5 @@ template void
     client::network::Network::attach<::network::ConnectionInfo>(std::function<void(const ::network::ConnectionInfo&)>);
 template void
     client::network::Network::attach<::network::UDPSentInfo>(std::function<void(const ::network::UDPSentInfo&)>);
+template void client::network::Network::attach<::network::ClientReceiveMessage>(
+    std::function<void(const ::network::ClientReceiveMessage&)>);

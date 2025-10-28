@@ -30,6 +30,11 @@ void network::ServerNetwork::notify(const NetworkData &data)
                     this->_tcpReceivedCallback(arg);
                 return;
             }
+            if constexpr (std::is_same_v<T, ClientSendMessage>) {
+                if (this->_tcpReceivedCallback) {
+                }
+                return;
+            }
             if constexpr (std::is_same_v<T, UDPReceivedInfo>) {
                 if (this->_udpReceivedCallback)
                     this->_udpReceivedCallback(arg);

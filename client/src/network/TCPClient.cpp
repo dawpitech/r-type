@@ -67,6 +67,8 @@ void client::network::TCPClient::sendData(const ::network::ClientTCPReceivedInfo
     }
 
     utils::Logger::debug("Client sent connection info");
+    const ::network::PacketType header = ::network::PacketType::TCPInfo;
+    boost::asio::write(this->_socket, boost::asio::buffer(&header, sizeof(header)));
     boost::asio::write(this->_socket, boost::asio::buffer(&data, sizeof(data)));
 }
 
@@ -89,14 +91,56 @@ void client::network::TCPClient::_connectHandler(const boost::system::error_code
 
 void client::network::TCPClient::_setupRead()
 {
-    boost::system::error_code error;
-    std::size_t bytesRead = boost::asio::read(
+    auto header = std::make_shared<::network::PacketType>();
+    boost::asio::async_read(
         this->_socket,
-        boost::asio::buffer(&this->_info, sizeof(::network::ClientTCPSentInfo)),
-        error
+        boost::asio::buffer(header.get(), sizeof(::network::PacketType)),
+        [this, header](const boost::system::error_code &error, size_t /*bytesRead*/)
+        {
+            if (error) {
+                return;
+            }
+            if (*header == ::network::PacketType::TCPInfo) {
+                boost::asio::async_read(
+                    this->_socket,
+                    boost::asio::buffer(&this->_info, sizeof(::network::ClientTCPSentInfo)),
+                    [this](const boost::system::error_code &err, size_t bytesRead)
+                    {
+                        this->_readHandler(err, bytesRead);
+                        if (!err)
+                            this->_setupRead();
+                    }
+                );
+            } else if (*header == ::network::PacketType::ChatReceive) {
+                auto sender = std::make_shared<std::array<char, ::network::BUFFERSIZE>>();
+                auto chat = std::make_shared<::network::ClientReceiveMessage>();
+                boost::asio::async_read(
+                    this->_socket,
+                    boost::asio::buffer(sender->data(), ::network::BUFFERSIZE),
+                    [this, sender, chat](const boost::system::error_code &err, size_t) {
+                        if (err) {
+                            utils::Logger::debug(std::format("TCP read sender error: {}", err.message()));
+                            return;
+                        }
+                        boost::asio::async_read(
+                            this->_socket,
+                            boost::asio::buffer(chat.get(), sizeof(::network::ClientReceiveMessage)),
+                            [this, sender, chat](const boost::system::error_code &err2, size_t) {
+                                if (!err2) {
+                                    ::network::ClientReceiveMessage merged{};
+                                    std::snprintf(merged.msg, ::network::BUFFERSIZE, "%s: %s", sender->data(), chat->msg);
+                                    this->notify(merged);
+                                }
+                                this->_setupRead();
+                            }
+                        );
+                    }
+                );
+            } else {
+                this->_setupRead();
+            }
+        }
     );
-
-    this->_readHandler(error, bytesRead);
 }
 
 void client::network::TCPClient::_readHandler(
@@ -125,6 +169,8 @@ void client::network::TCPClient::_readHandler(
     info.portUDP = this->_selfUDPPort;
 
     try {
+        const ::network::PacketType header = ::network::PacketType::TCPInfo;
+        boost::asio::write(this->_socket, boost::asio::buffer(&header, sizeof(header)));
         boost::asio::write(this->_socket, boost::asio::buffer(&info, sizeof(info)));
         utils::Logger::debug(std::format("Sent ClientTCPReceivedInfo via TCP udpPort {}\n", info.portUDP));
     } catch (const boost::system::system_error& e) {
@@ -132,4 +178,12 @@ void client::network::TCPClient::_readHandler(
     }
 
     utils::Logger::debug(std::format("UDP client local port: {}\n", info.portUDP));
+}
+
+void client::network::TCPClient::sendChat(const ::network::ClientSendMessage &msg)
+{
+    if (!this->_connected) return;
+    const ::network::PacketType header = ::network::PacketType::ChatSend;
+    boost::asio::write(this->_socket, boost::asio::buffer(&header, sizeof(header)));
+    boost::asio::write(this->_socket, boost::asio::buffer(&msg, sizeof(msg)));
 }

@@ -51,6 +51,9 @@ namespace game {
 
         void sendData(const std::string &string)
         {
+            if (this->_udpPort == 0) {
+                return;
+            }
             this->_network.sendData(this->_ip, this->_udpPort, string);
         }
 
