@@ -26,9 +26,10 @@ namespace Room {
     class Room {
        public:
         explicit Room(std::size_t roomNumber, std::uint8_t nbPlayers = BASEROOMPLAYER);
-        ~Room() = default;
+        ~Room();
 
         void run();
+        void stop();
         void clear(std::uint8_t nbPlayers);
 
         bool addPlayer(game::Player &player);
@@ -49,6 +50,7 @@ namespace Room {
         std::uint8_t _nbPlayerMax;
         std::size_t _roomNumber;
         bool _isReady = false;
+        std::atomic<bool> _isRunning = true;
 
         void _setRoomReady();
         void _waitRoomFull();
