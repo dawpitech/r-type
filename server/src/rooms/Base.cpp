@@ -30,6 +30,16 @@ Room::Room::~Room()
     this->stop();
 }
 
+void Room::Room::displayInfo() const
+{
+    auto msg = std::format(
+        "Room number {}\n"
+        "\tPlayer {} / {}"
+        ,this->_roomNumber, this->_players.size(), this->_nbPlayerMax
+    );
+    std::cout << msg << std::endl;
+}
+
 void Room::Room::run()
 {
     std::thread threadRun([this] {
