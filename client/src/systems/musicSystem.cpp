@@ -21,10 +21,8 @@ void MusicSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             SetMasterVolume(1.0f);
             PlayMusicStream(music.music);
             music.isPlaying = true;
-            ecs.AddOrReplace(entity, music);
         }
-        std::cout << "Update Music\n";
         UpdateMusicStream(music.music);
-        std::cout << "MUSIC Updated\n";
+        ecs.AddOrReplace(entity, music);
     }
 }
