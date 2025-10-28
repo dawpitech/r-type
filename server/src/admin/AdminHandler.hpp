@@ -31,8 +31,8 @@ namespace Server {
         void _getRoomsInfo();
 
         void _getRoomInfo();
-        void _kickPlayer() {};
-        void _getRemainingMobs() {};
-        void _spawnMob() {};
+        
+        void _resetRooms();
+        void _resetRoom();
     };
 }  // namespace Server

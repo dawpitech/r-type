@@ -24,9 +24,14 @@ namespace Server {
 
         void run();
         void stop() {this->_isRunning = false;}
+
         std::uint8_t getNbRooms() const {return this->_nbRooms;}
+
         void displayRoomsInfos();
         void displayRoomInfos(uint8_t roomNumber);
+
+        void resetRooms();
+        void resetRoom(uint8_t roomNumber);
         
        private:
         std::uint8_t _nbRooms = 0;
@@ -39,5 +44,7 @@ namespace Server {
         game::PlayersManager _playerManager;
         std::vector<std::jthread> _threads;
         std::vector<std::unique_ptr<Room::Room>> _rooms;
+
+        void _setupRooms();
     };
 }  // namespace Room

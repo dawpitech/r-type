@@ -54,7 +54,12 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms, bool cli)
     this->_gameUpdateNetwork.attach<network::UDPReceivedInfo>(
         [this](network::UDPReceivedInfo info) { this->_playerManager.storeInput(info); });
 
-    for (uint16_t i = 0; i < nbRooms; i += 1) {
+    this->_setupRooms();
+}
+
+void Server::Server::_setupRooms()
+{
+    for (uint16_t i = 0; i < this->_nbRooms; i += 1) {
         this->_rooms.push_back(std::make_unique<Room::Room>(i));
         Room::Room *roomPtr = this->_rooms.back().get();
         this->_threads.emplace_back([roomPtr] {
@@ -66,10 +71,10 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms, bool cli)
 
 Server::Server::~Server()
 {
-    for (auto &room: this->_rooms) {
+    for (auto &room : this->_rooms) {
         room->stop();
     }
-    for (auto &thread: this->_threads) {
+    for (auto &thread : this->_threads) {
         thread.join();
     }
 }
@@ -77,7 +82,7 @@ Server::Server::~Server()
 void Server::Server::run()
 {
     if (this->_cli) {
-        this->_threads.emplace_back([this] {
+        std::thread cliThread([this] {
             AdminHandler admin(*this);
             std::cout << "Welcome Dear Administrator" << std::endl;
             while (this->_isRunning) {
@@ -89,6 +94,7 @@ void Server::Server::run()
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         });
+        cliThread.detach();
     }
     while (this->_isRunning) {
         this->_connectionNetwork.connect();
@@ -99,7 +105,7 @@ void Server::Server::run()
 
 void Server::Server::displayRoomsInfos()
 {
-    for (auto &it: this->_rooms) {
+    for (auto &it : this->_rooms) {
         it->displayInfo();
     }
 }
@@ -110,3 +116,18 @@ void Server::Server::displayRoomInfos(uint8_t roomNumber)
         return;
     this->_rooms[roomNumber]->displayInfo();
 }
+
+void Server::Server::resetRooms()
+{
+    for (auto &room : this->_rooms) {
+        room->stop();
+    }
+    for (auto &thread : this->_threads) {
+        thread.join();
+    }
+    this->_rooms.clear();
+    this->_threads.clear();
+    this->_setupRooms();
+}
+
+void Server::Server::resetRoom(uint8_t roomNumber) {}

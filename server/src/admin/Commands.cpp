@@ -32,3 +32,20 @@ void Server::AdminHandler::_getRoomInfo()
     this->_server.displayRoomInfos(roomNumberInt);
     std::cin.clear();
 }
+
+void Server::AdminHandler::_resetRooms()
+{
+    this->_server.resetRooms();
+}
+
+void Server::AdminHandler::_resetRoom()
+{
+    int roomNumberInt = 0;
+    std::cout << "Type room number(start at 0):" << std::endl;
+    std::cin >> roomNumberInt;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (roomNumberInt < 0)
+        return;
+    this->_server.resetRoom(roomNumberInt);
+    std::cin.clear();
+}

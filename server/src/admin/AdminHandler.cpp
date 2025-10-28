@@ -47,14 +47,11 @@ void Server::AdminHandler::_initMap()
     this->_commandsMap["room info"] = [this] {
         this->_getRoomInfo();
     };
-    this->_commandsMap["kick player"] = [this] {
-        this->_kickPlayer();
+    this->_commandsMap["reset rooms"] = [this] {
+        this->_resetRooms();
     };
-    this->_commandsMap["get mobs"] = [this] {
-        this->_getRemainingMobs();
-    };
-    this->_commandsMap["spawn mob"] = [this] {
-        this->_spawnMob();
+    this->_commandsMap["reset room"] = [this] {
+        this->_resetRoom();
     };
     this->_commandsMap["exit"] = [this] {
         this->_server.stop();
