@@ -28,7 +28,7 @@ void Room::Room::run()
 {
     {
         std::lock_guard<std::mutex> lock(this->_roomMutex);
-        Simulation::setInitialSimState(this->_ecs);
+        Simulation::setInitialServerSimState(this->_ecs, "Level_0");
     }
     this->_setRoomReady();
     this->_waitRoomFull();
@@ -64,6 +64,9 @@ bool Room::Room::addPlayer(game::Player &player)
     player.assignRoom(this->_roomNumber);
 
     this->_assignPlayerToEntity(player);
+    if (this->_players.size() >= this->_nbPlayerMax) {
+        this->_fullCondition.notify_all();
+    }
     return true;
 }
 

@@ -9,6 +9,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/detail/error_code.hpp>
+#include <vector>
 
 #include "network/Network.hpp"
 #include "network/datatype.hpp"
@@ -34,5 +35,7 @@ namespace network
             void _acceptHandler(const boost::system::error_code& error);
 
             void _setupReadSocket(ClientTCP& client);
+
+            void _broadcastChat(const int& col, const ::network::ClientSendMessage &msg);
     };
 } // namespace network

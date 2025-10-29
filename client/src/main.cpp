@@ -20,7 +20,7 @@
 
 #include "Client.hpp"
 
-static void checkVariables(const po::variables_map &variables)
+static void checkVariables(const po::variables_map& variables)
 {
     if (!variables.contains("ip")) {
         throw utils::ParsingError("Arg ip undefined", "checkVariables");
@@ -33,7 +33,7 @@ static void checkVariables(const po::variables_map &variables)
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     try {
         utils::Parser parser(argc, argv);
@@ -41,8 +41,7 @@ int main(int argc, char **argv)
         po::variables_map variables = parser.getArgs();
 
         checkVariables(variables);
-        std::string msg =
-            std::format("IP: {}", variables["ip"].as<std::string>());
+        std::string msg = std::format("IP: {}", variables["ip"].as<std::string>());
         utils::Logger::debug(msg);
         msg = std::format("Port: {}", variables["port"].as<uint16_t>());
         utils::Logger::debug(msg);
@@ -53,14 +52,18 @@ int main(int argc, char **argv)
         client::Client gameClient(serverIP, serverPort);
 
         gameClient.run();
-    } catch (const utils::BaseError &e) {
+    }
+    catch (const utils::BaseError& e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;
-    } catch (const po::error &e) {
+    }
+    catch (const po::error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-    } catch (...) {
+    }
+    catch (...) {
         std::cerr << "Unexpected Error" << std::endl;
     }
     return EXIT_SUCCESS;

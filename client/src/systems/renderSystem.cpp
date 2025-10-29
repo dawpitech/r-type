@@ -7,6 +7,7 @@
 
 #include "TextureStore.hpp"
 
+#include <iostream>
 #include <raylib-cpp.hpp>
 
 #include <vector>
@@ -17,9 +18,9 @@
 
 #include <components/Animation.hpp>
 
-flux::View RenderSystemView(const flux::ECS &ecs) {
-  return ecs
-      .GenerateViewFromComponents<component::Sprite, component::Transform>();
+flux::View RenderSystemView(const flux::ECS& ecs)
+{
+    return ecs.GenerateViewFromComponents<component::Sprite, component::Transform>();
 }
 
 void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
@@ -32,10 +33,7 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         sorted_entities.emplace_back(s.zHeight, entity);
     }
 
-    std::ranges::stable_sort(sorted_entities,
-        [](const auto& a, const auto& b) {
-            return a.first < b.first;
-        });
+    std::ranges::stable_sort(sorted_entities, [](const auto& a, const auto& b) { return a.first < b.first; });
 
     for (const auto& [z, entity] : sorted_entities) {
         if (ecs.HasComponent<component::Animation>(entity))
@@ -43,9 +41,8 @@ void RenderSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         const auto& sprite = ecs.GetComponent<component::Sprite>(entity);
         const auto& transform = ecs.GetComponent<component::Transform>(entity);
 
-    const auto &texture = TextureStore::getInstance().getTexture(
-        sprite.assetPath, sprite.srcX, sprite.srcY, sprite.srcW, sprite.srcH);
-    texture.Draw(static_cast<int>(transform.pos.x),
-                 static_cast<int>(transform.pos.y));
-  }
+        const auto& texture = TextureStore::getInstance().getTexture(sprite.assetPath, sprite.srcX, sprite.srcY,
+                                                                     sprite.srcW, sprite.srcH);
+        texture.Draw({transform.pos.x, transform.pos.y}, 0, transform.scale.y);
+    }
 }

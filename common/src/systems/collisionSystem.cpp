@@ -22,11 +22,9 @@ static bool checkRectCollision(utils::Vector4<float> firstRect,
                                utils::Vector4<float> secondRect,
                                component::Transform secondTransform) {
   float left1 = firstTransform.pos.x;
-  float right1 =
-      firstTransform.pos.x + (firstRect.w * firstTransform.scale.x);
+  float right1 = firstTransform.pos.x + (firstRect.w * firstTransform.scale.x);
   float top1 = firstTransform.pos.y;
-  float bottom1 =
-      firstTransform.pos.y + (firstRect.h * firstTransform.scale.y);
+  float bottom1 = firstTransform.pos.y + (firstRect.h * firstTransform.scale.y);
 
   float left2 = secondTransform.pos.x;
   float right2 =
@@ -47,15 +45,14 @@ static void handleCollision(component::Collider &collider,
 void CollisionSystem(flux::ECS &ecs,
                      const std::vector<flux::Entity> &entities) {
   for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
-    auto &collider = ecs.GetComponent<component::Collider>(entities[i]);
-    auto &transform = ecs.GetComponent<component::Transform>(entities[i]);
+    auto collider = ecs.GetComponent<component::Collider>(entities[i]);
+    auto transform = ecs.GetComponent<component::Transform>(entities[i]);
 
     if (!collider.isActive)
       continue;
     for (int y = i - 1; y >= 0; --y) {
-      auto &colliderOther = ecs.GetComponent<component::Collider>(entities[y]);
-      auto &transformOther =
-          ecs.GetComponent<component::Transform>(entities[y]);
+      auto colliderOther = ecs.GetComponent<component::Collider>(entities[y]);
+      auto transformOther = ecs.GetComponent<component::Transform>(entities[y]);
 
       if (!colliderOther.isActive)
         continue;
@@ -64,13 +61,16 @@ void CollisionSystem(flux::ECS &ecs,
                         (colliderOther.mask & collider.layer) != 0;
       if (!canCollide)
         continue;
-            utils::Vector4<float> rect{};
+      utils::Vector4<float> rect{};
       rect.x = collider.srcX;
       rect.y = collider.srcY;
-      rect.h = collider.srch;
-      rect.w = collider.srcw;
-      if (checkRectCollision(rect, transform, rect, transformOther))
+      rect.w = collider.srcW;
+      rect.h = collider.srcH;
+      if (checkRectCollision(rect, transform, rect, transformOther)) {
         handleCollision(collider, colliderOther);
+        ecs.AddOrReplace<component::Collider>(entities[i], collider);
+        ecs.AddOrReplace<component::Collider>(entities[y], colliderOther);
+      }
     }
   }
 }

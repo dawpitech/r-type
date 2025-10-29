@@ -16,13 +16,21 @@ namespace network
 {
     constexpr uint16_t BUFFERSIZE = 64;
 
+    enum class PacketType : uint8_t {
+        TCPInfo = 1,
+        ChatSend = 2,
+        ChatReceive = 3,
+    };
+
     struct ConnectionInfo;
     struct ClientTCPReceivedInfo;
     struct ClientTCPSentInfo;
     struct UDPReceivedInfo;
     struct UDPSentInfo;
+    struct ClientSendMessage;
+    struct ClientReceiveMessage;
 
-    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ClientTCPSentInfo, network::ConnectionInfo, network::UDPReceivedInfo, network::UDPSentInfo>;
+    using NetworkData = std::variant<network::ClientTCPReceivedInfo, network::ClientTCPSentInfo, network::ConnectionInfo, network::UDPReceivedInfo, network::UDPSentInfo, network::ClientSendMessage, network::ClientReceiveMessage>;
 
     template <typename T>
     concept NetworkDataType = requires { std::get<T>(std::declval<NetworkData>()); };
@@ -35,6 +43,17 @@ namespace network
 
             ConnectionInfo(std::string ip, uint16_t port) :
                 ip(std::move(ip)), port(port), uuid(utils::UuidGenerator::generateUuid()) {};
+    };
+
+    struct ClientSendMessage final
+    {
+            char msg[BUFFERSIZE] = {};
+    };
+
+    struct ClientReceiveMessage final
+    {
+            char msg[BUFFERSIZE] = {};
+	    int hexcol = 0;
     };
 
     struct ClientTCPReceivedInfo final
