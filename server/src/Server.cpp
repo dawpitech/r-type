@@ -130,4 +130,18 @@ void Server::Server::resetRooms()
     this->_setupRooms();
 }
 
-void Server::Server::resetRoom(uint8_t roomNumber) {}
+void Server::Server::resetRoom(uint8_t roomNumber)
+{
+    if (roomNumber >= this->_rooms.size())
+        return;
+    this->_rooms[roomNumber]->stop();
+    std::cout << "Reset room number " << roomNumber << std::endl;
+    this->_rooms[roomNumber] = std::make_unique<Room::Room>(roomNumber);
+    Room::Room *roomPtr = this->_rooms[roomNumber].get();
+    std::cout << "Before thread: " << roomNumber << std::endl;
+    this->_threads[roomNumber] = std::jthread([roomPtr] {
+        if (roomPtr)
+            roomPtr->run();
+    });
+    std::cout << "After thread: " << roomNumber << std::endl;
+}
