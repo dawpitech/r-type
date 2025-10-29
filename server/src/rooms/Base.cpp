@@ -45,7 +45,7 @@ void Room::Room::run()
     std::thread threadRun([this] {
         {
             std::lock_guard<std::mutex> lock(this->_roomMutex);
-            Simulation::setInitialSimState(this->_ecs, "Level_0");
+            Simulation::setInitialServerSimState(this->_ecs, "Level_0");
         }
         this->_setRoomReady();
         this->_waitRoomFull();
