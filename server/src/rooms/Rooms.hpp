@@ -39,6 +39,8 @@ namespace Room {
         void notifyRoomFull();
         void waitRoomReady();
 
+        std::uint8_t getNbPlayerMax() {return this->_nbPlayerMax;};
+
        private:
         std::mutex _roomMutex;
         std::mutex _readyMutex;

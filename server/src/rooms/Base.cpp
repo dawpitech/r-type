@@ -76,10 +76,16 @@ void Room::Room::_waitRoomFull()
 
 void Room::Room::clear(const std::uint8_t nbPlayers)
 {
+    // this->stop();
     std::lock_guard<std::mutex> lock(this->_roomMutex);
-    this->_players.erase(this->_players.begin(), this->_players.end());
+    this->_players.clear();
     this->_nbPlayerMax = nbPlayers;
 }
+
+// void Room::Room::restart(const std::uint8_t nbPlayer)
+// {
+//     this->_ecs.stop();
+// }
 
 bool Room::Room::addPlayer(game::Player &player)
 {
