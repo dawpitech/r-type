@@ -9,7 +9,6 @@
 #include <Camera2D.hpp>
 #include <chrono>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <unordered_map>
@@ -25,6 +24,7 @@
 #include "systems/inputDetectorSystem.hpp"
 #include "systems/renderSystem.hpp"
 #include "systems/setCamera.hpp"
+#include "systems/endGameSystem.hpp"
 #include "utils/logger.hpp"
 
 client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
@@ -47,6 +47,7 @@ void client::Client::_registerBase()
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::LOGIC);
+    this->_ecs.registerSystem(endGameCameraSystem, endGameSystemView(this->_ecs), flux::systemType::RENDER);
 }
 
 void client::Client::_initHooks()
