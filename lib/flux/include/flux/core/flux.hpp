@@ -89,6 +89,7 @@ namespace flux
             std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
 
             Entity nextEntityID = 0;
+            Entity invertEntityID = UINT32_MAX;
 
             std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
                 systemsLogicList;
@@ -196,6 +197,20 @@ namespace flux
             Entity newEntity()
             {
                 const Entity id = nextEntityID++;
+                if (entitiesComponentMask.size() <= id)
+                    entitiesComponentMask.resize(id + PAGE_SIZE);
+                componentMaskGroups[entitiesComponentMask[id]].push_back(id);
+                return id;
+            }
+
+            /**
+             * Generate a new entity that has an inverted ID
+             * @note Inverted entities should only be used on client for client side only entities
+             * @return A new allocated entity
+             */
+            Entity newEntityInverted()
+            {
+                const Entity id = invertEntityID--;
                 if (entitiesComponentMask.size() <= id)
                     entitiesComponentMask.resize(id + PAGE_SIZE);
                 componentMaskGroups[entitiesComponentMask[id]].push_back(id);
