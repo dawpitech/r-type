@@ -19,7 +19,7 @@ flux::View endGameSystemView(const flux::ECS& ecs)
     return ecs.GenerateViewFromComponents<component::Camera, component::Transform, component::EndGame>();
 }
 
-void endGameCameraSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
+void endGameSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];

@@ -12,4 +12,4 @@
 #include <components/Transform.hpp>
 
 flux::View endGameSystemView(const flux::ECS& ecs);
-void endGameCameraSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities);
+void endGameSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities);

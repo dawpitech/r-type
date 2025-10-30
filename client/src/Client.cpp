@@ -47,7 +47,7 @@ void client::Client::_registerBase()
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::LOGIC);
-    this->_ecs.registerSystem(endGameCameraSystem, endGameSystemView(this->_ecs), flux::systemType::RENDER);
+    this->_ecs.registerSystem(endGameSystem, endGameSystemView(this->_ecs), flux::systemType::RENDER);
 }
 
 void client::Client::_initHooks()
