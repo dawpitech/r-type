@@ -11,13 +11,13 @@
 #include <sqlite3.h>
 
 void Server::Database::update(const std::string &table, const std::string &primaryKeyName,
-    const std::string &primariKeyValue, const std::string &field, const std::string &value)
+    const std::string &primaryKeyValue, const std::string &field, const std::string &value)
 {
     if (this->_db == nullptr)
         throw DatabaseError("Database not initialized", "update table");
     std::string query = std::format("INSERT INTO {} ({}, {}) VALUES ({}, {})"
                                     "ON CONFLICT({}) DO UPDATE SET {} = {}",
-                                    table, field, primaryKeyName, value, primariKeyValue,
+                                    table, field, primaryKeyName, value, primaryKeyValue,
                                     primaryKeyName, field, value);
 
 
