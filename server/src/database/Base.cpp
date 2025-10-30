@@ -7,6 +7,7 @@
 
 #include "Database.hpp"
 #include <format>
+#include <iostream>
 #include <sqlite3.h>
 
 void Server::Database::_createTable()
@@ -22,10 +23,12 @@ void Server::Database::_createTable()
     char *errorMessage = nullptr;
     auto res = sqlite3_exec(this->_db, query.c_str(), nullptr, nullptr, &errorMessage);
     if (res != SQLITE_OK) {
-        std::string errorStr = errorMessage;
+        std::string errorStr = errorMessage ? errorMessage : "Unknown error";
         if (errorMessage) {
-            free(errorMessage);
+            sqlite3_free(errorMessage);
         }
+        if (errorStr.find("already exists") != errorStr.npos)
+            return;
         throw DatabaseError(std::format("Can't create new database: {}", errorStr), "create table");
     }
 }
