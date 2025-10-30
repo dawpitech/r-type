@@ -197,11 +197,17 @@ void client::Client::_setupLuaEngine() {
 
     std::filesystem::path scriptsDir = "scripts";
     if (exists(scriptsDir)) {
-        for (const auto& entry : std::filesystem::directory_iterator(scriptsDir))
-            lua->script_file(entry.path());
+        for (const auto& entry : std::filesystem::directory_iterator(scriptsDir)) {
+            if (entry.path().extension() != "lua")
+                continue;
+            try {
+                lua->script_file(entry.path());
+            } catch (std::exception&) {
+                std::cout << "WARN: Skipped " << entry.path() << std::endl;
+            }
+        }
     }
 }
-
 
 void client::Client::run()
 {

@@ -16,7 +16,7 @@ flux::View LuaSystemView(const flux::ECS &ecs) {
 }
 
 void LuaSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities) {
-    std::cout << "TRACE: C++: LUA SYSTEM TRIGGERED" << std::endl;
+    //std::cout << "TRACE: C++: LUA SYSTEM TRIGGERED" << std::endl;
 
     const auto lua = LuaContextStore::getInstance().getLuaContext();
     const auto& luaSystems = LuaContextStore::getInstance().getLuaSystems();
