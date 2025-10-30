@@ -89,7 +89,9 @@ namespace flux
             std::unordered_map<std::type_index, std::unique_ptr<IComponentVector>> componentsStore;
 
             Entity nextEntityID = 0;
-            Entity invertEntityID = UINT32_MAX;
+
+            Entity clientEntityID = 0;
+            uint32_t clientEntityOffset = 4096;
 
             std::vector<std::tuple<std::function<void(ECS& ecs, const std::vector<Entity>& entities)>, View>>
                 systemsLogicList;
@@ -210,7 +212,7 @@ namespace flux
              */
             Entity newEntityInverted()
             {
-                const Entity id = invertEntityID--;
+                const Entity id = nextEntityID + clientEntityOffset + clientEntityID++;
                 if (entitiesComponentMask.size() <= id)
                     entitiesComponentMask.resize(id + PAGE_SIZE);
                 componentMaskGroups[entitiesComponentMask[id]].push_back(id);
