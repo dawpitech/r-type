@@ -29,6 +29,8 @@ namespace game {
 
         [[nodiscard]] const std::string &getId() const { return this->_id; }
 
+        uint16_t getScore() {return this->_score;}
+
         void storeInfo(const network::ClientTCPReceivedInfo &info)
         {
             utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));

@@ -9,6 +9,7 @@
 
 #include "Player.hpp"
 #include "components/PlayerInput.hpp"
+#include "database/Database.hpp"
 #include "network/TCP/TCPInfo.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
@@ -27,6 +28,7 @@ namespace game {
         void storeInput(const network::UDPReceivedInfo &info);
 
         std::optional<uint8_t> getPlayerRoom(const std::string &id);
+        void saveScore(Server::Database &database);
 
        private:
         std::mutex _playerLock;

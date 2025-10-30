@@ -99,8 +99,10 @@ void Server::Server::run()
     while (this->_isRunning) {
         this->_connectionNetwork.connect();
         this->_gameUpdateNetwork.connect();
+        this->_playerManager.saveScore(this->_db);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+    this->_playerManager.saveScore(this->_db);
 }
 
 void Server::Server::displayRoomsInfos()
