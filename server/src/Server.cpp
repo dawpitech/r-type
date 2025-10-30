@@ -99,7 +99,7 @@ void Server::Server::run()
     while (this->_isRunning) {
         this->_connectionNetwork.connect();
         this->_gameUpdateNetwork.connect();
-        std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
