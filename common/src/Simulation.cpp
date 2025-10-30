@@ -9,6 +9,7 @@
 #include <string>
 #include "components/Camera.hpp"
 #include "components/Collider.hpp"
+#include "components/EndGame.hpp"
 #include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -52,7 +53,6 @@ void Simulation::setInitialClientSimState(flux::ECS& ecs, std::string level)
         _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
         _registerGameSystems(ecs);
     }
-    _createCamera(ecs);
 }
 
 void Simulation::setInitialServerSimState(flux::ECS& ecs, std::string level)
@@ -68,7 +68,6 @@ void Simulation::setInitialServerSimState(flux::ECS& ecs, std::string level)
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
-    _createCamera(ecs);
 }
 
 void Simulation::_registerComponent(flux::ECS& ecs)
@@ -85,6 +84,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::NetworkIdentification>("NetworkIdentification");
     ecs.registerComponentType<component::Camera>("Camera");
     ecs.registerComponentType<component::FixOnScreen>("FixOnScreen");
+    ecs.registerComponentType<component::EndGame>("EndGame");
     ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::Mob>();
@@ -97,6 +97,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::NetworkIdentification>();
     ecs.Register<component::Camera>();
     ecs.Register<component::FixOnScreen>();
+    ecs.Register<component::EndGame>();
 }
 
 void Simulation::_registerGameSystems(flux::ECS& ecs)
@@ -169,13 +170,4 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
         playerEntity,
         component::Collider(component::CollisionLayer::PLAYER, component::CollisionLayer::WALL, 0, 0, width, height));
     ecs.Add<component::FixOnScreen>(playerEntity, component::FixOnScreen());
-}
-
-void Simulation::_createCamera(flux::ECS& ecs)
-{
-    flux::Entity camera = ecs.newEntity();
-    ecs.Add<component::Camera>(camera, component::Camera(MAP_WIDTH / 2, MAP_HEIGHT / 2));
-    ecs.Add<component::Transform>(camera, component::Transform(MAP_WIDTH / 2, MAP_HEIGHT / 2, 0, 1, 1));
-    ecs.Add<component::Velocity>(camera, component::Velocity());
-    ecs.Add<component::FixOnScreen>(camera, component::FixOnScreen());
 }
