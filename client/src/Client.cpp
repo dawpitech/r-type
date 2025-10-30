@@ -198,8 +198,6 @@ void client::Client::_setupLuaEngine() {
     std::filesystem::path scriptsDir = "scripts";
     if (exists(scriptsDir)) {
         for (const auto& entry : std::filesystem::directory_iterator(scriptsDir)) {
-            if (entry.path().extension() != "lua")
-                continue;
             try {
                 lua->script_file(entry.path());
             } catch (std::exception&) {
