@@ -25,5 +25,7 @@ namespace Server {
 
        private:
         sqlite3 *_db = nullptr;
+        
+        void _createTable();
     };
 }  // namespace Server

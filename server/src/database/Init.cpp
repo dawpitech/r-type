@@ -17,6 +17,7 @@ Server::Database::Database()
         throw DatabaseError("Error while loading database", "Database");
     }
     utils::Logger::debug("Database loaded successfuly");
+    this->_createTable();
 }
 
 Server::Database::~Database()
