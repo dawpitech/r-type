@@ -99,8 +99,10 @@ void Server::Server::run()
     while (this->_isRunning) {
         this->_connectionNetwork.connect();
         this->_gameUpdateNetwork.connect();
-        std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+        this->_playerManager.saveScore(this->_db);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+    this->_playerManager.saveScore(this->_db);
 }
 
 void Server::Server::displayRoomsInfos()
@@ -135,13 +137,10 @@ void Server::Server::resetRoom(uint8_t roomNumber)
     if (roomNumber >= this->_rooms.size())
         return;
     this->_rooms[roomNumber]->stop();
-    std::cout << "Reset room number " << roomNumber << std::endl;
     this->_rooms[roomNumber] = std::make_unique<Room::Room>(roomNumber);
     Room::Room *roomPtr = this->_rooms[roomNumber].get();
-    std::cout << "Before thread: " << roomNumber << std::endl;
     this->_threads[roomNumber] = std::jthread([roomPtr] {
         if (roomPtr)
             roomPtr->run();
     });
-    std::cout << "After thread: " << roomNumber << std::endl;
 }

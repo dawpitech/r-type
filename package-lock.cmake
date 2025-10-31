@@ -47,3 +47,10 @@ CPMDeclarePackage(ldtk_loader
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
 )
+# sqlite3
+CPMDeclarePackage(sqlite3
+        NAME sqlite3
+        URL https://github.com/sqlite/sqlite/archive/refs/tags/version-3.45.0.tar.gz
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)

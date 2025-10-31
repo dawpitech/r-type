@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <thread>
 #include <vector>
+#include "database/Database.hpp"
 #include "player/PlayersManager.hpp"
 #include "network/TCP/TCPNetwork.hpp"
 #include "network/UDP/UDPNetwork.hpp"
@@ -40,6 +41,8 @@ namespace Server {
 
         network::TCPNetwork _connectionNetwork;
         network::UDPNetwork _gameUpdateNetwork;
+
+        Database _db;
 
         game::PlayersManager _playerManager;
         std::vector<std::jthread> _threads;
