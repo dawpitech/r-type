@@ -29,7 +29,7 @@ namespace client {
 
     class Client {
        public:
-        Client(const std::string &ip, uint16_t port);
+        Client(const std::string &ip, uint16_t port, const std::string &userPass);
 
         void run();
 
@@ -40,6 +40,7 @@ namespace client {
         std::string _ip;
         unsigned _port = 0;
         unsigned _inputIndex = 0;
+        std::string _userPass = "";
 
         std::unique_ptr<raylib::Window> _window = nullptr;
         std::unique_ptr<raylib::Camera2D> _camera = nullptr;

@@ -40,6 +40,7 @@ void game::PlayersManager::storeInfo(const network::ClientTCPReceivedInfo& info)
     for (auto& it : this->_players) {
         if (it->getId() == info.uuid) {
             it->storeInfo(info);
+            // std::cout << "Added player with userpass " << info.userPass << std::endl;
             return;
         }
     }
