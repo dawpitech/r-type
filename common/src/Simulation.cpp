@@ -20,6 +20,7 @@
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
+#include "components/score.hpp"
 #include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
 #include "mapLoader.hpp"
@@ -32,6 +33,7 @@
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
 #include "systems/fixOnScreenSystems.hpp"
+#include "systems/scoreSystem.hpp"
 
 constexpr float MAP_WIDTH = 800;
 constexpr float MAP_HEIGHT = 450;
@@ -85,6 +87,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Camera>("Camera");
     ecs.registerComponentType<component::FixOnScreen>("FixOnScreen");
     ecs.registerComponentType<component::EndGame>("EndGame");
+    ecs.registerComponentType<component::Score>("Score");
     ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::Mob>();
@@ -98,6 +101,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Camera>();
     ecs.Register<component::FixOnScreen>();
     ecs.Register<component::EndGame>();
+    ecs.Register<component::Score>();
 }
 
 void Simulation::_registerGameSystems(flux::ECS& ecs)
@@ -114,6 +118,7 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(ScoreSystem, ScoreSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(AnimationSystem,
     // AnimationSystemView(ecs), flux::systemType::RENDER);
 }
@@ -170,4 +175,5 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
         playerEntity,
         component::Collider(component::CollisionLayer::PLAYER, component::CollisionLayer::WALL, 0, 0, width, height));
     ecs.Add<component::FixOnScreen>(playerEntity, component::FixOnScreen());
+    ecs.Add<component::Score>(playerEntity, component::Score());
 }

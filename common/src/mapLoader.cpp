@@ -19,6 +19,7 @@
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
+#include "components/score.hpp"
 #include "flux/core/Serialization.hpp"
 #include "vector4.hpp"
 
@@ -143,6 +144,7 @@ void map::MapLoader::_setMobs()
                                 component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE, pos.x,
                                 pos.y, rect.width, rect.height));
         this->_ecs.Add<component::Health>(mobEntity, component::Health(mob.getField<int>("Health").value()));
+        this->_ecs.Add<component::Score>(mobEntity, component::Score());
     }
 }
 

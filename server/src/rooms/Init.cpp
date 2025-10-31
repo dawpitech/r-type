@@ -22,6 +22,7 @@
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
+#include "components/score.hpp"
 #include "flux/core/Serialization.hpp"
 
 void Room::Room::_initHooks(flux::runtimeHooks &hooks)
@@ -104,6 +105,7 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::FixOnScreen>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::EndGame>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::NetworkIdentification>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::Score>(this->_ecs, componentStore);
 
     this->_snapshots.push_back(componentStore);
     if (this->_snapshots.size() > NB_SNAPSHOTS) {
@@ -125,6 +127,7 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Camera>(entity, component, out);
     this->_getSerializedComponent<component::FixOnScreen>(entity, component, out);
     this->_getSerializedComponent<component::EndGame>(entity, component, out);
+    this->_getSerializedComponent<component::Score>(entity, component, out);
 }
 
 void Room::Room::_sendSnapshotToPlayer(std::ostringstream &serializedData)
