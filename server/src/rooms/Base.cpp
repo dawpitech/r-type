@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include "Simulation.hpp"
+#include "components/Mob.hpp"
 #include "components/NetworkIdentification.hpp"
 #include "components/Player.hpp"
 #include "flux/core/Serialization.hpp"
@@ -48,6 +49,7 @@ void Room::Room::run()
             Simulation::setInitialServerSimState(this->_ecs, "Level_0");
         }
         this->_setRoomReady();
+        this->_getMaxScore();
         this->_waitRoomFull();
 
         if (!this->_isRunning) {
@@ -66,6 +68,17 @@ void Room::Room::stop()
     this->_readyCondition.notify_all();
     this->_fullCondition.notify_all();
     this->_ecs.stop();
+}
+
+void Room::Room::_getMaxScore()
+{
+    auto view =
+        this->_ecs.GenerateViewFromComponents<component::Mob>();
+    auto entities = this->_ecs.QueryViewNotExclusive(view);
+
+    for (auto entity : entities) {
+        this->_maxScore += 1;
+    }
 }
 
 void Room::Room::_waitRoomFull()

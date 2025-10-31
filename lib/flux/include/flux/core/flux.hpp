@@ -61,6 +61,7 @@ namespace flux
             std::optional<std::function<void(ECS&)>> hookPlayerInput;
             std::optional<std::function<void(ECS&)>> hookBeforeUpdate;
             std::optional<std::function<void(ECS&)>> hooksNetwork;
+            std::optional<std::function<void(ECS&)>> hooksScore;
     };
 
     template <typename Fn, typename... Args>
@@ -456,6 +457,8 @@ namespace flux
                         hooks->hooksNetwork.value()(*this);
                     if (hooks && hooks->hookPlayerInput)
                         hooks->hookPlayerInput.value()(*this);
+                    if (hooks && hooks->hooksScore)
+                        hooks->hooksScore.value()(*this);
                 }
             }
 

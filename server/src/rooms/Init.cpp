@@ -5,6 +5,7 @@
 // Init the rooms
 //
 
+#include <iostream>
 #include <sstream>
 #include <unordered_map>
 
@@ -28,6 +29,7 @@ void Room::Room::_initHooks(flux::runtimeHooks &hooks)
 {
     this->_initUpdateHook(hooks);
     this->_initNetworkHook(hooks);
+    this->_initScoreHook(hooks);
 }
 
 void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
@@ -86,6 +88,24 @@ void Room::Room::_initNetworkHook(flux::runtimeHooks &hooks)
         std::lock_guard<std::mutex> lock(this->_roomMutex);
 
         this->_sendSnapshotToPlayer(serializedData);
+    };
+}
+
+void Room::Room::_initScoreHook(flux::runtimeHooks &hooks)
+{
+    hooks.hooksScore = [this](flux::ECS &ecs) {
+        std::lock_guard<std::mutex> lock(this->_roomMutex);
+        auto view =
+            ecs.GenerateViewFromComponents<component::Mob>();
+        auto entities = ecs.QueryViewNotExclusive(view);
+
+        for (auto entity : entities) {
+            if (!ecs.HasComponent<component::Mob>(entity))
+                continue;
+            this->_roomScore += 1;
+        }
+        this->_roomScore = this->_maxScore - this->_roomScore;
+        utils::Logger::debug(std::format("SCORE {}", this->_roomScore));
     };
 }
 
