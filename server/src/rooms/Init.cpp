@@ -34,8 +34,8 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
 {
     hooks.hookBeforeUpdate = [this](flux::ECS &ecs) {
         std::lock_guard<std::mutex> lock(this->_roomMutex);
-        auto view =
-            ecs.GenerateViewFromComponents<component::NetworkIdentification, component::PlayerInput>();
+        auto view = ecs.GenerateViewFromComponents<component::NetworkIdentification, component::PlayerInput,
+            component::Player>();
         auto entities = ecs.QueryViewNotExclusive(view);
 
         for (auto &playerRef : this->_players) {
@@ -43,8 +43,9 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
             const auto &uuid = player.getId();
 
             for (auto entity : entities) {
-                if (!ecs.HasComponent<component::NetworkIdentification>(entity) &&
-                    !ecs.HasComponent<component::Health>(entity))
+                if (!ecs.HasComponent<component::NetworkIdentification>(entity) ||
+                    !ecs.HasComponent<component::Health>(entity) ||
+                    !ecs.HasComponent<component::Player>(entity))
                     continue;
                 auto &idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
                 auto health = ecs.GetComponent<component::Health>(entity);
@@ -57,6 +58,12 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
                     ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
                     break;
                 }
+
+                auto playerComp = ecs.GetComponent<component::Player>(entity);
+                if (playerComp.score == 0)
+                    playerComp.score = player.getScore();
+                player.setScore(playerComp.score);
+                ecs.AddOrReplace<component::Player>(entity, playerComp);
             }
         }
     };

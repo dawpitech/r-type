@@ -29,12 +29,13 @@ namespace game {
 
         [[nodiscard]] const std::string &getId() const { return this->_id; }
 
-        uint16_t getScore() {return this->_score;}
+        int getScore() { return this->_score; }
 
         void storeInfo(const network::ClientTCPReceivedInfo &info)
         {
             utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));
             this->_udpPort = info.portUDP;
+            this->_userPass = info.userPass;
         }
 
         void storeInput(component::PlayerInput input)
@@ -63,13 +64,18 @@ namespace game {
 
         unsigned getInputIndex() { return this->_inputIndex; }
 
+        std::string getUserPass() { return this->_userPass; };
+
+        void setScore(int score) { this->_score = score; }
+
        private:
         network::UDPNetwork &_network;
         component::PlayerInput _lastInput;
         std::string _id;
         unsigned _entity = BASE_ENTITY;
-        uint16_t _score = 0;
+        int _score = 0;
         uint16_t _udpPort = 0;
+        std::string _userPass;
         uint8_t _room = 0;
         unsigned _inputIndex = 0;
         std::string _ip;

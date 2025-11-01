@@ -18,9 +18,6 @@ Server::Database::Database()
     }
     utils::Logger::debug("Database loaded successfuly");
     this->_createTable();
-    // this->update("PLAYERS", "UUID", "'123H33'", "SCORE", "256");
-    // this->update("PLAYERS", "UUID", "'123-AB6'", "SCORE", "768");
-    // this->update("PLAYERS", "UUID", "'123H33'", "SCORE", "8");
 }
 
 Server::Database::~Database()

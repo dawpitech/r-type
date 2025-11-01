@@ -42,6 +42,9 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms, bool cli)
     this->_connectionNetwork.attach<network::ClientTCPReceivedInfo>(
         [this](network::ClientTCPReceivedInfo info) {
             this->_playerManager.storeInfo(info);
+
+            int playerScore = this->_db.selectInt("PLAYERS", "USERPASS", info.userPass, "SCORE");
+            this->_playerManager.setPlayerScore(info.uuid, playerScore);
             auto roomNb = this->_playerManager.getPlayerRoom(info.uuid);
             if (roomNb == std::nullopt || roomNb > this->_rooms.size()) {
                 utils::Logger::debug("Trying to add player to wrong room");
