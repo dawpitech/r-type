@@ -5,8 +5,10 @@
 ** EndGameSystem.cpp
 */
 
-#include "components/EndGame.hpp"
 #include "components/Camera.hpp"
+#include "components/EndGame.hpp"
+#include "components/NetworkIdentification.hpp"
+#include "components/Player.hpp"
 #include "flux/core/flux.hpp"
 
 #include <CameraRaylib.hpp>
@@ -33,6 +35,19 @@ void endGameSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             int centerX = transform.pos.x - textWidth / 2;
             int centerY = transform.pos.y - fontSize / 2;
             raylib::DrawText(text, centerX, centerY, fontSize, GREEN);
+        }
+        const auto playerView = ecs.GenerateViewFromComponents<component::Player, component::NetworkIdentification>();
+        const auto allPlayerEntities = ecs.QueryViewNotExclusive(playerView);
+        for (auto entity : allPlayerEntities) {
+            auto player = ecs.GetComponent<component::Player>(entity);
+            if (transform.pos.x >= endGameComponent.endX) {
+                std::string text = "Score: " + std::to_string(player.score);
+                int fontSize = 20;
+                int textWidth = raylib::MeasureText(text, fontSize);
+                int centerX = transform.pos.x - textWidth / 2;
+                int centerY = transform.pos.y + 20 - fontSize / 2;
+                raylib::DrawText(text, centerX, centerY, fontSize, GREEN);
+            }
         }
     }
 }

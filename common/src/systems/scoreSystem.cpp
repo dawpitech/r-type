@@ -30,7 +30,6 @@ static void improovePlayerScore(flux::ECS &ecs)
             player.score += 1;
         }
         ecs.AddOrReplace(playerEntity, player);
-        std::cout << std::format("Player with score {}", player.score) << std::endl;
     }
 }
 
