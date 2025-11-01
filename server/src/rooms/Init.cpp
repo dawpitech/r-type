@@ -43,7 +43,7 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
             const auto &uuid = player.getId();
 
             for (auto entity : entities) {
-                if (!ecs.HasComponent<component::NetworkIdentification>(entity) &&
+                if (!ecs.HasComponent<component::NetworkIdentification>(entity) ||
                     !ecs.HasComponent<component::Health>(entity))
                     continue;
                 auto &idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
