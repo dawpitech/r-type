@@ -17,9 +17,10 @@ namespace component
             bool move_up = false;
             bool move_down = false;
             bool shoot = false;
+            bool colorblind = false;
             
             bool operator==(const PlayerInput&) const = default;
-            REFLECT(move_right, move_left, move_up, move_down, shoot)
+            REFLECT(move_right, move_left, move_up, move_down, shoot, colorblind)
     };
 
     inline std::ostream& operator<<(std::ostream& stream, const PlayerInput& input)

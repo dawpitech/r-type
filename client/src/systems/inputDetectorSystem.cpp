@@ -76,6 +76,10 @@ static void handleKeyboard(component::PlayerInput& input) {
             input.move_right = true;
         if (raylib::Keyboard::IsKeyDown(KEY_SPACE))
             input.shoot = true;
+        if (raylib::Keyboard::IsKeyDown(KEY_P))
+            input.colorblind = true;
+        if (raylib::Keyboard::IsKeyDown(KEY_M))
+            input.colorblind = false;
 
         if (raylib::Keyboard::IsKeyUp(KEY_UP))
             input.move_up = false;
