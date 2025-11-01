@@ -35,6 +35,7 @@ namespace game {
         {
             utils::Logger::debug(std::format("Player {} on port {}", this->_id, info.portUDP));
             this->_udpPort = info.portUDP;
+            this->_userPass = info.userPass;
         }
 
         void storeInput(component::PlayerInput input)
@@ -62,6 +63,8 @@ namespace game {
         component::PlayerInput getInput() { return this->_lastInput; };
 
         unsigned getInputIndex() { return this->_inputIndex; }
+        
+        std::string getUserPass() {return this->_userPass;};
 
        private:
         network::UDPNetwork &_network;
@@ -70,6 +73,7 @@ namespace game {
         unsigned _entity = BASE_ENTITY;
         uint16_t _score = 0;
         uint16_t _udpPort = 0;
+        std::string _userPass;
         uint8_t _room = 0;
         unsigned _inputIndex = 0;
         std::string _ip;

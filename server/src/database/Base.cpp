@@ -37,9 +37,7 @@ void Server::Database::_createTable()
     if (this->_db == nullptr)
         throw DatabaseError("Database not initialized", "create table");
     std::string query = "CREATE TABLE PLAYERS("
-                        "UUID TEXT PRIMARY KEY NOT NULL, "
-                        "USERNAME TEXT, "
-                        "PASSWORD TEXT, "
+                        "USERPASS TEXT PRIMARY KEY NOT NULL, "
                         "SCORE INT NOT NULL); ";
 
     char *errorMessage = nullptr;

@@ -40,7 +40,6 @@ void game::PlayersManager::storeInfo(const network::ClientTCPReceivedInfo& info)
     for (auto& it : this->_players) {
         if (it->getId() == info.uuid) {
             it->storeInfo(info);
-            // std::cout << "Added player with userpass " << info.userPass << std::endl;
             return;
         }
     }
@@ -74,8 +73,8 @@ std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id
 void game::PlayersManager::saveScore(Server::Database &database)
 {
     for (const auto &player: this->_players) {
-        auto playerId = std::format("'{}'", player->getId());
+        auto playerPass = std::format("'{}'", player->getUserPass());
         auto playerScore = std::format("{}", player->getScore());
-        database.update("PLAYERS", "UUID", playerId, "SCORE", playerScore);
+        database.update("PLAYERS", "USERPASS", playerPass, "SCORE", playerScore);
     }
 }
