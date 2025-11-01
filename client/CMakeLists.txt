@@ -16,7 +16,7 @@ set_target_properties(flux
 )
 
 if(WIN32)
-    target_compile_definitions(r-type PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(r-type PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN RAYLIB_CPP_NO_MATH)
 
     set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
     set(BUILD_DIR ${CMAKE_BINARY_DIR})

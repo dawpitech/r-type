@@ -8,7 +8,11 @@
 #include "Database.hpp"
 #include "utils/logger.hpp"
 #include <format>
-#include <sqlite3.h>
+#ifdef _WIN32
+    #include <winsqlite/winsqlite3.h>
+#else
+    #include <sqlite3.h>
+#endif
 
 void Server::Database::update(const std::string &table, const std::string &primaryKeyName,
     const std::string &primaryKeyValue, const std::string &field, const std::string &value)

@@ -16,6 +16,10 @@
 #include "parser/parseArgs.hpp"
 #include "utils/logger.hpp"
 
+#ifdef _WIN32
+    #pragma comment(lib, "winsqlite3.lib")
+#endif
+
 static void checkVariables(const po::variables_map& variables)
 {
     if (!variables.contains("port"))

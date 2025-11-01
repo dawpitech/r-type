@@ -7,7 +7,11 @@
 
 #include "Database.hpp"
 #include "utils/logger.hpp"
-#include <sqlite3.h>
+#ifdef _WIN32
+    #include <winsqlite/winsqlite3.h>
+#else
+    #include <sqlite3.h>
+#endif
 
 Server::Database::Database()
 {
