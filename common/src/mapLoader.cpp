@@ -20,6 +20,7 @@
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/Serialization.hpp"
+#include "utils/error.hpp"
 #include "vector4.hpp"
 
 constexpr float MAP_WIDTH = 800;
@@ -33,26 +34,33 @@ map::MapLoader::MapLoader(flux::ECS& ecs) : _ecs(ecs), _world(std::nullopt), _le
         this->_world = this->_project.getWorld();
     }
     catch (std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        exit(EXIT_FAILURE);
+        throw utils::BaseError("Unable to Load World", "MapLoader");
     }
 }
 
 void map::MapLoader::loadGame()
 {
+    try {
     this->_level = this->_world->get().getLevel("Level_0");
     this->_setMapTiles();
     this->_setMobs();
     this->_setBackground();
     this->_setCamera();
+    } catch (...) {
+        throw utils::BaseError("Unable to Load Game", "LoadGame");
+    }
 }
 
 void map::MapLoader::loadMenu()
 {
+    try {
     this->_level = this->_world->get().getLevel("Menu");
     this->_setBackground();
     this->_setIdol();
     this->_setCamera();
+    } catch (...) {
+        throw utils::BaseError("Unable to Load Menu", "LoadMenu");
+    }
 }
 
 void map::MapLoader::_setIdol()

@@ -16,6 +16,7 @@
 #include "flux/core/flux.hpp"
 #include "player/Player.hpp"
 #include "rooms/Rooms.hpp"
+#include "utils/error.hpp"
 #include "utils/logger.hpp"
 #include <condition_variable>
 
@@ -45,7 +46,12 @@ void Room::Room::run()
     std::thread threadRun([this] {
         {
             std::lock_guard<std::mutex> lock(this->_roomMutex);
+            try {
             Simulation::setInitialServerSimState(this->_ecs, "Level_0");
+            } catch (utils::BaseError& e) {
+                this->stop();
+                return;
+            }
         }
         this->_setRoomReady();
         this->_waitRoomFull();
