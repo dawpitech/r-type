@@ -26,6 +26,9 @@ namespace Server {
         void update(const std::string &table, const std::string &primaryKeyName,
             const std::string &primaryKeyValue, const std::string &field, const std::string &value);
 
+        int selectInt(const std::string &table, const std::string &primaryKeyName,
+            const std::string &primaryKeyValue, const std::string &field);
+
        private:
         sqlite3 *_db = nullptr;
 

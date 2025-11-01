@@ -60,7 +60,10 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
                 }
 
                 auto playerComp = ecs.GetComponent<component::Player>(entity);
+                if (playerComp.score == 0)
+                    playerComp.score = player.getScore();
                 player.setScore(playerComp.score);
+                ecs.AddOrReplace<component::Player>(entity, playerComp);
             }
         }
     };

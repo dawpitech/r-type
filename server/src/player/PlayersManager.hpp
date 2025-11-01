@@ -26,6 +26,7 @@ namespace game {
         void createNewPlayer(const network::ConnectionInfo &info, network::UDPNetwork &network);
         void storeInfo(const network::ClientTCPReceivedInfo &info);
         void storeInput(const network::UDPReceivedInfo &info);
+        void setPlayerScore(const std::string &id, int score);
 
         std::optional<uint8_t> getPlayerRoom(const std::string &id);
         void saveScore(Server::Database &database);

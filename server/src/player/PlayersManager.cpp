@@ -80,3 +80,13 @@ void game::PlayersManager::saveScore(Server::Database &database)
         database.update("PLAYERS", "USERPASS", playerPass, "SCORE", playerScore);
     }
 }
+
+void game::PlayersManager::setPlayerScore(const std::string &id, int score)
+{
+    for (auto &player: this->_players) {
+        if (player->getId() == id) {
+            player->setScore(score);
+            return;
+        }
+    }
+}

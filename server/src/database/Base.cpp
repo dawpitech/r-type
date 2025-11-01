@@ -17,9 +17,7 @@ void Server::Database::update(const std::string &table, const std::string &prima
         throw DatabaseError("Database not initialized", "update table");
     std::string query = std::format("INSERT INTO {} ({}, {}) VALUES ({}, {})"
                                     "ON CONFLICT({}) DO UPDATE SET {} = {}",
-                                    table, field, primaryKeyName, value, primaryKeyValue,
-                                    primaryKeyName, field, value);
-
+        table, field, primaryKeyName, value, primaryKeyValue, primaryKeyName, field, value);
 
     char *errorMessage = nullptr;
     auto res = sqlite3_exec(this->_db, query.c_str(), nullptr, nullptr, &errorMessage);
@@ -28,8 +26,34 @@ void Server::Database::update(const std::string &table, const std::string &prima
         if (errorMessage) {
             sqlite3_free(errorMessage);
         }
-        utils::Logger::debug(std::format("Can't create new database: {}", errorStr));
+        utils::Logger::debug(std::format("Can't update database: {}", errorStr));
     }
+}
+
+int Server::Database::selectInt(const std::string &table, const std::string &primaryKeyName,
+    const std::string &primaryKeyValue, const std::string &field)
+{
+    if (this->_db == nullptr)
+        throw DatabaseError("Database not initialized", "select int");
+    auto query =
+        std::format("SELECT {} FROM {} WHERE {} = ?;", field, table, primaryKeyName, primaryKeyValue);
+
+    sqlite3_stmt *statement = nullptr;
+    int res = sqlite3_prepare_v2(this->_db, query.c_str(), -1, &statement, nullptr);
+    if (res != SQLITE_OK) {
+        throw DatabaseError(sqlite3_errmsg(this->_db), "select int");
+    }
+    sqlite3_bind_text(statement, 1, primaryKeyValue.c_str(), -1, SQLITE_TRANSIENT);
+    res = sqlite3_step(statement);
+    
+    if (res != SQLITE_ROW) {
+        sqlite3_finalize(statement);
+        return 0;
+    }
+
+    int result = sqlite3_column_int(statement, 0);
+    sqlite3_finalize(statement);
+    return result;
 }
 
 void Server::Database::_createTable()
