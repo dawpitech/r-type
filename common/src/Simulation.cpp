@@ -32,6 +32,7 @@
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
 #include "systems/fixOnScreenSystems.hpp"
+#include "systems/scoreSystem.hpp"
 
 constexpr float MAP_WIDTH = 800;
 constexpr float MAP_HEIGHT = 450;
@@ -112,6 +113,7 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(DamageSystem, DamageSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(ScoreSystem, ScoreSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(AnimationSystem,

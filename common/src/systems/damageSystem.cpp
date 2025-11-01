@@ -7,28 +7,31 @@
 
 #include "components/Collider.hpp"
 #include "components/Health.hpp"
+#include "components/Mob.hpp"
+#include "components/Player.hpp"
 #include "flux/core/flux.hpp"
 
-flux::View DamageSystemView(const flux::ECS &ecs) {
-  return ecs
-      .GenerateViewFromComponents<component::Collider, component::Health>();
+flux::View DamageSystemView(const flux::ECS &ecs)
+{
+    return ecs.GenerateViewFromComponents<component::Collider, component::Health>();
 }
 
-void DamageSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities) {
-  for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
-    const flux::Entity &entity = entities[i];
-    auto collider = ecs.GetComponent<component::Collider>(entity);
+void DamageSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities)
+{
+    for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
+        const flux::Entity &entity = entities[i];
+        auto collider = ecs.GetComponent<component::Collider>(entity);
 
-    if (!collider.hasCollide)
-      continue;
-    auto health = ecs.GetComponent<component::Health>(entity);
-    if (health.healthPoint >= 10)
-      health.healthPoint -= 10;
-    else {
-      health.healthPoint = 0;
+        if (!collider.hasCollide)
+            continue;
+        auto health = ecs.GetComponent<component::Health>(entity);
+        if (health.healthPoint >= 10)
+            health.healthPoint -= 10;
+        else {
+            health.healthPoint = 0;
+        }
+        collider.hasCollide = false;
+        ecs.AddOrReplace<component::Collider>(entity, collider);
+        ecs.AddOrReplace<component::Health>(entity, health);
     }
-    collider.hasCollide = false;
-    ecs.AddOrReplace<component::Collider>(entity, collider);
-    ecs.AddOrReplace<component::Health>(entity, health);
-  }
 }
