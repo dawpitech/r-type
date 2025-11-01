@@ -32,7 +32,7 @@ void ProjectileSystem(flux::ECS &ecs,
 
     if (proj.type == 0) {
       velocity.x = proj.speed;
-      if (transform.pos.x > 3000)
+      if (transform.pos.x > 5000)
         ecs.DeleteEntity(entity);
     }
     if (proj.type == 1) {

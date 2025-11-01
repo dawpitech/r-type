@@ -26,7 +26,7 @@ static void checkVariables(const po::variables_map& variables)
     {
         throw utils::ParsingError("Arg rooms undefined", "checkVariables");
     }
-    if (variables.contains("debug"))
+    if (variables.contains("debug") && !variables.contains("cli"))
     {
         utils::Logger::setDebug(true);
     }
@@ -49,7 +49,8 @@ int main(int argc, char** argv)
 
         std::uint16_t port = variables["port"].as<uint16_t>();
         std::uint16_t rooms = variables["rooms"].as<uint16_t>();
-        Server::Server roomsPool(port, rooms);
+        bool cli = variables.contains("cli");
+        Server::Server roomsPool(port, rooms, cli);
         roomsPool.run();
     }
     catch (const utils::BaseError& e)

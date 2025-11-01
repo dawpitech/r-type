@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include "player/PlayersManager.hpp"
+#include "database/Database.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
 #include "player/Player.hpp"
@@ -67,4 +68,25 @@ std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id
     }
     utils::Logger::debug(std::format("No player with uuid: {}", id));
     return std::nullopt;
+}
+
+void game::PlayersManager::saveScore(Server::Database &database)
+{
+    for (const auto &player: this->_players) {
+        if (player->getUserPass().empty())
+            continue;
+        auto playerPass = std::format("'{}'", player->getUserPass());
+        auto playerScore = std::format("{}", player->getScore());
+        database.update("PLAYERS", "USERPASS", playerPass, "SCORE", playerScore);
+    }
+}
+
+void game::PlayersManager::setPlayerScore(const std::string &id, int score)
+{
+    for (auto &player: this->_players) {
+        if (player->getId() == id) {
+            player->setScore(score);
+            return;
+        }
+    }
 }

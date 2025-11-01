@@ -10,14 +10,21 @@
 #include <iostream>
 #include <LDtkLoader/Entity.hpp>
 #include <raylib.h>
+#include "components/Camera.hpp"
 #include "components/Collider.hpp"
+#include "components/EndGame.hpp"
+#include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/Serialization.hpp"
+#include "utils/error.hpp"
 #include "vector4.hpp"
+
+constexpr float MAP_WIDTH = 800;
+constexpr float MAP_HEIGHT = 450;
 
 map::MapLoader::MapLoader(flux::ECS& ecs) : _ecs(ecs), _world(std::nullopt), _level(std::nullopt)
 {
@@ -27,27 +34,36 @@ map::MapLoader::MapLoader(flux::ECS& ecs) : _ecs(ecs), _world(std::nullopt), _le
         this->_world = this->_project.getWorld();
     }
     catch (std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        exit(EXIT_FAILURE);
+        throw utils::BaseError("Unable to Load World", "MapLoader");
     }
 }
 
 void map::MapLoader::loadGame()
 {
+    try {
     this->_level = this->_world->get().getLevel("Level_0");
-    this->_getMapTiles();
-    this->_getMobs();
-    this->_getBackground();
+    this->_setMapTiles();
+    this->_setMobs();
+    this->_setBackground();
+    this->_setCamera();
+    } catch (...) {
+        throw utils::BaseError("Unable to Load Game", "LoadGame");
+    }
 }
 
 void map::MapLoader::loadMenu()
 {
+    try {
     this->_level = this->_world->get().getLevel("Menu");
-    this->_getBackground();
-    this->_getIdol();
+    this->_setBackground();
+    this->_setIdol();
+    this->_setCamera();
+    } catch (...) {
+        throw utils::BaseError("Unable to Load Menu", "LoadMenu");
+    }
 }
 
-void map::MapLoader::_getIdol()
+void map::MapLoader::_setIdol()
 {
     for (const ldtk::Entity& idol : this->_level->get().getLayer("Entities").getEntitiesByName("Idol")) {
 
@@ -64,7 +80,7 @@ void map::MapLoader::_getIdol()
     }
 }
 
-void map::MapLoader::_getBackground()
+void map::MapLoader::_setBackground()
 {
     auto background = this->_level->get().getBgImage();
     auto rect = background.crop;
@@ -89,7 +105,8 @@ void map::MapLoader::_getBackground()
         }
     }
 }
-void map::MapLoader::_getMapTiles()
+
+void map::MapLoader::_setMapTiles()
 {
     const auto& wall = this->_level->get().getLayer("Wall");
 
@@ -114,7 +131,7 @@ void map::MapLoader::_getMapTiles()
     }
 }
 
-void map::MapLoader::_getMobs()
+void map::MapLoader::_setMobs()
 {
     for (const ldtk::Entity& mob : this->_level->get().getLayer("Entities").getEntitiesByName("Mob")) {
         flux::Entity mobEntity = this->_ecs.newEntity();
@@ -135,4 +152,13 @@ void map::MapLoader::_getMobs()
                                 pos.y, rect.width, rect.height));
         this->_ecs.Add<component::Health>(mobEntity, component::Health(mob.getField<int>("Health").value()));
     }
+}
+
+void map::MapLoader::_setCamera() {
+    flux::Entity camera = this->_ecs.newEntity();
+    this->_ecs.Add<component::Camera>(camera, component::Camera(MAP_WIDTH / 2, MAP_HEIGHT / 2));
+    this->_ecs.Add<component::Transform>(camera, component::Transform(MAP_WIDTH / 2, MAP_HEIGHT / 2, 0, 1, 1));
+    this->_ecs.Add<component::Velocity>(camera, component::Velocity());
+    this->_ecs.Add<component::FixOnScreen>(camera, component::FixOnScreen());
+    this->_ecs.Add<component::EndGame>(camera, component::EndGame(this->_level->get().size.x));
 }

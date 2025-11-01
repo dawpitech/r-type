@@ -30,6 +30,7 @@ namespace utils
             {
                 this->_desc.add_options()("help,h", "Display help message")(
                     "debug,d", "Enable debug mode")(
+                    "cli,c", "Enable admin cli")(
                     "port,p", po::value<uint16_t>(),
                     "Set port to run on")("rooms,r", po::value<uint16_t>(),
                                           "Number of rooms availables");

@@ -15,12 +15,9 @@
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
 
-#include <LuaContext.hpp>
-#include <components/Sprite.hpp>
-
 #include "Client.hpp"
 
-static void checkVariables(const po::variables_map& variables)
+static void checkVariables(const po::variables_map &variables)
 {
     if (!variables.contains("ip")) {
         throw utils::ParsingError("Arg ip undefined", "checkVariables");
@@ -33,7 +30,7 @@ static void checkVariables(const po::variables_map& variables)
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     try {
         utils::Parser parser(argc, argv);
@@ -48,22 +45,19 @@ int main(int argc, char** argv)
 
         const auto serverIP = variables["ip"].as<std::string>();
         const auto serverPort = variables["port"].as<uint16_t>();
+        const auto userPass = variables.contains("userpass") ? variables["userpass"].as<std::string>() : "";
 
-        client::Client gameClient(serverIP, serverPort);
+        client::Client gameClient(serverIP, serverPort, userPass);
 
         gameClient.run();
-    }
-    catch (const utils::BaseError& e) {
+    } catch (const utils::BaseError &e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;
-    }
-    catch (const po::error& e) {
+    } catch (const po::error &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return EXIT_FAILURE;
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;
-    }
-    catch (...) {
+    } catch (...) {
         std::cerr << "Unexpected Error" << std::endl;
     }
     return EXIT_SUCCESS;

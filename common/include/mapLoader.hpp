@@ -26,11 +26,12 @@ namespace map
             void loadGame();
 
         private:
-            void _getMapTiles();
-            void _getCollider();
-            void _getMobs();
-            void _getBackground();
-            void _getIdol();
+            void _setMapTiles();
+            void _setCollider();
+            void _setMobs();
+            void _setBackground();
+            void _setIdol();
+            void _setCamera();
 
             ldtk::Project _project;
             std::string _ldtkFile;

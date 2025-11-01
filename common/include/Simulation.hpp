@@ -29,5 +29,4 @@ class Simulation
         static void _registerMenuSystems(flux::ECS& ecs);
         static void _registerGameSystems(flux::ECS& ecs);
         static void _createPlayer(flux::ECS& ecs, PLAYER_TYPE type);
-        static void _createCamera(flux::ECS& ecs);
 };

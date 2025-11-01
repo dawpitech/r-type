@@ -9,7 +9,6 @@
 #include <Camera2D.hpp>
 #include <chrono>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include <unordered_map>
@@ -30,14 +29,15 @@
 #include <components/Velocity.hpp>
 #include <filesystem>
 #include "systems/setCamera.hpp"
+#include "systems/endGameSystem.hpp"
 #include "utils/logger.hpp"
 
-client::Client::Client(const std::string& ip, uint16_t port) : _ip(ip), _port(port)
+client::Client::Client(const std::string& ip, uint16_t port, const std::string &userPass) : _ip(ip), _port(port), _userPass(userPass)
 {
     this->_window = std::make_unique<raylib::Window>(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, WINDOW_BASE_NAME);
     this->_camera = std::make_unique<raylib::Camera2D>();
-    this->_networkUDPClient = std::make_unique<network::UDPClient>(ip, port);
-    this->_networkTCPClient = std::make_unique<network::TCPClient>(ip, port, _networkUDPClient->getLocalPort());
+    this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
+    this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort(), userPass);
 
     Simulation::setInitialClientSimState(this->_ecs, "Menu");
     this->_registerBase();
@@ -52,7 +52,8 @@ void client::Client::_registerBase()
     this->_ecs.registerSystem(InputDetectorSystem, InputDetectorSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
-    this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::LOGIC);
+    this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::RENDER);
+    this->_ecs.registerSystem(endGameSystem, endGameSystemView(this->_ecs), flux::systemType::RENDER);
 }
 
 void client::Client::_initHooks()

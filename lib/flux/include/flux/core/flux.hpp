@@ -541,6 +541,11 @@ namespace flux
                 }
             }
 
+            void stop()
+            {
+                this->_running = false;
+            }
+
             void reset()
             {
                 this->componentTypeRegistry.clear();

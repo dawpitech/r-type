@@ -59,6 +59,7 @@ namespace network
     struct ClientTCPReceivedInfo final
     {
             bool ready = false;
+            char userPass[BUFFERSIZE] = "";
             char uuid[BUFFERSIZE] = {};
             uint16_t portUDP = 0;
     };

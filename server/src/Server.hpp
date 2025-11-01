@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <thread>
 #include <vector>
+#include "database/Database.hpp"
 #include "player/PlayersManager.hpp"
 #include "network/TCP/TCPNetwork.hpp"
 #include "network/UDP/UDPNetwork.hpp"
@@ -19,20 +20,34 @@ namespace Server {
 
     class Server final {
        public:
-        explicit Server(std::uint16_t port, std::uint16_t nbRooms = BASENBROOMS);
+        explicit Server(std::uint16_t port, std::uint16_t nbRooms = BASENBROOMS, bool cli = false);
         ~Server();
 
         void run();
+        void stop() {this->_isRunning = false;}
+
+        std::uint8_t getNbRooms() const {return this->_nbRooms;}
+
+        void displayRoomsInfos();
+        void displayRoomInfos(uint8_t roomNumber);
+
+        void resetRooms();
+        void resetRoom(uint8_t roomNumber);
         
        private:
         std::uint8_t _nbRooms = 0;
         bool _isRunning = true;
+        bool _cli;
 
         network::TCPNetwork _connectionNetwork;
         network::UDPNetwork _gameUpdateNetwork;
 
+        Database _db;
+
         game::PlayersManager _playerManager;
-        std::vector<std::thread> _threads;
+        std::vector<std::jthread> _threads;
         std::vector<std::unique_ptr<Room::Room>> _rooms;
+
+        void _setupRooms();
     };
 }  // namespace Room

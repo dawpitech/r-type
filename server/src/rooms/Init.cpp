@@ -11,6 +11,7 @@
 #include "Rooms.hpp"
 #include "components/Camera.hpp"
 #include "components/Collider.hpp"
+#include "components/EndGame.hpp"
 #include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
@@ -33,8 +34,8 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
 {
     hooks.hookBeforeUpdate = [this](flux::ECS &ecs) {
         std::lock_guard<std::mutex> lock(this->_roomMutex);
-        auto view =
-            ecs.GenerateViewFromComponents<component::NetworkIdentification, component::PlayerInput>();
+        auto view = ecs.GenerateViewFromComponents<component::NetworkIdentification, component::PlayerInput,
+            component::Player>();
         auto entities = ecs.QueryViewNotExclusive(view);
 
         for (auto &playerRef : this->_players) {
@@ -42,8 +43,9 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
             const auto &uuid = player.getId();
 
             for (auto entity : entities) {
-                if (!ecs.HasComponent<component::NetworkIdentification>(entity) &&
-                    !ecs.HasComponent<component::Health>(entity))
+                if (!ecs.HasComponent<component::NetworkIdentification>(entity) ||
+                    !ecs.HasComponent<component::Health>(entity) ||
+                    !ecs.HasComponent<component::Player>(entity))
                     continue;
                 auto &idComp = ecs.GetComponent<component::NetworkIdentification>(entity);
                 auto health = ecs.GetComponent<component::Health>(entity);
@@ -56,6 +58,12 @@ void Room::Room::_initUpdateHook(flux::runtimeHooks &hooks)
                     ecs.AddOrReplace<component::PlayerInput>(entity, inputComp);
                     break;
                 }
+
+                auto playerComp = ecs.GetComponent<component::Player>(entity);
+                if (playerComp.score == 0)
+                    playerComp.score = player.getScore();
+                player.setScore(playerComp.score);
+                ecs.AddOrReplace<component::Player>(entity, playerComp);
             }
         }
     };
@@ -101,6 +109,7 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Camera>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::FixOnScreen>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::EndGame>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::NetworkIdentification>(this->_ecs, componentStore);
 
     this->_snapshots.push_back(componentStore);
@@ -122,6 +131,7 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Sprite>(entity, component, out);
     this->_getSerializedComponent<component::Camera>(entity, component, out);
     this->_getSerializedComponent<component::FixOnScreen>(entity, component, out);
+    this->_getSerializedComponent<component::EndGame>(entity, component, out);
 }
 
 void Room::Room::_sendSnapshotToPlayer(std::ostringstream &serializedData)
