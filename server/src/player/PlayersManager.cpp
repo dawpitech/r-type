@@ -73,6 +73,8 @@ std::optional<uint8_t> game::PlayersManager::getPlayerRoom(const std::string &id
 void game::PlayersManager::saveScore(Server::Database &database)
 {
     for (const auto &player: this->_players) {
+        if (player->getUserPass().empty())
+            continue;
         auto playerPass = std::format("'{}'", player->getUserPass());
         auto playerScore = std::format("{}", player->getScore());
         database.update("PLAYERS", "USERPASS", playerPass, "SCORE", playerScore);

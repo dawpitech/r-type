@@ -29,7 +29,7 @@ namespace game {
 
         [[nodiscard]] const std::string &getId() const { return this->_id; }
 
-        uint16_t getScore() {return this->_score;}
+        uint16_t getScore() { return this->_score; }
 
         void storeInfo(const network::ClientTCPReceivedInfo &info)
         {
@@ -63,8 +63,10 @@ namespace game {
         component::PlayerInput getInput() { return this->_lastInput; };
 
         unsigned getInputIndex() { return this->_inputIndex; }
-        
-        std::string getUserPass() {return this->_userPass;};
+
+        std::string getUserPass() { return this->_userPass; };
+
+        void setScore(uint16_t score) { this->_score = score; }
 
        private:
         network::UDPNetwork &_network;
