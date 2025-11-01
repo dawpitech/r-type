@@ -16,24 +16,6 @@ flux::View DamageSystemView(const flux::ECS &ecs)
     return ecs.GenerateViewFromComponents<component::Collider, component::Health>();
 }
 
-void improovePlayerScore(flux::ECS &ecs)
-{
-    const auto playerView = ecs.GenerateViewFromComponents<component::Player>();
-    const auto allPlayerEntities = ecs.QueryViewNotExclusive(playerView);
-
-    for (auto playerEntity : allPlayerEntities) {
-        if (!ecs.HasComponent<component::Player>(playerEntity) ||
-            !ecs.HasComponent<component::Health>(playerEntity))
-            return;
-        auto player = ecs.GetComponent<component::Player>(playerEntity);
-        auto playerHealth = ecs.GetComponent<component::Health>(playerEntity);
-        if (playerHealth.healthPoint > 0) {
-            player.score += 1;
-        }
-        ecs.AddOrReplace(playerEntity, player);
-    }
-}
-
 void DamageSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities)
 {
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
@@ -47,9 +29,6 @@ void DamageSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities)
             health.healthPoint -= 10;
         else {
             health.healthPoint = 0;
-        }
-        if (ecs.HasComponent<component::Mob>(entity) && health.healthPoint == 0) {
-            improovePlayerScore(ecs);
         }
         collider.hasCollide = false;
         ecs.AddOrReplace<component::Collider>(entity, collider);
