@@ -6,38 +6,40 @@
 //
 
 #include "Client.hpp"
+#include "CameraRaylib.hpp"
+#include "Simulation.hpp"
+#include "components/Animation.hpp"
+#include "components/NetworkIdentification.hpp"
+#include "flux/core/Serialization.hpp"
+#include "network/datatype.hpp"
+#include "systems/animationSystem.hpp"
+#include "systems/inputDetectorSystem.hpp"
+#include "systems/renderSystem.hpp"
 #include <Camera2D.hpp>
+#include <Window.hpp>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <raylib.h>
 #include <unordered_map>
-#include <Window.hpp>
 #include <vector>
-#include "CameraRaylib.hpp"
-#include "components/Animation.hpp"
-#include "components/NetworkIdentification.hpp"
-#include "flux/core/Serialization.hpp"
-#include "network/datatype.hpp"
-#include "Simulation.hpp"
-#include "systems/animationSystem.hpp"
-#include "systems/inputDetectorSystem.hpp"
-#include "systems/renderSystem.hpp"
 
+#include "systems/endGameSystem.hpp"
+#include "systems/setCamera.hpp"
+#include "utils/logger.hpp"
 #include <LuaContext.hpp>
 #include <components/Transform.hpp>
 #include <components/Velocity.hpp>
 #include <filesystem>
-#include "systems/setCamera.hpp"
-#include "systems/endGameSystem.hpp"
-#include "utils/logger.hpp"
 
-client::Client::Client(const std::string& ip, uint16_t port, const std::string &userPass) : _ip(ip), _port(port), _userPass(userPass)
+client::Client::Client(const std::string &ip, uint16_t port, const std::string &userPass)
+    : _ip(ip), _port(port), _userPass(userPass)
 {
     this->_window = std::make_unique<raylib::Window>(WINDOW_BASE_WIDTH, WINDOW_BASE_HEIGHT, WINDOW_BASE_NAME);
     this->_camera = std::make_unique<raylib::Camera2D>();
     this->_networkUDPClient = std::make_unique<client::network::UDPClient>(ip, port);
-    this->_networkTCPClient = std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort(), userPass);
+    this->_networkTCPClient =
+        std::make_unique<client::network::TCPClient>(ip, port, _networkUDPClient->getLocalPort(), userPass);
 
     Simulation::setInitialClientSimState(this->_ecs, "Menu");
     this->_registerBase();
@@ -49,7 +51,8 @@ void client::Client::_registerBase()
 {
     this->_ecs.Register<component::Animation>();
 
-    this->_ecs.registerSystem(InputDetectorSystem, InputDetectorSystemView(this->_ecs), flux::systemType::LOGIC);
+    this->_ecs.registerSystem(
+        InputDetectorSystem, InputDetectorSystemView(this->_ecs), flux::systemType::LOGIC);
     this->_ecs.registerSystem(RenderSystem, RenderSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(AnimationSystem, AnimationSystemView(this->_ecs), flux::systemType::RENDER);
     this->_ecs.registerSystem(setCameraSystem, setCameraSystemView(this->_ecs), flux::systemType::RENDER);
@@ -58,21 +61,25 @@ void client::Client::_registerBase()
 
 void client::Client::_initHooks()
 {
-    auto& window = this->_window;
-    auto& masterRunVar = this->_ecs.getMasterRunState();
+    auto &window = this->_window;
+    auto &masterRunVar = this->_ecs.getMasterRunState();
 
     this->_hooks = {
         .hookBeforeRender =
-            [this, &window, &masterRunVar]
-        {
-            window->ClearBackground();
-            BeginDrawing();
-            BeginMode2D(CameraRaylib::getCamera());
-            if (window->ShouldClose())
-                masterRunVar = false;
-            this->_handleChatInput();
-        },
-        .hookAfterRender = [this] { EndMode2D(); this->_renderChat(); EndDrawing(); },
+            [this, &window, &masterRunVar] {
+                window->ClearBackground();
+                BeginDrawing();
+                BeginMode2D(CameraRaylib::getCamera());
+                if (window->ShouldClose())
+                    masterRunVar = false;
+                this->_handleChatInput();
+            },
+        .hookAfterRender =
+            [this] {
+                EndMode2D();
+                this->_renderChat();
+                EndDrawing();
+            },
     };
     this->_initNetworkableHooks();
 }
@@ -81,34 +88,34 @@ void client::Client::_initNetworkableHooks()
 {
     utils::Logger::debug(std::format("Setting up network connection to {}:{}", this->_ip, this->_port));
 
-    this->_networkTCPClient->attach<::network::ClientTCPSentInfo>([this](const ::network::ClientTCPSentInfo& info)
-                                                                  { this->_gameInfo = info; });
-    this->_networkUDPClient->attach<::network::UDPSentInfo>(
-        [this](const ::network::UDPSentInfo& info)
-        {
-            if (this->_gameLaunch == false) {
-                Simulation::setInitialClientSimState(this->_ecs, "Level_0");
-                this->_registerBase();
-                this->_initHooks();
-            }
-            this->_gameLaunch = true;
-            this->_ecs.unserializeAllComponents(info.serializedData);
+    this->_networkTCPClient->attach<::network::ClientTCPSentInfo>(
+        [this](const ::network::ClientTCPSentInfo &info) {
+            this->_gameInfo = info;
+            this->_networkUDPClient->async_write(::network::UDPReceivedInfo());
         });
-    this->_networkTCPClient->attach<::network::ClientReceiveMessage>([this](const ::network::ClientReceiveMessage &msg) {
-        this->_chatLog.emplace_back(std::string(msg.msg), msg.hexcol);
-        if (this->_chatLog.size() > 6)
-            this->_chatLog.pop_front();
+    this->_networkUDPClient->attach<::network::UDPSentInfo>([this](const ::network::UDPSentInfo &info) {
+        if (this->_gameLaunch == false) {
+            Simulation::setInitialClientSimState(this->_ecs, "Level_0");
+            this->_registerBase();
+            this->_initHooks();
+        }
+        this->_gameLaunch = true;
+        this->_ecs.unserializeAllComponents(info.serializedData);
     });
-    this->_hooks.hooksNetwork = [this](flux::ECS&)
-    {
+    this->_networkTCPClient->attach<::network::ClientReceiveMessage>(
+        [this](const ::network::ClientReceiveMessage &msg) {
+            this->_chatLog.emplace_back(std::string(msg.msg), msg.hexcol);
+            if (this->_chatLog.size() > 6)
+                this->_chatLog.pop_front();
+        });
+    this->_hooks.hooksNetwork = [this](flux::ECS &) {
         this->_networkTCPClient->run();
         this->_networkUDPClient->connect();
     };
 
     this->_lastInputSend = std::chrono::steady_clock::now();
 
-    this->_hooks.hookPlayerInput = [this](flux::ECS& ecs)
-    {
+    this->_hooks.hookPlayerInput = [this](flux::ECS &ecs) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->_lastInputSend);
 
@@ -123,14 +130,15 @@ void client::Client::_initNetworkableHooks()
     };
 }
 
-void client::Client::_sendPlayerInput(const std::unordered_map<flux::Entity, std::vector<std::any>>& componentStore,
-                                      const std::chrono::steady_clock::time_point& now)
+void client::Client::_sendPlayerInput(
+    const std::unordered_map<flux::Entity, std::vector<std::any>> &componentStore,
+    const std::chrono::steady_clock::time_point &now)
 {
-    for (const auto& [entity, components] : componentStore) {
-        const component::NetworkIdentification* netId = nullptr;
-        const component::PlayerInput* playerInput = nullptr;
+    for (const auto &[entity, components] : componentStore) {
+        const component::NetworkIdentification *netId = nullptr;
+        const component::PlayerInput *playerInput = nullptr;
 
-        for (const auto& component : components) {
+        for (const auto &component : components) {
             if (component.type() == typeid(component::NetworkIdentification))
                 netId = std::any_cast<component::NetworkIdentification>(&component);
             if (component.type() == typeid(component::PlayerInput))
@@ -158,36 +166,31 @@ void client::Client::_sendPlayerInput(const std::unordered_map<flux::Entity, std
     }
 }
 
-void client::Client::_setupLuaEngine() {
+void client::Client::_setupLuaEngine()
+{
     auto lua = LuaContextStore::getInstance().getLuaContext();
-    auto& luaSystems = LuaContextStore::getInstance().getLuaSystems();
+    auto &luaSystems = LuaContextStore::getInstance().getLuaSystems();
 
     //TODO: should be eventually removed, or scoped more precisely to only
     //      allow stdout access, not stdin or disk access
     lua->open_libraries(sol::lib::base);
 
     lua->new_usertype<utils::Vector2<float>>("Vector2f",
-        sol::constructors<utils::Vector2<float>(), utils::Vector2<float>(float, float)>(),
-        "x", &utils::Vector2<float>::x,
-        "y", &utils::Vector2<float>::y
-    );
+        sol::constructors<utils::Vector2<float>(), utils::Vector2<float>(float, float)>(), "x",
+        &utils::Vector2<float>::x, "y", &utils::Vector2<float>::y);
 
-    lua->new_usertype<component::Transform>("Transform",
-        "pos", &component::Transform::pos,
-        "rotation", &component::Transform::rotation
-    );
+    lua->new_usertype<component::Transform>(
+        "Transform", "pos", &component::Transform::pos, "rotation", &component::Transform::rotation);
 
-    lua->new_usertype<component::Velocity>("Velocity",
-        "x", &component::Velocity::x,
-        "y", &component::Velocity::y
-    );
+    lua->new_usertype<component::Velocity>(
+        "Velocity", "x", &component::Velocity::x, "y", &component::Velocity::y);
 
     (*lua)["ecs"] = lua->create_table();
     (*lua)["ecs"]["register_system"] = [&luaSystems](sol::function f, sol::table comps) {
         [&luaSystems](sol::function fn, sol::table components) {
             LuaContextStore::LuaSystemCPPRepr sys;
             sys.fn = fn;
-            for (const auto& pair : components) {
+            for (const auto &pair : components) {
                 auto componentName = pair.second.as<std::string>();
                 sys.componentsRequired.push_back(componentName);
             }
@@ -198,10 +201,10 @@ void client::Client::_setupLuaEngine() {
 
     std::filesystem::path scriptsDir = "scripts";
     if (exists(scriptsDir)) {
-        for (const auto& entry : std::filesystem::directory_iterator(scriptsDir)) {
+        for (const auto &entry : std::filesystem::directory_iterator(scriptsDir)) {
             try {
                 lua->script_file(entry.path());
-            } catch (std::exception&) {
+            } catch (std::exception &) {
                 std::cout << "WARN: Skipped " << entry.path() << std::endl;
             }
         }
@@ -213,8 +216,7 @@ void client::Client::run()
     try {
         this->_networkTCPClient->connect();
         utils::Logger::debug("Network setup completed");
-    }
-    catch (const client::network::NetworkError& e) {
+    } catch (const client::network::NetworkError &e) {
         utils::Logger::debug(std::format("Network connection failed: {}", e.what()));
         throw utils::BaseError("Failed to connect to server", "_setupNetwork");
     }
@@ -262,7 +264,8 @@ void client::Client::_renderChat()
             break;
     }
     if (this->_chatTyping) {
-        std::string line = "> " + this->_chatBuffer + ((GetTime() - static_cast<int>(GetTime()) < 0.5) ? "_" : "");
+        std::string line =
+            "> " + this->_chatBuffer + ((GetTime() - static_cast<int>(GetTime()) < 0.5) ? "_" : "");
         DrawText(line.c_str(), 10, WINDOW_BASE_HEIGHT - 18, 16, YELLOW);
     }
     EndScissorMode();
