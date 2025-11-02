@@ -14,6 +14,7 @@
 
 #include "Server.hpp"
 #include "parser/parseArgs.hpp"
+#include "utils/error.hpp"
 #include "utils/logger.hpp"
 
 static void checkVariables(const po::variables_map& variables)
@@ -49,7 +50,10 @@ int main(int argc, char** argv)
 
         std::uint16_t port = variables["port"].as<uint16_t>();
         std::uint16_t rooms = variables["rooms"].as<uint16_t>();
+        if (rooms <= 0 || rooms > 8)
+            throw utils::BaseError("Rooms should be between 0 and 8", "parsing");
         bool cli = variables.contains("cli");
+
         Server::Server roomsPool(port, rooms, cli);
         roomsPool.run();
     }
