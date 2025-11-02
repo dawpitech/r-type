@@ -106,7 +106,7 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::Projectile>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Transform>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Velocity>(this->_ecs, componentStore);
-    this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
+    //this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Camera>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::FixOnScreen>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::EndGame>(this->_ecs, componentStore);
@@ -128,7 +128,7 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Projectile>(entity, component, out);
     this->_getSerializedComponent<component::Transform>(entity, component, out);
     this->_getSerializedComponent<component::Velocity>(entity, component, out);
-    this->_getSerializedComponent<component::Sprite>(entity, component, out);
+    //this->_getSerializedComponent<component::Sprite>(entity, component, out);
     this->_getSerializedComponent<component::Camera>(entity, component, out);
     this->_getSerializedComponent<component::FixOnScreen>(entity, component, out);
     this->_getSerializedComponent<component::EndGame>(entity, component, out);
