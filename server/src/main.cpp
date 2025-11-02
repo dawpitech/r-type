@@ -20,6 +20,10 @@
 constexpr int max_rooms = 8;
 constexpr int min_rooms = 0;
 
+#ifdef _WIN32
+    #pragma comment(lib, "winsqlite3.lib")
+#endif
+
 static void checkVariables(const po::variables_map& variables)
 {
     if (!variables.contains("port"))

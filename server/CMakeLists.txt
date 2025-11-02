@@ -4,7 +4,11 @@ file(GLOB_RECURSE src "src/*.cpp")
 file(GLOB_RECURSE common_src "${CMAKE_SOURCE_DIR}/common/src/*.cpp")
 add_executable(r-type_server ${src} ${common_src})
 
-target_link_libraries(r-type_server PRIVATE flux Boost::program_options Boost::asio Boost::uuid raylib raylib_cpp zlib sol2 lua::lua LDtkLoader::LDtkLoader sqlite3)
+target_link_libraries(r-type_server PRIVATE flux Boost::program_options Boost::asio Boost::uuid raylib raylib_cpp zlib sol2 lua::lua LDtkLoader::LDtkLoader)
+
+if (NOT WIN32)
+    target_link_libraries(r-type_server PRIVATE sqlite3)
+endif()
 
 target_include_directories(r-type_server PRIVATE
     ${CMAKE_SOURCE_DIR}/common/include
@@ -16,7 +20,7 @@ set_target_properties(flux
 )
 
 if(WIN32)
-    target_compile_definitions(r-type_server PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(r-type_server PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN RAYLIB_CPP_NO_MATH)
 
     set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
     set(BUILD_DIR ${CMAKE_BINARY_DIR})

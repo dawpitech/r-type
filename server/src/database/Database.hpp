@@ -9,7 +9,14 @@
 
 #include "utils/error.hpp"
 #include <memory>
-#include <sqlite3.h>
+#ifdef _WIN32
+    #include <winsqlite/winsqlite3.h>
+#ifndef sqlite3
+typedef struct sqlite3 sqlite3;
+#endif
+#else
+    #include <sqlite3.h>
+#endif
 
 namespace Server {
 
