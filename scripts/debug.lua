@@ -1,3 +1,4 @@
+--[[
 print("TRACE: Lua: Loading enemy behavior script.")
 
 local function enemy_ai_system(entity)
@@ -14,3 +15,4 @@ end
 
 -- Register the system with its component dependencies
 ecs.register_system(enemy_ai_system, { "Transform", "Velocity" })
+--]]
