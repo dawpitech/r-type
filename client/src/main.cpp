@@ -9,16 +9,13 @@
 #include <cstdlib>
 #include <format>
 #include <iostream>
+#include <filesystem>
 
 #include "parseArgs.hpp"
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
 
 #include "Client.hpp"
-#include <components/Sprite.hpp>
-#include <components/Transform.hpp>
-#include <components/Velocity.hpp>
-#include <systems/animationSystem.hpp>
 
 static void checkVariables(const po::variables_map &variables)
 {
