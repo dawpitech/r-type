@@ -17,6 +17,9 @@
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
 
+constexpr int max_rooms = 8;
+constexpr int min_rooms = 0;
+
 static void checkVariables(const po::variables_map& variables)
 {
     if (!variables.contains("port"))
@@ -50,7 +53,7 @@ int main(int argc, char** argv)
 
         std::uint16_t port = variables["port"].as<uint16_t>();
         std::uint16_t rooms = variables["rooms"].as<uint16_t>();
-        if (rooms <= 0 || rooms > 8)
+        if (rooms <= min_rooms || rooms > max_rooms)
             throw utils::BaseError("Rooms should be between 0 and 8", "parsing");
         bool cli = variables.contains("cli");
 

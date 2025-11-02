@@ -10,11 +10,13 @@
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
 #include "components/Projectile.hpp"
-#include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
-#include <iostream>
+
+#ifdef IS_CLIENT
+    #include "components/Animation.hpp"
+#endif
 
 constexpr float SCALE_X = 0.5;
 constexpr float SCALE_Y = 0.5;
@@ -46,7 +48,7 @@ void ShootSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities) {
       auto playerTransform = ecs.GetComponent<component::Transform>(entity);
       flux::Entity projectile = ecs.newEntity();
       ecs.Add<component::Transform>(
-          projectile, component::Transform(playerTransform.pos.x,
+          projectile, component::Transform(playerTransform.pos.x + 16,
                                            playerTransform.pos.y, 0, 1, 1));
       ecs.Add<component::Velocity>(projectile);
       ecs.Add<component::Projectile>(projectile, component::Projectile(0));
@@ -55,11 +57,11 @@ void ShootSystem(flux::ECS &ecs, const std::vector<flux::Entity> &entities) {
           component::Collider(component::CollisionLayer::PLAYER_PROJECTILE,
                               component::CollisionLayer::MOB_PROJECTILE |
                                   component::CollisionLayer::MOB,
-                              playerTransform.pos.x, playerTransform.pos.y, 32,
+                              playerTransform.pos.x + 16, playerTransform.pos.y, 32,
                               32));
-      // ecs.Add<component::Animation>(projectileEntity,
-      //     component::Animation(
-      //         4, 200, "assets/player_shoot_spritesheet.png", true, 32, 32));
+#ifdef IS_CLIENT
+      ecs.Add<component::Animation>(projectile, component::Animation(4, 200, "assets/player_shoot_spritesheet.png", false, 32, 32));
+#endif
 
       ecs.Add<component::Health>(projectile);
       playerCpn.shootCooldown = 0.2;

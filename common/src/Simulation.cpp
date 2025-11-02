@@ -6,7 +6,6 @@
 */
 
 #include "Simulation.hpp"
-#include <string>
 #include "components/Camera.hpp"
 #include "components/Collider.hpp"
 #include "components/EndGame.hpp"
@@ -29,12 +28,18 @@
 #include "systems/fixOnScreenSystems.hpp"
 #include "systems/healthSystem.hpp"
 #include "systems/inputSystem.hpp"
-#include "systems/movementSystem.hpp"
-#include "systems/projectileSystem.hpp"
-#include "systems/shootSystem.hpp"
-#include "systems/scoreSystem.hpp"
 #include "systems/mobShootSystem.hpp"
 #include "systems/mobSystem.hpp"
+#include "systems/movementSystem.hpp"
+#include "systems/projectileSystem.hpp"
+#include "systems/scoreSystem.hpp"
+#include "systems/shootSystem.hpp"
+#include <string>
+
+#ifdef IS_CLIENT
+    #include <systems/animationSystem.hpp>
+    #include <components/Animation.hpp>
+#endif
 
 #include <systems/luaSystem.hpp>
 
@@ -103,6 +108,9 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Camera>();
     ecs.Register<component::FixOnScreen>();
     ecs.Register<component::EndGame>();
+#ifdef IS_CLIENT
+    ecs.Register<component::Animation>();
+#endif
 }
 
 void Simulation::_registerGameSystems(flux::ECS& ecs)
@@ -120,8 +128,9 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(LuaSystem, LuaSystemView(ecs), flux::systemType::LOGIC);
-    // ecs.registerSystem(AnimationSystem,
-    // AnimationSystemView(ecs), flux::systemType::RENDER);
+#ifdef IS_CLIENT
+    ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
+#endif
 }
 
 void Simulation::_registerMenuSystems(flux::ECS& ecs)
