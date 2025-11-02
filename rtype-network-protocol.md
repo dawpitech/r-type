@@ -12,6 +12,8 @@ The protocol follows a three-phase communication pattern:
 2. **Gameplay Phase (UDP)**: Real-time game state synchronization and player input transmission
 3. **Termination Phase (TCP)**: Session cleanup and final score transmission
 
+In parallel, the TCP connection is used for asynchronous communication, such as the chat system.
+
 ## Communication Flow
 
 ```mermaid
@@ -60,6 +62,7 @@ Data structure sent **from client to server** via TCP.
 ```cpp
 struct ClientTCPReceivedInfo {
     bool ready;                    // Player ready status
+    char userPass[BUFFERSIZE];     // User password/identifier
     char uuid[BUFFERSIZE];         // Client UUID
     uint16_t portUDP;              // UDP port for gameplay
 }
@@ -91,6 +94,7 @@ Data structure sent **from client to server** via UDP during gameplay.
 
 ```cpp
 struct UDPReceivedInfo {
+    unsigned inputIndex = 0;       // Input sequence number
     char uuid[BUFFERSIZE];         // Client UUID for identification
     component::PlayerInput game;   // Player input actions
 }
@@ -131,9 +135,10 @@ Once TCP handshake completes, the game transitions to UDP for performance:
 - **Server → Client**: Continuously sends `UDPSentInfo` containing serialized game state
   - Include entities and components networkables
   
-- **Client → Server**: Continuously sends `UDPReceivedInfo` with player inputs
+- **Client → Server**: Sends `UDPReceivedInfo` with player inputs every time during the game
   - Contains movement commands, actions
   - Includes `uuid` for player identification
+  - Includes inputIndex for packet sequencing.
   - Sent every input change
 
 This bidirectional UDP communication enables real-time gameplay with minimal latency.
@@ -144,9 +149,6 @@ When the game ends:
 
 1. **Server sends** final `ClientTCPSentInfo` with:
    - Final `score`
-   - Session confirmation data
-2. **Client acknowledges** with final `ClientTCPReceivedInfo`
-3. Connection closes gracefully
 
 ### UUID Management
 
@@ -154,3 +156,23 @@ Each client receives a unique generated UUID. This identifier:
 - Persists across the entire session
 - Enables multiplayer client distinction in UDP packets
 - Links TCP and UDP communications for the same client
+
+### Auxiliary Protocol: Chat (TCP)
+
+The chat system operates in parallel to the gameplay loop, using the established TCP connection.
+
+    Client → Server: To send a message, the client sends a packet prefixed with PacketType::ChatSend, followed by the ClientSendMessage structure.
+
+    Server → Client: When the server receives a message, it processes it (e.g., prepending the player's name) and broadcasts it to all connected clients. It sends a packet prefixed with PacketType::ChatReceive, followed by the ClientReceiveMessage structure.
+
+This communication can happen at any point after Phase 1 (Connection) and before Phase 3 (Termination).
+
+UUID Management
+
+Each client receives a unique generated UUID. This identifier:
+
+    Persists across the entire session.
+
+    Enables multiplayer client distinction in UDP packets.
+
+    Links TCP and UDP communications for the same client.
