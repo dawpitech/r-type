@@ -12,6 +12,10 @@
 #include "components/Velocity.hpp"
 #include "flux/core/flux.hpp"
 
+#ifdef IS_CLIENT
+    #include "components/Animation.hpp"
+#endif
+
 flux::View ProjectileSystemView(const flux::ECS &ecs) {
   return ecs.GenerateViewFromComponents<
       component::Projectile, component::Velocity, component::Transform>();
@@ -28,6 +32,9 @@ void ProjectileSystem(flux::ECS &ecs,
       ecs.Add<component::Sprite>(
           entity, component::Sprite("assets/player_shoot_spritesheet.png", 96,
                                     0, 32, 32, 1));
+#ifdef IS_CLIENT
+        ecs.Add<component::Animation>(entity, component::Animation(4, 200, "assets/player_shoot_spritesheet.png", false, 32, 32));
+#endif
     }
 
     if (proj.type == 0) {

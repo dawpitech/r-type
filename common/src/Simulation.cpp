@@ -5,14 +5,16 @@
 ** Simulation.cpp
 */
 
+#include <filesystem>
+
 #include "Simulation.hpp"
-#include <string>
 #include "components/Camera.hpp"
 #include "components/Collider.hpp"
 #include "components/EndGame.hpp"
 #include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/MobStartPosition.hpp"
 #include "components/NetworkIdentification.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
@@ -29,13 +31,20 @@
 #include "systems/fixOnScreenSystems.hpp"
 #include "systems/healthSystem.hpp"
 #include "systems/inputSystem.hpp"
-#include "systems/movementSystem.hpp"
-#include "systems/projectileSystem.hpp"
-#include "systems/shootSystem.hpp"
-#include "systems/scoreSystem.hpp"
 #include "systems/mobShootSystem.hpp"
 #include "systems/mobSystem.hpp"
+#include "systems/movementSystem.hpp"
+#include "systems/projectileSystem.hpp"
+#include "systems/scoreSystem.hpp"
+#include "systems/shootSystem.hpp"
+#include <string>
 
+#ifdef IS_CLIENT
+    #include <systems/animationSystem.hpp>
+    #include <components/Animation.hpp>
+#endif
+
+#include <LuaContext.hpp>
 #include <systems/luaSystem.hpp>
 
 constexpr float MAP_WIDTH = 800;
@@ -73,6 +82,7 @@ void Simulation::setInitialServerSimState(flux::ECS& ecs, std::string level)
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
+    _setupLuaEngine();
 }
 
 void Simulation::_registerComponent(flux::ECS& ecs)
@@ -80,6 +90,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.registerComponentType<component::Collider>("Collider");
     ecs.registerComponentType<component::Health>("Health");
     ecs.registerComponentType<component::Mob>("Mob");
+    ecs.registerComponentType<component::MobStartPosition>("MobStartPosition");
     ecs.registerComponentType<component::Player>("Player");
     ecs.registerComponentType<component::PlayerInput>("PlayerInput");
     ecs.registerComponentType<component::Projectile>("Projectile");
@@ -93,6 +104,7 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Collider>();
     ecs.Register<component::Health>();
     ecs.Register<component::Mob>();
+    ecs.Register<component::MobStartPosition>();
     ecs.Register<component::Player>();
     ecs.Register<component::PlayerInput>();
     ecs.Register<component::Projectile>();
@@ -103,6 +115,9 @@ void Simulation::_registerComponent(flux::ECS& ecs)
     ecs.Register<component::Camera>();
     ecs.Register<component::FixOnScreen>();
     ecs.Register<component::EndGame>();
+#ifdef IS_CLIENT
+    ecs.Register<component::Animation>();
+#endif
 }
 
 void Simulation::_registerGameSystems(flux::ECS& ecs)
@@ -120,8 +135,9 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(LuaSystem, LuaSystemView(ecs), flux::systemType::LOGIC);
-    // ecs.registerSystem(AnimationSystem,
-    // AnimationSystemView(ecs), flux::systemType::RENDER);
+#ifdef IS_CLIENT
+    ecs.registerSystem(AnimationSystem, AnimationSystemView(ecs), flux::systemType::RENDER);
+#endif
 }
 
 void Simulation::_registerMenuSystems(flux::ECS& ecs)
@@ -176,4 +192,57 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
         playerEntity,
         component::Collider(component::CollisionLayer::PLAYER, component::CollisionLayer::WALL, 0, 0, width, height));
     ecs.Add<component::FixOnScreen>(playerEntity, component::FixOnScreen());
+}
+
+void Simulation::_setupLuaEngine()
+{
+    auto lua = LuaContextStore::getInstance().getLuaContext();
+    auto &luaSystems = LuaContextStore::getInstance().getLuaSystems();
+
+    //TODO: should be eventually removed, or scoped more precisely to only
+    //      allow stdout access, not stdin or disk access
+    lua->open_libraries(sol::lib::base, sol::lib::math);
+
+    lua->new_usertype<utils::Vector2<float>>("Vector2f",
+        sol::constructors<utils::Vector2<float>(), utils::Vector2<float>(float, float)>(), "x",
+        &utils::Vector2<float>::x, "y", &utils::Vector2<float>::y);
+
+    lua->new_usertype<component::Transform>(
+        "Transform", "pos", &component::Transform::pos, "rotation", &component::Transform::rotation);
+
+    lua->new_usertype<component::Velocity>(
+        "Velocity", "x", &component::Velocity::x, "y", &component::Velocity::y);
+
+    lua->new_usertype<component::MobStartPosition>(
+        "MobStartPosition",
+        "startY", &component::MobStartPosition::startY,
+        "amplitude", &component::MobStartPosition::amplitude,
+        "speed", &component::MobStartPosition::speed,
+        "currentPosModificator", &component::MobStartPosition::currentPosModificator,
+        "movingUp", &component::MobStartPosition::movingUp);
+
+    (*lua)["ecs"] = lua->create_table();
+    (*lua)["ecs"]["register_system"] = [&luaSystems](sol::function f, sol::table comps) {
+        [&luaSystems](sol::function fn, sol::table components) {
+            LuaContextStore::LuaSystemCPPRepr sys;
+            sys.fn = fn;
+            for (const auto &pair : components) {
+                auto componentName = pair.second.as<std::string>();
+                sys.componentsRequired.push_back(componentName);
+            }
+            luaSystems.push_back(sys);
+            std::cout << "TRACE: C++: Registered a new Lua system." << std::endl;
+        }(f, comps);
+    };
+
+    std::filesystem::path scriptsDir = "scripts";
+    if (exists(scriptsDir)) {
+        for (const auto &entry : std::filesystem::directory_iterator(scriptsDir)) {
+            try {
+                lua->script_file(entry.path());
+            } catch (std::exception &) {
+                std::cout << "WARN: Skipped " << entry.path() << std::endl;
+            }
+        }
+    }
 }

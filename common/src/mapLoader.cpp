@@ -14,6 +14,7 @@
 #include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/MobStartPosition.hpp"
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
@@ -148,7 +149,9 @@ void map::MapLoader::_setMobs()
             mobEntity, component::Sprite(mob.getTexturePath(), rect.x, rect.y, rect.width, rect.height, 1));
         this->_ecs.Add<component::Transform>(
             mobEntity, component::Transform(static_cast<float>(pos.x), static_cast<float>(pos.y), 0, 1, 1));
-        this->_ecs.Add<component::Velocity>(mobEntity);
+        this->_ecs.Add<component::Velocity>(mobEntity, component::Velocity(0.0f, 0.0f));
+        this->_ecs.Add<component::MobStartPosition>(
+            mobEntity, component::MobStartPosition(static_cast<float>(pos.y), 50, 2));
         this->_ecs.Add<component::Collider>(
             mobEntity,
             component::Collider(component::CollisionLayer::MOB,

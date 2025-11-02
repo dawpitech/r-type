@@ -11,6 +11,8 @@ target_include_directories(r-type PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_compile_definitions(r-type PRIVATE IS_CLIENT)
+
 set_target_properties(flux
         PROPERTIES PREFIX "${CMAKE_SOURCE_DIR}/"
 )

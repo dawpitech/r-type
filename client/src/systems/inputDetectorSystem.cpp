@@ -90,10 +90,9 @@ void InputDetectorSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entiti
         input.move_left = false;
         input.move_right = false;
         input.shoot = false;
-        
+
+        handleKeyboard(input);
         if (IsGamepadAvailable(0))
             handleGamePad(input);
-        else
-            handleKeyboard(input);
     }
 }

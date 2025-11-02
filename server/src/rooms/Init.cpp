@@ -15,6 +15,7 @@
 #include "components/FixOnScreen.hpp"
 #include "components/Health.hpp"
 #include "components/Mob.hpp"
+#include "components/MobStartPosition.hpp"
 #include "components/NetworkIdentification.hpp"
 #include "components/Player.hpp"
 #include "components/PlayerInput.hpp"
@@ -101,12 +102,13 @@ void Room::Room::_getSnapshot(std::unordered_map<flux::Entity, std::vector<std::
     this->_ecs.getEntities<component::Collider>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Health>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Mob>(this->_ecs, componentStore);
+    this->_ecs.getEntities<component::MobStartPosition>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Player>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::PlayerInput>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Projectile>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Transform>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Velocity>(this->_ecs, componentStore);
-    this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
+    //this->_ecs.getEntities<component::Sprite>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::Camera>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::FixOnScreen>(this->_ecs, componentStore);
     this->_ecs.getEntities<component::EndGame>(this->_ecs, componentStore);
@@ -124,11 +126,12 @@ void Room::Room::_serializeComponent(
     this->_getSerializedComponent<component::Collider>(entity, component, out);
     this->_getSerializedComponent<component::Health>(entity, component, out);
     this->_getSerializedComponent<component::Mob>(entity, component, out);
+    this->_getSerializedComponent<component::MobStartPosition>(entity, component, out);
     this->_getSerializedComponent<component::Player>(entity, component, out);
     this->_getSerializedComponent<component::Projectile>(entity, component, out);
     this->_getSerializedComponent<component::Transform>(entity, component, out);
     this->_getSerializedComponent<component::Velocity>(entity, component, out);
-    this->_getSerializedComponent<component::Sprite>(entity, component, out);
+    //this->_getSerializedComponent<component::Sprite>(entity, component, out);
     this->_getSerializedComponent<component::Camera>(entity, component, out);
     this->_getSerializedComponent<component::FixOnScreen>(entity, component, out);
     this->_getSerializedComponent<component::EndGame>(entity, component, out);

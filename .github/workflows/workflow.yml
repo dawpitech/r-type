@@ -57,6 +57,18 @@ jobs:
           path: '.cpm_cache'
           key: ${{ runner.os }}-cpm.cache
 
+      - name: Archive client binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-type_linux
+          path: ./r-type
+
+      - name: Archive server binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-type_server_linux
+          path: ./r-type_server
+
   mirror:
     if: github.event_name != 'pull_request' && github.repository_owner == 'dawpitech' && github.ref_name == 'main'
     runs-on: ubuntu-latest
