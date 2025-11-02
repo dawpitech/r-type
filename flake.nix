@@ -21,6 +21,7 @@
             ninja
             act
             sdl3
+            sqlite
 
             alsa-lib
             hidapi
