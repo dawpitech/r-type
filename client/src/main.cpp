@@ -63,5 +63,6 @@ int main(int argc, char **argv)
     } catch (...) {
         std::cerr << "Unexpected Error" << std::endl;
     }
+    TextureStore::getInstance().clear();
     return EXIT_SUCCESS;
 }
