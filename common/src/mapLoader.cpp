@@ -6,8 +6,6 @@
 //
 
 #include "mapLoader.hpp"
-#include <cstdlib>
-#include <iostream>
 #include <LDtkLoader/Entity.hpp>
 #include <raylib.h>
 #include "components/Camera.hpp"
@@ -41,12 +39,13 @@ map::MapLoader::MapLoader(flux::ECS& ecs) : _ecs(ecs), _world(std::nullopt), _le
 void map::MapLoader::loadGame()
 {
     try {
-    this->_level = this->_world->get().getLevel("Level_0");
-    this->_setMapTiles();
-    this->_setMobs();
-    this->_setBackground();
-    this->_setCamera();
-    } catch (...) {
+        this->_level = this->_world->get().getLevel("Level_0");
+        this->_setMapTiles();
+        this->_setMobs();
+        this->_setBackground();
+        this->_setCamera();
+    }
+    catch (...) {
         throw utils::BaseError("Unable to Load Game", "LoadGame");
     }
 }
@@ -54,11 +53,12 @@ void map::MapLoader::loadGame()
 void map::MapLoader::loadMenu()
 {
     try {
-    this->_level = this->_world->get().getLevel("Menu");
-    this->_setBackground();
-    this->_setIdol();
-    this->_setCamera();
-    } catch (...) {
+        this->_level = this->_world->get().getLevel("Menu");
+        this->_setBackground();
+        this->_setIdol();
+        this->_setCamera();
+    }
+    catch (...) {
         throw utils::BaseError("Unable to Load Menu", "LoadMenu");
     }
 }
@@ -124,12 +124,12 @@ void map::MapLoader::_setMapTiles()
             newTile, component::Sprite(wall.getTileset().path, srcRect.x, srcRect.y, srcRect.w, srcRect.h, 1));
         this->_ecs.AddOrReplace<component::Transform>(newTile,
                                                       component::Transform(destRect.x, destRect.y, 0, 1.0f, 1.0f));
-        this->_ecs.AddOrReplace<component::Collider>(newTile,
-                                                     component::Collider(component::CollisionLayer::WALL,
-                                                                         component::CollisionLayer::PLAYER |
-                                                                         component::CollisionLayer::PLAYER_PROJECTILE |
-                                                                         component::CollisionLayer::MOB_PROJECTILE, pos.x,
-                                                                         pos.y, rect.width, rect.height));
+        this->_ecs.AddOrReplace<component::Collider>(
+            newTile,
+            component::Collider(component::CollisionLayer::WALL,
+                                component::CollisionLayer::PLAYER | component::CollisionLayer::PLAYER_PROJECTILE |
+                                    component::CollisionLayer::MOB_PROJECTILE,
+                                pos.x, pos.y, rect.width, rect.height));
     }
 }
 
@@ -141,7 +141,9 @@ void map::MapLoader::_setMobs()
 
         const auto& pos = mob.getPosition();
         const auto& size = mob.getSize();
-        this->_ecs.Add<component::Mob>(mobEntity, component::Mob());
+        this->_ecs.Add<component::Mob>(mobEntity,
+                                       component::Mob(10, 0, mob.getField<bool>("canShoot").value(), 0.0f,
+                                                      mob.getField<float>("shootRate").value()));
         this->_ecs.Add<component::Sprite>(
             mobEntity, component::Sprite(mob.getTexturePath(), rect.x, rect.y, rect.width, rect.height, 1));
         this->_ecs.Add<component::Transform>(
@@ -156,7 +158,8 @@ void map::MapLoader::_setMobs()
     }
 }
 
-void map::MapLoader::_setCamera() {
+void map::MapLoader::_setCamera()
+{
     flux::Entity camera = this->_ecs.newEntity();
     this->_ecs.Add<component::Camera>(camera, component::Camera(MAP_WIDTH / 2, MAP_HEIGHT / 2));
     this->_ecs.Add<component::Transform>(camera, component::Transform(MAP_WIDTH / 2, MAP_HEIGHT / 2, 0, 1, 1));
