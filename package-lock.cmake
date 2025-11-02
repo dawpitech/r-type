@@ -7,7 +7,7 @@ CPMDeclarePackage(lua
 )
 # sol2
 CPMDeclarePackage(sol2
-        VERSION 3.3.0
+        VERSION 3.5.0
         GITHUB_REPOSITORY ThePhD/sol2
         SYSTEM YES
         EXCLUDE_FROM_ALL YES
