@@ -60,9 +60,11 @@ class TextureStore {
             return this->_store.at(tuple);
         }
 
+        void clear() {_store.clear();};
+
     private:
         std::unordered_map<std::tuple<std::string, int, int, int, int>, raylib::Texture, SubTextureKeyHash> _store;
 
         TextureStore() : _store() {}
-        ~TextureStore() = default;
+        ~TextureStore() {};
 };

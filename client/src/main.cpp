@@ -10,7 +10,9 @@
 #include <format>
 #include <iostream>
 #include <filesystem>
+#include <raylib.h>
 
+#include "TextureStore.hpp"
 #include "parseArgs.hpp"
 #include "utils/error.hpp"
 #include "utils/logger.hpp"
@@ -50,6 +52,7 @@ int main(int argc, char **argv)
         client::Client gameClient(serverIP, serverPort, userPass);
 
         gameClient.run();
+        TextureStore::getInstance().clear();
     } catch (const utils::BaseError &e) {
         std::cerr << e.what() << " in " << e.where() << std::endl;
     } catch (const po::error &e) {
@@ -60,5 +63,6 @@ int main(int argc, char **argv)
     } catch (...) {
         std::cerr << "Unexpected Error" << std::endl;
     }
+    TextureStore::getInstance().clear();
     return EXIT_SUCCESS;
 }
