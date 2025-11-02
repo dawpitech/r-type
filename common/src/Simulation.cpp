@@ -239,7 +239,11 @@ void Simulation::setupLuaEngine()
     if (exists(scriptsDir)) {
         for (const auto &entry : std::filesystem::directory_iterator(scriptsDir)) {
             try {
+		#ifdef _WIN32
+                lua->script_file(entry.path().string());
+		#else
                 lua->script_file(entry.path());
+		#endif
             } catch (std::exception &) {
                 std::cout << "WARN: Skipped " << entry.path() << std::endl;
             }
