@@ -9,15 +9,24 @@ R-Type is a side-scrolling shooter game inspired by the classic arcade experienc
 - Power-ups and ship upgrades
 - Updated graphics and sound, with a retro feel
 
-## Installation
+## Usage
+
+- Use arrow keys or WASD to move.
+- Shoot with Space or Ctrl.
+- Avoid enemy fire and collect power-ups.
+- Defeat bosses to progress.
 
 ### Windows
+
+> [!WARNING]
+> Windows binary provided by the Github releases are still an experimental feature.
+> Please for windows build the game from source
 
 1. Download the latest release from [GitHub Releases](https://github.com/dawpitech/r-type/releases).
 2. Extract the zip file.
 3. Run
    ```powershell
-   r-type.exe
+   r-type.exe -i <SERVER_IP> -p <SERVER_PORT>
    ```
 
 ### Linux
@@ -27,21 +36,14 @@ R-Type is a side-scrolling shooter game inspired by the classic arcade experienc
 3. Open a terminal in the extracted folder.
 4. Run:
    ```bash
-   ./r-type
+   ./r-type -i <SERVER_IP> -p <SERVER_PORT>
    ```
 
 ### macOS
 
 macOS is not officially supported, but you can try building from source (see below).
 
-## How to Play
-
-- Use arrow keys or WASD to move.
-- Shoot with Space or Ctrl.
-- Avoid enemy fire and collect power-ups.
-- Defeat bosses to progress.
-
-## Multiplayer
+## Running a server
 
 You can run a server using the `r-type_server` executable. You need to provide a port to bind to and the number of rooms, for example:
 ```bash
@@ -51,6 +53,8 @@ Clients can then connect to your server using the game client.
 ```
 ./r-type -i IP -p PORT
 ```
+
+The server is always available on Windows, you just need to adapt the above commands to make it work.
 
 ## Support & Feedback
 
@@ -115,8 +119,3 @@ If you do not wish to use `just`, you can build manually:
    ```bash
    cmake --build build --config Release -j%NUMBER_OF_PROCESSORS%
    ```
-
-## Dev guidelines
-
-Contributions are welcomed. You can check the GitHub profile for an overview of what needs to be done for future updates.  
-`CODEOWNERS` helps keep track of who is responsible for which part of the project—please update it when you make changes to ownership or responsibility.
