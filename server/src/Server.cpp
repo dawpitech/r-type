@@ -13,6 +13,7 @@
 #include <thread>
 
 #include "Server.hpp"
+#include "Simulation.hpp"
 #include "admin/AdminHandler.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
@@ -58,6 +59,13 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms, bool cli)
         [this](network::UDPReceivedInfo info) { this->_playerManager.storeInput(info); });
 
     this->_setupRooms();
+
+    if (this->_nbRooms == 1) {
+        Simulation::setupLuaEngine();
+        utils::Logger::debug("Lua engine enabled (single room mode)");
+    } else {
+        utils::Logger::debug("Lua engine disabled (multi-room mode)");
+    }
 }
 
 void Server::Server::_setupRooms()

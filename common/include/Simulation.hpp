@@ -15,6 +15,7 @@ class Simulation
     public:
         static void setInitialClientSimState(flux::ECS& ecs, std::string level);
         static void setInitialServerSimState(flux::ECS& ecs, std::string level);
+        static void setupLuaEngine();
 
     private:
         enum class PLAYER_TYPE {
@@ -24,7 +25,6 @@ class Simulation
             PLAYER_FOUR,
         };
 
-        static void _setupLuaEngine();
         static void _createEntities(flux::ECS& ecs, std::string level);
         static void _registerComponent(flux::ECS& ecs);
         static void _registerMenuSystems(flux::ECS& ecs);

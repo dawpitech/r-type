@@ -29,13 +29,26 @@ class LuaContextStore {
 			return this->_luaContext.get();
         }
 
-        [[nodiscard]] std::vector<LuaSystemCPPRepr>& getLuaSystems() {
+        [[nodiscard]] const std::vector<LuaSystemCPPRepr>& getLuaSystems() const {
             return this->_luaSystems;
+        }
+
+        [[nodiscard]] std::vector<LuaSystemCPPRepr>& getLuaSystemsMutable() {
+            return this->_luaSystems;
+        }
+
+        [[nodiscard]] bool isInitialized() const {
+            return this->_initialized;
+        }
+
+        void setInitialized(bool initialized) {
+            this->_initialized = initialized;
         }
 
     private:
 		std::unique_ptr<sol::state> _luaContext = std::make_unique<sol::state>();
         std::vector<LuaSystemCPPRepr> _luaSystems = {};
+        bool _initialized = false;
 
         LuaContextStore() = default;
         ~LuaContextStore() = default;

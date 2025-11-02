@@ -51,6 +51,9 @@ void Room::Room::run()
             } catch (utils::BaseError& e) {
                 this->stop();
                 return;
+            } catch (...) {
+                this->stop();
+                return;
             }
         }
         this->_setRoomReady();

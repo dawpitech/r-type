@@ -1,5 +1,4 @@
 local function mob_oscillation_system(entity)
-    print("test")
 
     local transform = entity.transform
     local velocity = entity.velocity
