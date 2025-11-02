@@ -33,6 +33,8 @@
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
 #include "systems/scoreSystem.hpp"
+#include "systems/mobShootSystem.hpp"
+#include "systems/mobSystem.hpp"
 
 #include <systems/luaSystem.hpp>
 
@@ -108,9 +110,8 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(InputHandlerSystem, InputHandlerSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(FixOnScreenSystem, FixOnScreenSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(MovementSystem, MovementSystemView(ecs), flux::systemType::LOGIC);
-    // ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
-    // ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs),
-    // flux::systemType::LOGIC);
+    ecs.registerSystem(MobSystem, MobSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(MobShootSystem, MobShootSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ShootSystem, ShootSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(ProjectileSystem, ProjectileSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CollisionSystem, CollisionSystemView(ecs), flux::systemType::LOGIC);

@@ -126,7 +126,9 @@ void map::MapLoader::_setMapTiles()
                                                       component::Transform(destRect.x, destRect.y, 0, 1.0f, 1.0f));
         this->_ecs.AddOrReplace<component::Collider>(newTile,
                                                      component::Collider(component::CollisionLayer::WALL,
-                                                                         component::CollisionLayer::PLAYER, pos.x,
+                                                                         component::CollisionLayer::PLAYER |
+                                                                         component::CollisionLayer::PLAYER_PROJECTILE |
+                                                                         component::CollisionLayer::MOB_PROJECTILE, pos.x,
                                                                          pos.y, rect.width, rect.height));
     }
 }
