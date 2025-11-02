@@ -19,8 +19,18 @@ flux::View LuaSystemView(const flux::ECS &ecs) {
 void LuaSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities) {
     //std::cout << "TRACE: C++: LUA SYSTEM TRIGGERED" << std::endl;
 
-    const auto lua = LuaContextStore::getInstance().getLuaContext();
-    const auto& luaSystems = LuaContextStore::getInstance().getLuaSystems();
+    const auto& luaStore = LuaContextStore::getInstance();
+    
+    if (!luaStore.isInitialized()) {
+        return;
+    }
+    
+    const auto lua = luaStore.getLuaContext();
+    const auto& luaSystems = luaStore.getLuaSystems();
+    
+    if (luaSystems.empty()) {
+        return;
+    }
     for (const auto entity : entities) {
         for (const auto& system : luaSystems) {
             sol::table entityComponents = lua->create_table();

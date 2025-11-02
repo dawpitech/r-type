@@ -197,7 +197,7 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
 void Simulation::setupLuaEngine()
 {
     auto lua = LuaContextStore::getInstance().getLuaContext();
-    auto &luaSystems = LuaContextStore::getInstance().getLuaSystems();
+    auto &luaSystems = LuaContextStore::getInstance().getLuaSystemsMutable();
 
     //TODO: should be eventually removed, or scoped more precisely to only
     //      allow stdout access, not stdin or disk access
@@ -245,4 +245,6 @@ void Simulation::setupLuaEngine()
             }
         }
     }
+    
+    LuaContextStore::getInstance().setInitialized(true);
 }
