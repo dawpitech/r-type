@@ -27,9 +27,6 @@
 #include "systems/endGameSystem.hpp"
 #include "systems/setCamera.hpp"
 #include "utils/logger.hpp"
-#include <LuaContext.hpp>
-#include <components/Transform.hpp>
-#include <components/Velocity.hpp>
 #include <filesystem>
 
 client::Client::Client(const std::string &ip, uint16_t port, const std::string &userPass)
@@ -44,7 +41,6 @@ client::Client::Client(const std::string &ip, uint16_t port, const std::string &
     Simulation::setInitialClientSimState(this->_ecs, "Menu");
     this->_registerBase();
     this->_initHooks();
-    this->_setupLuaEngine();
 }
 
 void client::Client::_registerBase()
@@ -161,51 +157,6 @@ void client::Client::_sendPlayerInput(
                     this->_lastSentInput = data.game;
                     this->_lastInputSend = now;
                 }
-            }
-        }
-    }
-}
-
-void client::Client::_setupLuaEngine()
-{
-    auto lua = LuaContextStore::getInstance().getLuaContext();
-    auto &luaSystems = LuaContextStore::getInstance().getLuaSystems();
-
-    //TODO: should be eventually removed, or scoped more precisely to only
-    //      allow stdout access, not stdin or disk access
-    lua->open_libraries(sol::lib::base);
-
-    lua->new_usertype<utils::Vector2<float>>("Vector2f",
-        sol::constructors<utils::Vector2<float>(), utils::Vector2<float>(float, float)>(), "x",
-        &utils::Vector2<float>::x, "y", &utils::Vector2<float>::y);
-
-    lua->new_usertype<component::Transform>(
-        "Transform", "pos", &component::Transform::pos, "rotation", &component::Transform::rotation);
-
-    lua->new_usertype<component::Velocity>(
-        "Velocity", "x", &component::Velocity::x, "y", &component::Velocity::y);
-
-    (*lua)["ecs"] = lua->create_table();
-    (*lua)["ecs"]["register_system"] = [&luaSystems](sol::function f, sol::table comps) {
-        [&luaSystems](sol::function fn, sol::table components) {
-            LuaContextStore::LuaSystemCPPRepr sys;
-            sys.fn = fn;
-            for (const auto &pair : components) {
-                auto componentName = pair.second.as<std::string>();
-                sys.componentsRequired.push_back(componentName);
-            }
-            luaSystems.push_back(sys);
-            std::cout << "TRACE: C++: Registered a new Lua system." << std::endl;
-        }(f, comps);
-    };
-
-    std::filesystem::path scriptsDir = "scripts";
-    if (exists(scriptsDir)) {
-        for (const auto &entry : std::filesystem::directory_iterator(scriptsDir)) {
-            try {
-                lua->script_file(entry.path());
-            } catch (std::exception &) {
-                std::cout << "WARN: Skipped " << entry.path() << std::endl;
             }
         }
     }
