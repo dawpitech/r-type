@@ -54,7 +54,7 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
             ecs.Add<component::Projectile>(projectile, component::Projectile(1));
             ecs.Add<component::Collider>(
                 projectile,
-                component::Collider(component::CollisionLayer::MOB_PROJECTILE, component::CollisionLayer::WALL,
+                component::Collider(component::CollisionLayer::MOB_PROJECTILE, component::CollisionLayer::WALL | component::CollisionLayer::PLAYER,
                                     mobTransform.pos.x, mobTransform.pos.y, 32,
                                     32));
 
