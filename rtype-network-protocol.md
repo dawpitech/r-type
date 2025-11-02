@@ -161,18 +161,8 @@ Each client receives a unique generated UUID. This identifier:
 
 The chat system operates in parallel to the gameplay loop, using the established TCP connection.
 
-    Client → Server: To send a message, the client sends a packet prefixed with PacketType::ChatSend, followed by the ClientSendMessage structure.
+-   Client → Server: To send a message, the client sends a packet prefixed with PacketType::ChatSend, followed by the ClientSendMessage structure.
 
-    Server → Client: When the server receives a message, it processes it (e.g., prepending the player's name) and broadcasts it to all connected clients. It sends a packet prefixed with PacketType::ChatReceive, followed by the ClientReceiveMessage structure.
+-   Server → Client: When the server receives a message, it processes it (e.g., prepending the player's name) and broadcasts it to all connected clients. It sends a packet prefixed with PacketType::ChatReceive, followed by the ClientReceiveMessage structure.
 
 This communication can happen at any point after Phase 1 (Connection) and before Phase 3 (Termination).
-
-UUID Management
-
-Each client receives a unique generated UUID. This identifier:
-
-    Persists across the entire session.
-
-    Enables multiplayer client distinction in UDP packets.
-
-    Links TCP and UDP communications for the same client.
