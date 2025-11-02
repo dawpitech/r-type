@@ -82,7 +82,7 @@ void Simulation::setInitialServerSimState(flux::ECS& ecs, std::string level)
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_TWO);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_THREE);
     _createPlayer(ecs, PLAYER_TYPE::PLAYER_FOUR);
-    _setupLuaEngine();
+    // _setupLuaEngine();
 }
 
 void Simulation::_registerComponent(flux::ECS& ecs)
@@ -194,7 +194,7 @@ void Simulation::_createPlayer(flux::ECS& ecs, PLAYER_TYPE type)
     ecs.Add<component::FixOnScreen>(playerEntity, component::FixOnScreen());
 }
 
-void Simulation::_setupLuaEngine()
+void Simulation::setupLuaEngine()
 {
     auto lua = LuaContextStore::getInstance().getLuaContext();
     auto &luaSystems = LuaContextStore::getInstance().getLuaSystems();

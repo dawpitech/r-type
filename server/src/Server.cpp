@@ -13,6 +13,7 @@
 #include <thread>
 
 #include "Server.hpp"
+#include "Simulation.hpp"
 #include "admin/AdminHandler.hpp"
 #include "network/UDP/UDPNetwork.hpp"
 #include "network/datatype.hpp"
@@ -58,6 +59,7 @@ Server::Server::Server(std::uint16_t port, std::uint16_t nbRooms, bool cli)
         [this](network::UDPReceivedInfo info) { this->_playerManager.storeInput(info); });
 
     this->_setupRooms();
+    Simulation::setupLuaEngine();
 }
 
 void Server::Server::_setupRooms()
