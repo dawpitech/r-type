@@ -22,8 +22,8 @@ static void handleGamePad(component::PlayerInput& input)
     const float leftStickDeadzoneY = 0.1f;
     const float rightStickDeadzoneX = 0.1f;
     const float rightStickDeadzoneY = 0.1f;
-    const float leftTriggerDeadzone = -0.9f;
-    const float rightTriggerDeadzone = -0.9f;
+    const float leftTriggerDeadzone = 0.1f;
+    const float rightTriggerDeadzone = 0.1f;
     int gamepad = 0;
     if (IsGamepadAvailable(gamepad)) {
         float axisX = GetGamepadAxisMovement(gamepad, GAMEPAD_AXIS_LEFT_X);
