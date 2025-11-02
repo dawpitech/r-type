@@ -25,8 +25,6 @@ flux::View MobShootSystemView(const flux::ECS& ecs)
 
 void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    return;
-    /*
     using clock = std::chrono::steady_clock;
     static auto prev = clock::now();
 
@@ -38,7 +36,7 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
-        auto& mob = ecs.GetComponent<component::mob>(entity);
+        auto& mob = ecs.GetComponent<component::Mob>(entity);
 
         if (!mob.canShoot)
             continue;
@@ -46,27 +44,21 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         mob.shootCooldown -= static_cast<float>(deltaTime);
 
         if (mob.shootCooldown <= 0.0f && mob.isShooting) {
-            auto& mobTransform = ecs.GetComponent<component::Transform>(entity);
-            flux::Entity projectile = ecs.newEntity();
-            render::SpriteData proj = render::SDLManager::load("./assets/playerProjectile.gif");
-            render::SpriteData mobSprite = render::SDLManager::load("./assets/player.gif");
+            const auto& mobTransform = ecs.GetComponent<component::Transform>(entity);
+            const flux::Entity projectile = ecs.newEntity();
 
-            ecs.Add<component::Projectile>(projectile,
-                                           component::Projectile(component::ProjectileType::MOB, PROJECTILE_SPEED));
-            ecs.Add<component::Transform>(
+            ecs.Add<component::Transform>(projectile,
+                                          component::Transform(mobTransform.pos.x, mobTransform.pos.y, 0, 1, 1));
+            ecs.Add<component::Velocity>(projectile);
+            ecs.Add<component::Projectile>(projectile, component::Projectile(1));
+            ecs.Add<component::Collider>(
                 projectile,
-                component::Transform(mobTransform.pos.x,
-                                     mobTransform.pos.y + (mobSprite.frameSize.y * mobTransform.scale.y) / 2, ROTATION,
-                                     SCALE_X, SCALE_Y));
-            ecs.Add<component::Velocity>(projectile, component::Velocity(0, 0));
-            ecs.Add<component::collider>(projectile,
-                                         component::collider(component::MOB_PROJECTILE, component::PLAYER,
-                                                             0, 0, proj.frameSize.x, proj.frameSize.y));
+                component::Collider(component::CollisionLayer::MOB_PROJECTILE,
+                                    component::CollisionLayer::WALL | component::CollisionLayer::PLAYER,
+                                    mobTransform.pos.x, mobTransform.pos.y, 32, 32));
             ecs.Add<component::Health>(projectile);
-
             mob.shootCooldown = mob.shootRate;
             mob.isShooting = false;
         }
     }
-    */
 }

@@ -590,7 +590,7 @@
 					"max": null,
 					"regex": null,
 					"acceptFileTypes": null,
-					"defaultOverride": { "id": "V_Float", "params": [1] },
+					"defaultOverride": { "id": "V_Float", "params": [4] },
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -964,7 +964,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -986,7 +986,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -1008,7 +1008,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -1030,7 +1030,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -1052,7 +1052,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -1074,7 +1074,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -1096,7 +1096,7 @@
 							"fieldInstances": [
 								{ "__identifier": "MobType", "__type": "LocalEnum.MobType", "__value": "Ball", "__tile": null, "defUid": 7, "realEditorValues": [] },
 								{ "__identifier": "canShoot", "__type": "Bool", "__value": true, "__tile": null, "defUid": 8, "realEditorValues": [] },
-								{ "__identifier": "shootRate", "__type": "Float", "__value": 1, "__tile": null, "defUid": 9, "realEditorValues": [] },
+								{ "__identifier": "shootRate", "__type": "Float", "__value": 4, "__tile": null, "defUid": 9, "realEditorValues": [] },
 								{ "__identifier": "speed", "__type": "Float", "__value": 1, "__tile": null, "defUid": 10, "realEditorValues": [] },
 								{ "__identifier": "Health", "__type": "Int", "__value": 50, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],

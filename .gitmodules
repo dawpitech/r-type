@@ -1,0 +1,3 @@
+[submodule "bonus/pedro"]
+	path = bonus/pedro
+	url = git@github.com:dawpitech/pedro

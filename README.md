@@ -43,15 +43,21 @@ macOS is not officially supported, but you can try building from source (see bel
 
 ## Multiplayer
 
-You can run a server using the `r-type_server` executable. You need to provide a port to bind onto, for example:
+You can run a server using the `r-type_server` executable. You need to provide a port to bind to and the number of rooms, for example:
 ```bash
-./r-type_server 4242
+./r-type_server -p PORT -r NBROOMS
 ```
 Clients can then connect to your server using the game client.
+```
+./r-type -i IP -p PORT
+```
 
 ## Support & Feedback
 
 Please report issues or suggestions via [GitHub Issues](https://github.com/dawpitech/r-type/issues).
+
+## Documentation
+The comparative study is available [here](./comparative_study_r-type.pdf), and the network protocol can be found [here](./rtype-network-protocol.md).
 
 ## License
 

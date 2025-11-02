@@ -26,5 +26,5 @@ class CameraRaylib {
         raylib::Camera2D _camera;
 
         CameraRaylib() : _camera() {}
-        ~CameraRaylib() = default;
+        ~CameraRaylib() {};
 };

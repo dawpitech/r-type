@@ -17,17 +17,14 @@ flux::View MobSystemView(const flux::ECS& ecs)
 
 void MobSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
 {
-    return;
-    /*
     for (int i = static_cast<int>(entities.size()) - 1; i >= 0; --i) {
         const flux::Entity& entity = entities[i];
         const auto& tranform = ecs.GetComponent<component::Transform>(entity);
         auto& velocity = ecs.GetComponent<component::Velocity>(entity);
-        auto& mob = ecs.GetComponent<component::mob>(entity);
+        auto& mob = ecs.GetComponent<component::Mob>(entity);
 
-        velocity.x = (-mob.speed);
-        if (tranform.pos.x > 0 && tranform.pos.x < static_cast<float>(render::SDLManager::getWindowWidth()))
+        //velocity.x = (-mob.speed);
+        if (tranform.pos.x > 0 && tranform.pos.x)
             mob.isShooting = true;
     }
-    */
 }
