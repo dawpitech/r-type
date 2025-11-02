@@ -58,6 +58,7 @@ namespace client {
         std::string _chatBuffer;
         std::deque<std::pair<std::string, int>> _chatLog;
 
+        static void _setupLuaEngine();
         void _initHooks();
         void _initNetworkableHooks();
         void _registerBase();

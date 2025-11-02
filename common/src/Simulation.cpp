@@ -20,19 +20,21 @@
 #include "components/Sprite.hpp"
 #include "components/Transform.hpp"
 #include "components/Velocity.hpp"
-#include "flux/core/flux.hpp"
 #include "flux/core/Serialization.hpp"
+#include "flux/core/flux.hpp"
 #include "mapLoader.hpp"
 #include "systems/cameraSystem.hpp"
 #include "systems/collisionSystem.hpp"
 #include "systems/damageSystem.hpp"
+#include "systems/fixOnScreenSystems.hpp"
 #include "systems/healthSystem.hpp"
 #include "systems/inputSystem.hpp"
 #include "systems/movementSystem.hpp"
 #include "systems/projectileSystem.hpp"
 #include "systems/shootSystem.hpp"
-#include "systems/fixOnScreenSystems.hpp"
 #include "systems/scoreSystem.hpp"
+
+#include <systems/luaSystem.hpp>
 
 constexpr float MAP_WIDTH = 800;
 constexpr float MAP_HEIGHT = 450;
@@ -116,6 +118,7 @@ void Simulation::_registerGameSystems(flux::ECS& ecs)
     ecs.registerSystem(ScoreSystem, ScoreSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(HealthSystem, HealthSystemView(ecs), flux::systemType::LOGIC);
     ecs.registerSystem(CameraSystem, CameraSystemView(ecs), flux::systemType::LOGIC);
+    ecs.registerSystem(LuaSystem, LuaSystemView(ecs), flux::systemType::LOGIC);
     // ecs.registerSystem(AnimationSystem,
     // AnimationSystemView(ecs), flux::systemType::RENDER);
 }
