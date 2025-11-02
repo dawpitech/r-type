@@ -44,20 +44,19 @@ void MobShootSystem(flux::ECS& ecs, const std::vector<flux::Entity>& entities)
         mob.shootCooldown -= static_cast<float>(deltaTime);
 
         if (mob.shootCooldown <= 0.0f && mob.isShooting) {
-            const auto &mobTransform = ecs.GetComponent<component::Transform>(entity);
+            const auto& mobTransform = ecs.GetComponent<component::Transform>(entity);
             const flux::Entity projectile = ecs.newEntity();
 
-            ecs.Add<component::Transform>(
-                projectile, component::Transform(mobTransform.pos.x,
-                                                 mobTransform.pos.y, 0, 1, 1));
+            ecs.Add<component::Transform>(projectile,
+                                          component::Transform(mobTransform.pos.x, mobTransform.pos.y, 0, 1, 1));
             ecs.Add<component::Velocity>(projectile);
             ecs.Add<component::Projectile>(projectile, component::Projectile(1));
             ecs.Add<component::Collider>(
                 projectile,
-                component::Collider(component::CollisionLayer::MOB_PROJECTILE, component::CollisionLayer::WALL | component::CollisionLayer::PLAYER,
-                                    mobTransform.pos.x, mobTransform.pos.y, 32,
-                                    32));
-
+                component::Collider(component::CollisionLayer::MOB_PROJECTILE,
+                                    component::CollisionLayer::WALL | component::CollisionLayer::PLAYER,
+                                    mobTransform.pos.x, mobTransform.pos.y, 32, 32));
+            ecs.Add<component::Health>(projectile);
             mob.shootCooldown = mob.shootRate;
             mob.isShooting = false;
         }
